@@ -1,1 +1,15 @@
-# holbertonschool-hbnb
+# HBnB Evolution
+This repository has as objective to recreate a Airbnb-like site.
+
+It will be composed of three parts:
+- Technical documentation
+- Business Logic and API
+- Authentification and Database
+
+## Technical documentation
+This documentation will help in understanding the overall architecture, the detailed design of the business logic, and the interactions within the system.
+
+The first part of this project is to do 3 different diagrams:
+- A High-Level diagram which shows a three-layers architecture and the communication between these layers via the facade pattern
+- A Class diagram which shows the different relationships between the classes
+- A Sequence diagram for API calls which shows the interaction between the layers and the flow of information.
