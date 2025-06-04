@@ -1,5 +1,5 @@
 # HBnB Evolution
-This repository has as objective to recreate a Airbnb-like site.
+This repository has as objective to recreate a Airbnb-like application.
 
 It will be composed of three parts:
 - Technical documentation
