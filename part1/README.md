@@ -1,5 +1,5 @@
 # HBnB Evolution : Technical Documentation
-This repository contains the comprehensive technical documentation for the initial phase of the HBnB Evolution application, a simplified AirBnB-like platform.
+This repository contains comprehensive technical documentation for the initial phase of the HBnB Evolution application, a simplified AirBnB-like platform.
 This documentation serves as the foundational design blueprint for subsequent development phases, focusing on understanding the overall architecture, detailed business logic, and system interactions.
 
 # 🛠️ Project Overview
@@ -38,7 +38,7 @@ This phase delivers the following UML diagrams and accompanying explanatory note
 	- Place Creation
 	- Review Submission
 	- Fetching a List of Places
-	- User Loggin
+	- User Login
 
 ## 🧑‍💻 Authors
 - [Delphine Coutouly-Laborda](https://github.com/Delphes1980)
