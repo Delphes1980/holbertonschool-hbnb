@@ -22,6 +22,7 @@ class Review(BaseEntity):
         self.rating = rating
         self.place = place
         self.user = user
+        place.add_review(self)
 
     def type_validation(self, arg, arg_name, arg_type):
         if not isinstance(arg, arg_type):
@@ -57,10 +58,3 @@ class Review(BaseEntity):
         self.type_validation(rating, "rating", int)
         self.rating_validation(rating)
         self.__rating = rating
-
-if __name__ == "__main__":
-    somePlace = Place()
-    myUser = User("John", "Smith", "john@smith.com")
-    review = Review("I liked the place.", 5, somePlace, myUser)
-    print(review.__dict__)
-    print("Review was successfully created")

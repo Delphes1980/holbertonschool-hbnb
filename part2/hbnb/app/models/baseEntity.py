@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime, timezone
 
 
-class BaseModel:
+class BaseEntity:
     def __init__(self):
         self.id = str(uuid.uuid4())
         self.created_at = datetime.now(timezone.utc)
@@ -18,3 +18,7 @@ class BaseModel:
             if hasattr(self, key):
                 setattr(self, key, value)
         self.save()  # Update the updated_at timestamp
+
+def type_validation(arg, arg_name: str, *arg_type):
+        if not isinstance(arg, arg_type):
+            raise TypeError(f"{arg_name} must be a {arg_type}")
