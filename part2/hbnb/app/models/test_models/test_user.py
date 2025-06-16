@@ -5,7 +5,7 @@ import unittest
 class TestUser(unittest.TestCase):
 
     def test_user_creation(self):
-        user = User(first_name=8, last_name="Doe",
+        user = User(first_name="John", last_name="Doe",
                     email="john.doe@example.com")
         self.assertEqual(user.first_name, "John")
         self.assertEqual(user.last_name, "Doe")
