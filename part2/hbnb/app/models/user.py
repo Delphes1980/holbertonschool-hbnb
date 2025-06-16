@@ -3,10 +3,10 @@ from validate_email_address import validate_email
 
 
 class User(BaseEntity):
-    """ Missing error handles: 
+    """ Missing error handles:
             - special characters in names
     """
-    def __init__(self, first_name: str, last_name: str, 
+    def __init__(self, first_name: str, last_name: str,
                  email: str, is_admin: bool = False):
         if not first_name:
             raise ValueError("First name is required")
@@ -26,8 +26,9 @@ class User(BaseEntity):
         min_length = 1
         name = name.strip()
         if len(name) < min_length or len(name) > max_length:
-            raise ValueError(f"{name_name} must be shorter than "
-                             f"{max_length} characters and include at" f"least {min_length} non-space character")
+            raise ValueError(f"{name_name} must be shorter than {max_length} "
+                             "characters and include at least {min_length} "
+                             "non-space character")
         return name
 
     def email_validation(self, email: str):
@@ -41,14 +42,15 @@ class User(BaseEntity):
     @property
     def first_name(self):
         return self.__first_name
+
     @first_name.setter
     def first_name(self, first_name: str):
-        self.__first_name = self.name_validation(first_name,
-                                                 "First name")
-    
+        self.__first_name = self.name_validation(first_name, "First name")
+
     @property
     def last_name(self):
         return self.__last_name
+
     @last_name.setter
     def last_name(self, last_name: str):
         self.__last_name = self.name_validation(last_name, "Last name")
@@ -56,6 +58,7 @@ class User(BaseEntity):
     @property
     def email(self):
         return self.__email
+
     @email.setter
     def email(self, email: str):
         self.email_validation(email)
@@ -64,6 +67,7 @@ class User(BaseEntity):
     @property
     def is_admin(self):
         return self.__is_admin
+
     @is_admin.setter
     def is_admin(self, is_admin: bool):
         type_validation(is_admin, "is_admin", bool)

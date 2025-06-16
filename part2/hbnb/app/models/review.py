@@ -2,6 +2,7 @@ from hbnb.app.models.baseEntity import BaseEntity
 from hbnb.app.models.place import Place
 from hbnb.app.models.user import User
 
+
 class Review(BaseEntity):
     def __init__(self, text: str, rating: int, place: Place,
                  user: User):
@@ -27,7 +28,7 @@ class Review(BaseEntity):
     def type_validation(self, arg, arg_name, arg_type):
         if not isinstance(arg, arg_type):
             raise TypeError(f"{arg_name} must be a {arg_type}")
-        
+
     def text_validation(self, text: str):
         max_length = 500
         min_length = 2
@@ -43,16 +44,18 @@ class Review(BaseEntity):
     @property
     def text(self):
         return self.__text
+
     @text.setter
     def text(self, text: str):
         text = text.strip()
         self.type_validation(text, "text", str)
         self.text_validation(text)
         self.__text = text
-    
+
     @property
     def rating(self):
         return self.__rating
+
     @rating.setter
     def rating(self, rating: int):
         self.type_validation(rating, "rating", int)

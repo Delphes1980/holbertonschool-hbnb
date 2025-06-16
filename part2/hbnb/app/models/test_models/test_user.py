@@ -2,6 +2,7 @@ from hbnb.app.models.user import User
 from datetime import datetime
 import unittest
 
+
 class TestUser(unittest.TestCase):
 
     def test_user_creation(self):
@@ -14,7 +15,7 @@ class TestUser(unittest.TestCase):
         self.assertIsInstance(user.id, str)
         self.assertIsInstance(user.created_at, datetime)
         self.assertIsInstance(user.updated_at, datetime)
-    
+
     def test_admin_user_creation(self):
         user = User("Alice", "Smith", "alice@example.com",
                     is_admin=True)
@@ -48,9 +49,10 @@ class TestUser(unittest.TestCase):
 
     def test_long_first_name(self):
         with self.assertRaises(ValueError) as e:
-            User("JohnDuudly do whatever somethin tkind", "Doe", "email@email.com")
+            User("JohnDuudly do whatever somethin tkind", "Doe",
+                 "email@email.com")
         self.assertIn("First name", str(e.exception))
-        
+
 
 if __name__ == "__main__":
     unittest.main()
