@@ -1,6 +1,6 @@
-from baseModel import BaseModel
+from hbnb.app.models.baseEntity import BaseEntity
 
-class Place(BaseModel):
+class Place(BaseEntity):
     def __init__(self, title, description, price, latitude, longitude, owner):
         super().__init__()
         self.title = title

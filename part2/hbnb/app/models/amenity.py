@@ -1,4 +1,4 @@
-from baseModel import BaseModel
+from hbnb.app.models.baseEntity import BaseEntity
 
-class Amenity(BaseModel):
+class Amenity(BaseEntity):
     pass
