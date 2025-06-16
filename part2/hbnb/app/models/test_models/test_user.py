@@ -5,7 +5,7 @@ import unittest
 class TestUser(unittest.TestCase):
 
     def test_user_creation(self):
-        user = User(first_name="John", last_name="Doe",
+        user = User(first_name=8, last_name="Doe",
                     email="john.doe@example.com")
         self.assertEqual(user.first_name, "John")
         self.assertEqual(user.last_name, "Doe")
@@ -14,17 +14,17 @@ class TestUser(unittest.TestCase):
         self.assertIsInstance(user.id, str)
         self.assertIsInstance(user.created_at, datetime)
         self.assertIsInstance(user.updated_at, datetime)
-
-    def test_user_creation_bad_email(self):
-        with self.assertRaises(ValueError) as cm:
-            User(first_name="Jane", last_name="Doe", email="invalid-email")
-        self.assertIn("Invalid email", str(cm.exception))
-
+    
     def test_admin_user_creation(self):
         user = User("Alice", "Smith", "alice@example.com",
                     is_admin=True)
         self.assertTrue(user.is_admin)
         self.assertEqual(user.first_name, "Alice")
+
+    def test_user_creation_bad_email(self):
+        with self.assertRaises(ValueError) as cm:
+            User(first_name="Jane", last_name="Doe", email="invalid-email")
+        self.assertIn("Invalid email", str(cm.exception))
 
     def test_missing_first_name(self):
         with self.assertRaises(ValueError) as e:
@@ -46,14 +46,11 @@ class TestUser(unittest.TestCase):
             User("John", "Doe", "")
         self.assertIn("Invalid email", str(e.exception))
 
-        # try:
-        #     user = User(first_name="John", last_name="Doe",
-        #                 email="john.doe@example@extra_arobas.com")
-        # except Exception as e:
-        #     print(f"{type(e).__name__}: {e}")
-        #     assert type(e).__name__ == "ValueError"
-
-    # test_user_creation_bad_email()
+    def test_long_first_name(self):
+        with self.assertRaises(ValueError) as e:
+            User("JohnDuudly do whatever somethin tkind", "Doe", "email@email.com")
+        self.assertIn("First name", str(e.exception))
+        
 
 if __name__ == "__main__":
     unittest.main()
