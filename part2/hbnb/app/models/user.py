@@ -1,4 +1,4 @@
-from hbnb.app.models.baseEntity import (BaseEntity, type_validation,
+from app.models.baseEntity import (BaseEntity, type_validation,
                                         strlen_validation)
 from validate_email_address import validate_email
 import re
@@ -39,8 +39,6 @@ class User(BaseEntity):
         if not validate_email(email):
             raise ValueError("Invalid email: email must have format"
                              " example@exam.ple")
-        print("Warning: email has not been verified for uniqueness "
-              " despite it being absolutely necessary")
 
     @property
     def first_name(self):

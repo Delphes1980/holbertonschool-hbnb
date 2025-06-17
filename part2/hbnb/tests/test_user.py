@@ -1,4 +1,4 @@
-from hbnb.app.models.user import User
+from app.models.user import User
 from datetime import datetime
 import unittest
 

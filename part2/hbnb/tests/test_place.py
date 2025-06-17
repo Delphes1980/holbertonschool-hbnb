@@ -1,8 +1,8 @@
 import unittest
-from hbnb.app.models.place import Place
-from hbnb.app.models.user import User
-from hbnb.app.models.review import Review
-from hbnb.app.models.amenity import Amenity
+from app.models.place import Place
+from app.models.user import User
+from app.models.review import Review
+from app.models.amenity import Amenity
 
 
 class TestPlace(unittest.TestCase):
@@ -39,7 +39,7 @@ class TestPlace(unittest.TestCase):
 
     def test_invalid_description(self):
         with self.assertRaises(ValueError):
-            Place(title='Valid Title', description='abc', price=10,
+            Place(title='Valid Title', description='abc'*50, price=10,
                   latitude=0, longitude=0, owner=self.owner)
         with self.assertRaises(TypeError):
             Place(title='Valid Title', description=123, price=10,

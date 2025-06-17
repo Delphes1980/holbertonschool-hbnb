@@ -1,7 +1,7 @@
-from hbnb.app.models.baseEntity import (BaseEntity, type_validation,
+from app.models.baseEntity import (BaseEntity, type_validation,
                                         strlen_validation)
-from hbnb.app.models.place import Place
-from hbnb.app.models.user import User
+from app.models.place import Place
+from app.models.user import User
 
 
 class Review(BaseEntity):
