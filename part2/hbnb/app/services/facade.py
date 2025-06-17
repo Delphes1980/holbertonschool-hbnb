@@ -17,22 +17,38 @@ class HBnBFacade:
         # Logic will be implemented in later tasks
         pass
 
-    # Placeholder method for fetching a place by ID
+    def create_place(self, place_data):
+    # Placeholder for logic to create a place, including validation for price, latitude, and longitude
+        pass
+
     def get_place(self, place_id):
-        # Logic will be implemented in later tasks
+    # Placeholder for logic to retrieve a place by ID, including associated owner and amenities
+        pass
+
+    def get_all_places(self):
+    # Placeholder for logic to retrieve all places
+        pass
+
+    def update_place(self, place_id, place_data):
+    # Placeholder for logic to update a place
         pass
 
     def create_amenity(self, amenity_data):
     # Placeholder for logic to create an amenity
-        pass
+        stripped_name = self.strip()
+        existing_amenity = self.amenity_repo.get_by_attribute('name', stripped_name)
+        if existing_amenity:
+            raise ValueError(f"Amenity with the name '{stripped_name}' already exists.")
+        new_amenity = Amenity(name=stripped_name)
+        return new_amenity
 
     def get_amenity(self, amenity_id):
     # Placeholder for logic to retrieve an amenity by ID
-        pass
+        return self.amenity_repo.get(Amenity, amenity_id)
 
     def get_all_amenities(self):
     # Placeholder for logic to retrieve all amenities
-        pass
+        return self.amenity_repo.get_all()
 
     def update_amenity(self, amenity_id, amenity_data):
     # Placeholder for logic to update an amenity
