@@ -1,10 +1,11 @@
-from hbnb.app.models.baseEntity import BaseEntity
+from hbnb.app.models.baseEntity import (BaseEntity, type_validation,
+                                        strlen_validation)
 from hbnb.app.models.place import Place
 from hbnb.app.models.user import User
 
+
 class Review(BaseEntity):
-    def __init__(self, text: str, rating: int, place: Place,
-                 user: User):
+    def __init__(self, text, rating, place, user):
         if not text:
             raise ValueError("text is required: provide content for"
                              " the review")
@@ -20,41 +21,40 @@ class Review(BaseEntity):
         super().__init__()
         self.text = text
         self.rating = rating
-        self.place = place
-        self.user = user
+        self.place = self.set_place(place)
+        self.user = self.set_user(user)
         place.add_review(self)
-
-    def type_validation(self, arg, arg_name, arg_type):
-        if not isinstance(arg, arg_type):
-            raise TypeError(f"{arg_name} must be a {arg_type}")
-        
-    def text_validation(self, text: str):
-        max_length = 500
-        min_length = 2
-        if len(text) < 2 or len(text) > max_length:
-            raise ValueError(f"text must be max {max_length} and"
-                             f" atleast {min_length} characters long")
-
-    def rating_validation(self, rating: int):
-        if rating < 1 or rating > 5:
-            raise ValueError("rating must be an integer between 1 and"
-                             " 5")
 
     @property
     def text(self):
         return self.__text
+
     @text.setter
-    def text(self, text: str):
+    def text(self, text):
+        type_validation(text, "Text", str)
         text = text.strip()
-        self.type_validation(text, "text", str)
-        self.text_validation(text)
+        strlen_validation(text, "Text", 2, 500)
         self.__text = text
     
     @property
     def rating(self):
         return self.__rating
+
     @rating.setter
-    def rating(self, rating: int):
-        self.type_validation(rating, "rating", int)
+    def rating(self, rating):
+        type_validation(rating, "Rating", int)
         self.rating_validation(rating)
         self.__rating = rating
+
+    def rating_validation(self, rating):
+        if not (1 <= rating <= 5):
+            raise ValueError("Rating must be an integer between 1 and"
+                             " 5, both inclusive")
+
+    def set_user(self, user):
+        type_validation(user, "User", User)
+        return user
+
+    def set_place(self, place):
+        type_validation(place, "Place", Place)
+        return place
