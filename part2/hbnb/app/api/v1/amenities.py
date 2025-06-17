@@ -1,4 +1,3 @@
-
 from flask_restx import Namespace, Resource, fields
 from hbnb.app.services import facade
 
@@ -9,12 +8,10 @@ amenity_model = api.model('Amenity', {
     'name': fields.String(required=True, description='Name of the amenity')
 })
 
-amenity_response_model = api.inherits('AmenityResponse', amenity_model, {
+amenity_response_model = api.inherit('AmenityResponse', amenity_model, {
     'id': fields.String(description='Unique identifier for the amenity'),
-    'created_at': fields.Datetime(dt=format='iso8601', description='Timestamp'
-                                  'of creation (ISO 8601)'),
-    'updated_at': fields.Datetime(dt=format='iso8601', description='Timestamp'
-                                  'of the last update (ISO 8601)')
+    'created_at': fields.Datetime(dt_format='iso8601', description='Timestamp of creation (ISO 8601)'),
+    'updated_at': fields.Datetime(dt_format='iso8601', description='Timestamp of the last update (ISO 8601)')
 })
 
 
