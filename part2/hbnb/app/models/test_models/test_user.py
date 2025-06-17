@@ -21,6 +21,11 @@ class TestUser(unittest.TestCase):
                     is_admin=True)
         self.assertTrue(user.is_admin)
         self.assertEqual(user.first_name, "Alice")
+        self.assertEqual(user.last_name, "Smith")
+        self.assertEqual(user.email, "alice@example.com")
+        self.assertIsInstance(user.id, str)
+        self.assertIsInstance(user.created_at, datetime)
+        self.assertIsInstance(user.updated_at, datetime)
 
     def test_user_creation_bad_email(self):
         with self.assertRaises(ValueError) as cm:
@@ -53,6 +58,37 @@ class TestUser(unittest.TestCase):
                  "email@email.com")
         self.assertIn("First name", str(e.exception))
 
+    def test_name_with_accents_and_special_characters(self):
+        # Acceptable names with accents, dots, apostrophes, and dashes
+        valid_names = [
+            "José", "François", "Müller", "Çelik", "Łukasz", "Zoë",
+            "Dvořák", "O'Connor", "Jean-Pierre", "Ana-Maria",
+            "Dvořák-Smith", "Zoë-Marie", "J.R.R.", "J. K.",
+            "Smith-Jones", "D'Arcy", "St. John"
+        ]
+        for name in valid_names:
+            user = User(first_name=name, last_name="Doe",
+                        email="test@example.com")
+            self.assertEqual(user.first_name, name)
+            user = User(first_name="John", last_name=name,
+                        email="test@example.com")
+            self.assertEqual(user.last_name, name)
+
+        # Names with invalid special characters or numbers should
+        # raise ValueError
+        invalid_names = [
+            "J*hn", "Ann3", "M@rie", "Al/ice", "Bob!", "Eve#", "123",
+            "Jean--Pierre", "Jean..Pierre", "Jean''Pierre",
+            "Jean.-Pierre", "-Jean", ".Jean", "Jean-", "Jean'", "'Jean"
+        ]
+        for name in invalid_names:
+            with self.assertRaises(ValueError):
+                User(first_name=name, last_name="Doe",
+                     email="test@example.com")
+            with self.assertRaises(ValueError):
+                User(first_name="John", last_name=name,
+                     email="test@example.com")
+                
 
 if __name__ == "__main__":
     unittest.main()

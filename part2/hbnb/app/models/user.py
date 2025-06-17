@@ -1,11 +1,11 @@
-from hbnb.app.models.baseEntity import BaseEntity, type_validation
+from hbnb.app.models.baseEntity import (BaseEntity, type_validation,
+                                        strlen_validation)
 from validate_email_address import validate_email
+import re
 
 
 class User(BaseEntity):
-    """ Missing error handles:
-            - special characters in names
-    """
+
     def __init__(self, first_name: str, last_name: str,
                  email: str, is_admin: bool = False):
         if not first_name:
@@ -22,20 +22,23 @@ class User(BaseEntity):
 
     def name_validation(self, name: str, name_name: str):
         type_validation(name, name_name, str)
-        max_length = 20
-        min_length = 1
         name = name.strip()
-        if len(name) < min_length or len(name) > max_length:
-            raise ValueError(f"{name_name} must be shorter than {max_length} "
-                             "characters and include at least {min_length} "
-                             "non-space character")
+        strlen_validation(name, name_name, 1, 50)
+        # Accept only letters (including accents/localized), dot,dash,
+        # apostrophe
+        if not re.match(r"^[^\W\d_]+([.'-][^\W\d_]+)*[.]?( [^\W\d_]"
+                        r"+([.'-][^\W\d_]+)*[.]?)?$", name,
+                        re.UNICODE):
+            raise ValueError(f"{name_name} must contain only letters, "
+                             "apostrophes, dashes, or dots (no digits "
+                             "or other special characters)")
         return name
 
     def email_validation(self, email: str):
         type_validation(email, "email", str)
         if not validate_email(email):
             raise ValueError("Invalid email: email must have format"
-                             " example@example_dom.ain")
+                             " example@exam.ple")
         print("Warning: email has not been verified for uniqueness "
               " despite it being absolutely necessary")
 
@@ -45,7 +48,8 @@ class User(BaseEntity):
 
     @first_name.setter
     def first_name(self, first_name: str):
-        self.__first_name = self.name_validation(first_name, "First name")
+        self.__first_name = self.name_validation(first_name,
+                                                 "First name")
 
     @property
     def last_name(self):
