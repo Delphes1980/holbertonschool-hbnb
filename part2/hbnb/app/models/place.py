@@ -1,6 +1,6 @@
-from hbnb.app.models.baseEntity import (BaseEntity, type_validation,
+from app.models.baseEntity import (BaseEntity, type_validation,
                                         strlen_validation)
-from hbnb.app.models.user import User
+from app.models.user import User
 
 
 class Place(BaseEntity):
@@ -20,13 +20,13 @@ class Place(BaseEntity):
 
     def add_review(self, review):
         """Add a review to the place."""
-        from hbnb.app.models.review import Review
+        from app.models.review import Review
         type_validation(review, "Review", Review)
         self.reviews.append(review)
 
     def add_amenity(self, amenity):
         """Add an amenity to the place."""
-        from hbnb.app.models.amenity import Amenity
+        from app.models.amenity import Amenity
         type_validation(amenity, "Amenity", Amenity)
         self.amenities.append(amenity)
 

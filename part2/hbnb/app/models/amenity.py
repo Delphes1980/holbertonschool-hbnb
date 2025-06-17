@@ -1,4 +1,4 @@
-from hbnb.app.models.baseEntity import (BaseEntity, type_validation,
+from app.models.baseEntity import (BaseEntity, type_validation,
                                         strlen_validation)
 
 

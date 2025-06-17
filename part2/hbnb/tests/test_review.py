@@ -1,7 +1,7 @@
 import unittest
-from hbnb.app.models.review import Review
-from hbnb.app.models.place import Place
-from hbnb.app.models.user import User
+from app.models.review import Review
+from app.models.place import Place
+from app.models.user import User
 
 
 class TestReview(unittest.TestCase):
