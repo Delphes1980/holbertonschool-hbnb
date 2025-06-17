@@ -88,7 +88,7 @@ class TestUser(unittest.TestCase):
             with self.assertRaises(ValueError):
                 User(first_name="John", last_name=name,
                      email="test@example.com")
-
+                
 
 if __name__ == "__main__":
     unittest.main()

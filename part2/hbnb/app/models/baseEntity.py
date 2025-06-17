@@ -13,11 +13,13 @@ class BaseEntity:
         self.updated_at = datetime.now(timezone.utc)
 
     def update(self, data):
-        """Update the attributes of the object based on the provided dictionary"""
+        """Update the attributes of the object based on the
+        provided dictionary"""
         for key, value in data.items():
             if hasattr(self, key):
                 setattr(self, key, value)
         self.save()  # Update the updated_at timestamp
+
 
 def type_validation(arg, arg_name: str, *arg_type):
     types_to_check = arg_type[0] if isinstance(arg_type[0], tuple) else arg_type
