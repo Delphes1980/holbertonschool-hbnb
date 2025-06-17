@@ -4,6 +4,7 @@ from hbnb.app.models.baseEntity import (BaseEntity, type_validation,
 
 class Amenity(BaseEntity):
     def __init__(self, name):
+        super().__init__()
         if not name:
             raise ValueError("Name of the Amenity is required")
         self.name = self.set_name(name)
