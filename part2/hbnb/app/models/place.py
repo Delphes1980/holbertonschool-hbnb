@@ -4,8 +4,8 @@ from hbnb.app.models.user import User
 
 
 class Place(BaseEntity):
-    def __init__(self, title, description, price, latitude,
-                 longitude, owner):
+    def __init__(self, title, description=None, price=-1,
+                 latitude=-360, longitude=-360, owner=None):
         super().__init__()
         self.title = self.validate_title(title)
         self.description = self.validate_description(description)
@@ -15,6 +15,8 @@ class Place(BaseEntity):
         self.owner = self.validate_owner(owner)
         self.reviews = []  # List to store related reviews
         self.amenities = []  # List to store related amenities
+        print("Warning: The existence of the owner has not been "
+              "validated")
 
     def add_review(self, review):
         """Add a review to the place."""
@@ -30,23 +32,28 @@ class Place(BaseEntity):
 
     def validate_title(self, title):
         """Verify if the title is a string < 100 characters."""
+        if not title:
+            raise ValueError("Title is required")
         type_validation(title, "Title", str)
         title = title.strip()
-        strlen_validation(title, "Title", 4, 50)
+        strlen_validation(title, "Title", 4, 100)
         return title
 
     def validate_description(self, description):
         """Verify if the description is a string."""
+        if description is None:
+            return ""
         type_validation(description, "Description", str)
         description = description.strip()
-        strlen_validation(description, "Description", 4, 50)
+        strlen_validation(description, "Description", 0, 50)
         return description
 
     def validate_price(self, price: float):
         """Verify is the price is an integer."""
         type_validation(price, "Price", (float, int))
-        if price < 0:
-            raise ValueError("Price must be a positive number")
+        if price <= 0:
+            raise ValueError("Price must be a positive number (larger "
+                             "than 0)")
         return float(price)
 
     def validate_latitude(self, latitude):

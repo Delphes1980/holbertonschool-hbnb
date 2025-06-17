@@ -23,7 +23,7 @@ class User(BaseEntity):
     def name_validation(self, name: str, name_name: str):
         type_validation(name, name_name, str)
         name = name.strip()
-        strlen_validation(name, name_name, 1, 20)
+        strlen_validation(name, name_name, 1, 50)
         # Accept only letters (including accents/localized), dot,dash,
         # apostrophe
         if not re.match(r"^[^\W\d_]+([.'-][^\W\d_]+)*[.]?( [^\W\d_]"
