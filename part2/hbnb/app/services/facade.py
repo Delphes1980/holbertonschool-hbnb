@@ -1,5 +1,5 @@
 from app.persistence.repository import InMemoryRepository
-from app.models.amenity import Amenity, set_name
+from app.models.amenity import Amenity
 from app.models.place import Place
 from app.models.user import User
 from app.models.review import Review
@@ -36,34 +36,24 @@ class HBnBFacade:
         pass
 
     def create_amenity(self, amenity_data):
-        # Placeholder for logic to create an amenity
-        stripped_name = self.strip()
-        existing_amenity = self.amenity_repo.get_by_attribute('name',
-                                                              stripped_name)
-        if existing_amenity:
-            raise ValueError(f"Amenity with the name '{stripped_name}' already"
-                             "exists.")
-        new_amenity = Amenity(name=stripped_name)
+        # Validate the amenity data
+        new_amenity = Amenity(**amenity_data)
+        # Store the new amenity in the repository
         self.amenity_repo.add(new_amenity)
         return new_amenity
 
     def get_amenity(self, amenity_id):
-        # Placeholder for logic to retrieve an amenity by ID
         return self.amenity_repo.get(amenity_id)
 
     def get_all_amenities(self):
-        # Placeholder for logic to retrieve all amenities
         return self.amenity_repo.get_all()
 
     def update_amenity(self, amenity_id, amenity_data):
-        # Placeholder for logic to update an amenity
         amenity_to_update = self.amenity_repo.get(amenity_id)
-        # Checks if the amenity_to_update is empty
+        # Check if amenity exists
         if not amenity_to_update:
-            raise TypeError("There must be an amenity")
-        new_name = amenity_data['name']
-        set_name(new_name)
-        stripped_new_name = new_name.strip()
-        self.amenity_repo.update(amenity_id, {'name': stripped_new_name})
+            return None
+        # Update the amenity with the provided data
+        amenity_to_update.update(amenity_data)
         updated_amenity = self.amenity_repo.get(amenity_id)
         return updated_amenity
