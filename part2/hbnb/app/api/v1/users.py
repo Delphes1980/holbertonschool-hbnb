@@ -65,6 +65,7 @@ class UserResource(Resource):
         return {'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email}, 200
 
     @api.expect(user_model, validate=True)
+    @api.response(204, 'User has been updated')
     @api.response(404, 'User_id does not correspond to any registered'
                   ' user')
     @api.response(400, 'Invalid input data')
@@ -87,6 +88,6 @@ class UserResource(Resource):
         return {'id': user_by_id.id, 
                 'first_name': user_by_id.first_name,
                 'last_name': user_by_id.last_name,
-                'email': user_by_id.email}, 200
+                'email': user_by_id.email}, 204
 
         
