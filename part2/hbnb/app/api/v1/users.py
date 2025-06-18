@@ -18,8 +18,7 @@ user_model = api.model('User', {
 class UserList(Resource):
     @api.expect(user_model, validate=True)
     @api.response(201, 'User successfully created')
-    @api.response(400, 'Email already registered')
-    @api.response(400, 'Invalid input data')
+    @api.response(400, 'Email already registered / Invalid input data')
     def post(self):
         """Register a new user
         
@@ -65,7 +64,7 @@ class UserResource(Resource):
         return {'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email}, 200
 
     @api.expect(user_model, validate=True)
-    @api.response(204, 'User has been updated')
+    @api.response(200, 'User successfully updated')
     @api.response(404, 'User_id does not correspond to any registered'
                   ' user')
     @api.response(400, 'Invalid input data')
@@ -84,10 +83,12 @@ class UserResource(Resource):
                 user_by_email.id != user_by_id.id):
             return {'error': 'email already registered with another '
                     'account'}, 400
-        facade.user_repo.update(user_id, user_data)
+        try:
+            facade.user_repo.update(user_id, user_data)
+        except Exception as e:
+            return {'error': str(e)}, 400
         return {'id': user_by_id.id, 
                 'first_name': user_by_id.first_name,
                 'last_name': user_by_id.last_name,
-                'email': user_by_id.email}, 204
-
+                'email': user_by_id.email}, 200
         
