@@ -10,7 +10,7 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def get_all(self):
+    def get_all(self) -> list:
         pass
 
     @abstractmethod
