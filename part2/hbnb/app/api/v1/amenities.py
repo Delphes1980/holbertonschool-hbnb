@@ -72,7 +72,7 @@ class AmenityResource(Resource):
         new_amenity_data = api.payload
         try:
             updated_amenity = facade.update_amenity(amenity_id, new_amenity_data)
-            # If the amenity is not founde, return an error
+            # If the amenity is not found, return an error
             # Otherwise, return the updated amenity as a dictionary
             if not updated_amenity:
                 api.abort(404, 'Amenity not found')

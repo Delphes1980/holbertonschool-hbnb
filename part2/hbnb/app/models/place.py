@@ -12,7 +12,7 @@ class Place(BaseEntity):
         self.price = self.validate_price(price)
         self.latitude = self.validate_latitude(latitude)
         self.longitude = self.validate_longitude(longitude)
-        self.owner = self.validate_owner(owner)
+        self.owner_id = owner
         self.reviews = []  # List to store related reviews
         self.amenities = []  # List to store related amenities
         print("Warning: The existence of the owner has not been "
@@ -71,13 +71,25 @@ class Place(BaseEntity):
                              " 180.0")
         return float(longitude)
 
-    def validate_owner(self, owner):
-        type_validation(owner, "Owner", User)
-        return owner
+    def is_owner(self, user_id):
+        """Verify is the user owns the place."""
+        if self.owner != user_id:
+            raise PermissionError("Unauthorized access: the current user "
+                              "is not the owner")
+        return True
 
-    # def is_owner(self, owner, User_id):
-    #     """Verify is the user owns the place."""
-    #     if owner.id != User_id:
-    #         raise ValueError("Unauthorized access: the current user "
-    #                          "is not the owner")
-    #     return True
+    def to_dict(self):
+        """ Convert the Place object to a dictionary representation,
+        including BaseEntity fields """
+        base_dict = super().to_dict()
+        base_dict.update({
+            "title": self.title,
+            "description": self.description,
+            "price": self.price,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "owner_id": self.owner_id,
+            "reviews": list(self.reviews),
+            "amenities": list(self.amenities)
+            })
+        return base_dict

@@ -27,36 +27,72 @@ place_model = api.model('Place', {
     'amenities': fields.List(fields.String, required=True, description="List of amenities ID's")
 })
 
+# Define the response model for returning place data
+place_response_model = api.inherit('PlaceResponse', place_model, {
+    'id': fields.String(description='Unique identifier for the place'),
+    'created_at': fields.DateTime(dt_format='iso8601', description='Timestamp of creation (ISO 8601)'),
+    'updated_at': fields.DateTime(dt_format='iso8601', description='Timestamp of the last update (ISO 8601)')
+})
+
 @api.route('/')
 class PlaceList(Resource):
+    @api.doc('create place')
+    @api.marshal_with(place_response_model)
     @api.expect(place_model)
     @api.response(201, 'Place successfully created')
     @api.response(400, 'Invalid input data')
     def post(self):
         """Register a new place"""
-        # Placeholder for the logic to register a new place
-        pass
+        # api.payload automatically parses and validates the request JSON against amenity_model
+        data = api.payload
+        try:
+            # Call the facade to create a new place
+            new_place = facade.create_place(data)
+            # Return the created place as a dictionary
+            return new_place.to_dict(), 201
+        except ValueError as e:
+            api.abort(400, message=str(e))
 
+    @api.doc('list_places')
+    @api.marshal_list_with(place_response_model)
     @api.response(200, 'List of places retrieved successfully')
     def get(self):
         """Retrieve a list of all places"""
-        # Placeholder for logic to return a list of all places
-        pass
+        # Call the facade to get all places
+        places = facade.get_all_places()
+        # Convert each place to a dictionary & return the list
+        return [place.to_dict() for place in places], 200
 
 @api.route('/<place_id>')
 class PlaceResource(Resource):
+    @api.doc('get_place_by_id')
+    @api.marshal_with(place_response_model)
     @api.response(200, 'Place details retrieved successfully')
     @api.response(404, 'Place not found')
     def get(self, place_id):
         """Get place details by ID"""
-        # Placeholder for the logic to retrieve a place by ID, including associated owner and amenities
-        pass
+        # Call the facade to retrieve a place by ID
+        place = facade.get_place(place_id)
+        if not place:
+            api.abort(404, 'Place not found')
+        return place.to_dict(), 200
 
+    @api.doc('update_place')
     @api.expect(place_model)
+    @api.marshal_with(place_response_model)
     @api.response(200, 'Place updated successfully')
     @api.response(404, 'Place not found')
     @api.response(400, 'Invalid input data')
     def put(self, place_id):
         """Update a place's information"""
-        # Placeholder for the logic to update a place by ID
-        pass
+        # api.payload automatically parses and validates the request JSON against amenity_model
+        new_place_data = api.payload
+        try:
+            updated_place = facade.update_place(place_id, new_place_data)
+            # If the place is not found, return an error
+            # Otherwise, return the updated place as a dictionary
+            if not updated_place:
+                api.abort(404, 'Place not found')
+            return updated_place.to_dict(), 200
+        except ValueError as e:
+            api.abort(400, message=str(e))
