@@ -76,7 +76,7 @@ class PlaceResource(Resource):
         # Call the facade to retrieve a place by ID
         place = facade.get_place(place_id)
         if not place:
-            api.abort(404, 'Place not found')
+            api.abort(404, error='Place not found')
         return place.to_dict(), 200
 
     @api.doc('update_place')
@@ -94,7 +94,7 @@ class PlaceResource(Resource):
             # If the place is not found, return an error
             # Otherwise, return the updated place as a dictionary
             if not updated_place:
-                api.abort(404, 'Place not found')
+                api.abort(404, error='Place not found')
                 return {'returned error': 
                         'returned Place not found'}, 404
             return updated_place.to_dict(), 200
