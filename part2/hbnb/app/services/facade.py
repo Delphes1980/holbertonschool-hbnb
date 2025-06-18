@@ -14,13 +14,15 @@ def is_valid_uuid4(uuid_str):
     except ValueError:
         return False
 
-    
+
 class HBnBFacade:
     def __init__(self):
         self.user_repo = InMemoryRepository()
         self.place_repo = InMemoryRepository()
         self.review_repo = InMemoryRepository()
         self.amenity_repo = InMemoryRepository()
+
+#### Services for Place CRUD operations ####
 
     def create_place(self, place_data):
         """ Create a new place with the provided data """
@@ -63,6 +65,8 @@ class HBnBFacade:
         updated_place = self.place_repo.get(place_id)
         return updated_place
 
+#### Services for User CRUD operations ####
+
     def create_user(self, user_data):
         """ Create a new user with the provided data """
         user = User(**user_data)
@@ -76,6 +80,8 @@ class HBnBFacade:
     def get_user_by_email(self, email):
         """ Retrieve a user byt their email address """
         return self.user_repo.get_by_attribute('email', email)
+
+#### Services for Amenity CRUD operations ####
 
     def create_amenity(self, amenity_data):
         """ Create a new amenity with the provided data """
@@ -103,3 +109,31 @@ class HBnBFacade:
         amenity_to_update.update(amenity_data)
         updated_amenity = self.amenity_repo.get(amenity_id)
         return updated_amenity
+
+#### Services for Review CRUD operations ####
+
+    def create_review(self, review_data):
+        # Placeholder for logic to create a review, including
+        # validation for user_id, place_id, and rating
+        
+        pass
+
+    def get_review(self, review_id):
+        # Placeholder for logic to retrieve a review by ID
+        pass
+
+    def get_all_reviews(self):
+        # Placeholder for logic to retrieve all reviews
+        pass
+
+    def get_reviews_by_place(self, place_id):
+        # Placeholder for logic to retrieve all reviews for a specific place
+        pass
+
+    def update_review(self, review_id, review_data):
+        # Placeholder for logic to update a review
+        pass
+
+    def delete_review(self, review_id):
+        # Placeholder for logic to delete a review
+        pass
