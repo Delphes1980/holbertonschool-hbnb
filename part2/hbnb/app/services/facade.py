@@ -1,5 +1,8 @@
 from app.persistence.repository import InMemoryRepository
+from app.models.amenity import Amenity
+from app.models.place import Place
 from app.models.user import User
+from app.models.review import Review
 
 
 class HBnBFacade:
@@ -19,8 +22,26 @@ class HBnBFacade:
 
     def get_user_by_email(self, email):
         return self.user_repo.get_by_attribute('email', email)
-    
-    # Placeholder method for fetching a place by ID
-    def get_place(self, place_id):
-        # Logic will be implemented in later tasks
-        pass
+
+    def create_amenity(self, amenity_data):
+        # Validate the amenity data
+        new_amenity = Amenity(**amenity_data)
+        # Store the new amenity in the repository
+        self.amenity_repo.add(new_amenity)
+        return new_amenity
+
+    def get_amenity(self, amenity_id):
+        return self.amenity_repo.get(amenity_id)
+
+    def get_all_amenities(self):
+        return self.amenity_repo.get_all()
+
+    def update_amenity(self, amenity_id, amenity_data):
+        amenity_to_update = self.amenity_repo.get(amenity_id)
+        # Check if amenity exists
+        if not amenity_to_update:
+            return None
+        # Update the amenity with the provided data
+        amenity_to_update.update(amenity_data)
+        updated_amenity = self.amenity_repo.get(amenity_id)
+        return updated_amenity
