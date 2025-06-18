@@ -1,5 +1,7 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
+from app.services.facade import is_valid_uuid4
+
 
 api = Namespace('places', description='Place operations')
 
@@ -93,6 +95,30 @@ class PlaceResource(Resource):
             # Otherwise, return the updated place as a dictionary
             if not updated_place:
                 api.abort(404, 'Place not found')
+                return {'returned error': 
+                        'returned Place not found'}, 404
             return updated_place.to_dict(), 200
         except ValueError as e:
             api.abort(400, message=str(e))
+
+@api.route('/<place_id>/reviews')
+class PlaceReviewsList(Resource):
+    @api.doc('Returns list of reviews given to the selected place')
+    @api.response(200, 'List of reviews retrieved successfully')
+    @api.response(404, 'Place not found')
+    @api.response(400, "Invalid ID")
+    def get(self, place_id):
+        """Get list of reviews for a place given its ID"""
+        if not is_valid_uuid4(place_id):
+            return {'error': 'Invalid UUID: provided ID is not a valid'
+                             ' UUID4'}, 400
+        place = facade.get_place(place_id)
+        if not place:
+            return {'error': 'Place not found'}, 404
+        place.reviews
+        return [{"id": review.id,
+                 "rating": review.rating,
+                 "text": review.text,
+                 "place_id": review.place.id,
+                 "user_id": review.user.id
+                 } for review in place.reviews], 200
