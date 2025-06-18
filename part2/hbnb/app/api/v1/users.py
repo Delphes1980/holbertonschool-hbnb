@@ -40,6 +40,8 @@ class UserList(Resource):
 
         return {'id': new_user.id, 'first_name': new_user.first_name, 'last_name': new_user.last_name, 'email': new_user.email}, 201
     
+    @api.doc('Returns list of registered users')
+    @api.response(200, 'List of users retrieved successfully')
     def get(self):
         """Get a list of registered users"""
         user_list = facade.user_repo.get_all()
