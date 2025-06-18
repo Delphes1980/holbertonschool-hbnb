@@ -38,7 +38,6 @@ def type_validation(arg, arg_name: str, *arg_type):
             types_string = types_to_check.__name__
         raise TypeError(f"{arg_name} must be of type {types_string}")
 
-
 def strlen_validation(string: str, string_name: str, min_len, max_len):
     if len(string) < min_len or len(string) > max_len:
         raise ValueError(f"{string_name} must be shorter than {max_len}"

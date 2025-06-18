@@ -36,6 +36,17 @@ class HBnBFacade:
         updated_place = self.place_repo.get(place_id)
         return updated_place
 
+    def create_user(self, user_data):
+        user = User(**user_data)
+        self.user_repo.add(user)
+        return user
+
+    def get_user(self, user_id):
+        return self.user_repo.get(user_id)
+
+    def get_user_by_email(self, email):
+        return self.user_repo.get_by_attribute('email', email)
+
     def create_amenity(self, amenity_data):
         # Validate the amenity data
         new_amenity = Amenity(**amenity_data)
