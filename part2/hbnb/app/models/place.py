@@ -40,6 +40,8 @@ class Place(BaseEntity):
         """Verify is the price is an integer."""
         if not isinstance(price, float):
             raise TypeError("Price must be an integer")
+        if not isinstance(price, int) or price < 0:
+            raise ValueError("Price must be a positive integer")
         return price
 
     def validate_latitude(latitude):
