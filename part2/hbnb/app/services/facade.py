@@ -3,8 +3,18 @@ from app.models.amenity import Amenity
 from app.models.place import Place
 from app.models.user import User
 from app.models.review import Review
+from uuid import UUID
 
 
+def is_valid_uuid4(uuid_str):
+    """Determines if given str is a uuid4"""
+    try:
+        val = UUID(uuid_str, version=4)
+        return val.version == 4
+    except ValueError:
+        return False
+
+    
 class HBnBFacade:
     def __init__(self):
         self.user_repo = InMemoryRepository()
