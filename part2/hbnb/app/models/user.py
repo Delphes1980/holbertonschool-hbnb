@@ -1,7 +1,7 @@
 
-from hbnb.app.models.baseEntity import (BaseEntity, type_validation,
+from app.models.baseEntity import (BaseEntity, type_validation,
                                         strlen_validation)
-from validate_email_address import validate_email
+#from validate_email_address import validate_email
 import re
 
 

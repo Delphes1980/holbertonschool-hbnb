@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from hbnb.app.services import facade
+from app.services import facade
 
 api = Namespace('amenities', description='Amenity operations')
 
@@ -10,8 +10,8 @@ amenity_model = api.model('Amenity', {
 
 amenity_response_model = api.inherit('AmenityResponse', amenity_model, {
     'id': fields.String(description='Unique identifier for the amenity'),
-    'created_at': fields.Datetime(dt_format='iso8601', description='Timestamp of creation (ISO 8601)'),
-    'updated_at': fields.Datetime(dt_format='iso8601', description='Timestamp of the last update (ISO 8601)')
+    'created_at': fields.DateTime(dt_format='iso8601', description='Timestamp of creation (ISO 8601)'),
+    'updated_at': fields.DateTime(dt_format='iso8601', description='Timestamp of the last update (ISO 8601)')
 })
 
 
@@ -19,18 +19,18 @@ amenity_response_model = api.inherit('AmenityResponse', amenity_model, {
 class AmenityList(Resource):
     @api.doc('create_amenity')
     @api.expect(amenity_model, validate=True)
-    @api.marshal_with(amenity_model)
+    @api.marshal_with(amenity_response_model)
     @api.response(201, 'Amenity successfully created', amenity_response_model)
     @api.response(400, 'Invalid input data')
     def post(self):
         """Register a new amenity"""
         # Placeholder for the logic to register a new amenity
-        amenity_name = api.payload.get('name')
+        data = api.payload
         try:
-            new_amenity = facade.create_amenity(amenity_name)
+            new_amenity = facade.create_amenity(data)
             return new_amenity.to_dict(), 201
-        except (TypeError, ValueError):
-            api.abort(400, 'Invalid input data')
+        except ValueError as e:
+            api.abort(400, message=str(e))
 
     @api.doc('list_amenities')
     @api.marshal_list_with(amenity_response_model)
@@ -39,7 +39,7 @@ class AmenityList(Resource):
         """Retrieve a list of all amenities"""
         # Placeholder for logic to return a list of all amenities
         amenities = facade.get_all_amenities()
-        return amenities.to_dict(), 200
+        return [amenity.to_dict() for amenity in amenities], 200
 
 
 @api.route('/<amenity_id>')

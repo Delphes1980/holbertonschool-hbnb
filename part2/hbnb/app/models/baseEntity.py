@@ -20,6 +20,13 @@ class BaseEntity:
                 setattr(self, key, value)
         self.save()  # Update the updated_at timestamp
 
+    def to_dict(self):
+        """Convert the object to a dictionary representation"""
+        return {
+            "id": self.id,
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat(),
+        }
 
 def type_validation(arg, arg_name: str, *arg_type):
     types_to_check = arg_type[0] if isinstance(arg_type[0], tuple) else arg_type
