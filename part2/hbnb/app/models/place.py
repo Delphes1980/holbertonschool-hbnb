@@ -1,10 +1,10 @@
 from app.models.baseEntity import (BaseEntity, type_validation,
-                                        strlen_validation)
+                                   strlen_validation)
 from app.models.user import User
 
 
 class Place(BaseEntity):
-    def __init__(self, title, description=None, price=-1,
+    def __init__(self, title, description=None, price=1,
                  latitude=-360, longitude=-360, owner=None):
         super().__init__()
         self.title = self.validate_title(title)
@@ -12,7 +12,7 @@ class Place(BaseEntity):
         self.price = self.validate_price(price)
         self.latitude = self.validate_latitude(latitude)
         self.longitude = self.validate_longitude(longitude)
-        self.owner_id = owner
+        self.owner = self.validate_owner(owner)
         self.reviews = []  # List to store related reviews
         self.amenities = []  # List to store related amenities
         print("Warning: The existence of the owner has not been "
@@ -74,9 +74,13 @@ class Place(BaseEntity):
     def is_owner(self, user_id):
         """Verify is the user owns the place."""
         if self.owner != user_id:
-            raise PermissionError("Unauthorized access: the current user "
-                              "is not the owner")
+            raise PermissionError("Unauthorized access: the current user"
+                                  "is not the owner")
         return True
+
+    def validate_owner(self, owner_obj):
+        type_validation(owner_obj, "Owner", str)
+        return owner_obj
 
     def to_dict(self):
         """ Convert the Place object to a dictionary representation,
@@ -88,7 +92,7 @@ class Place(BaseEntity):
             "price": self.price,
             "latitude": self.latitude,
             "longitude": self.longitude,
-            "owner_id": self.owner_id,
+            "owner_id": self.owner,
             "reviews": list(self.reviews),
             "amenities": list(self.amenities)
             })

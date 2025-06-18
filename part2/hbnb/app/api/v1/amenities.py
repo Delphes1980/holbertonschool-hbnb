@@ -2,7 +2,6 @@ from flask_restx import Namespace, Resource, fields
 from app.services import facade
 
 api = Namespace('amenities', description='Amenity operations')
-
 # Define the amenity model for input validation and documentation
 amenity_model = api.model('Amenity', {
     'name': fields.String(required=True, description='Name of the amenity')
@@ -11,8 +10,10 @@ amenity_model = api.model('Amenity', {
 # Define the response model for returning amenity data
 amenity_response_model = api.inherit('AmenityResponse', amenity_model, {
     'id': fields.String(description='Unique identifier for the amenity'),
-    'created_at': fields.DateTime(dt_format='iso8601', description='Timestamp of creation (ISO 8601)'),
-    'updated_at': fields.DateTime(dt_format='iso8601', description='Timestamp of the last update (ISO 8601)')
+    'created_at': fields.DateTime(dt_format='iso8601', description='Timestamp'
+                                  'of creation (ISO 8601)'),
+    'updated_at': fields.DateTime(dt_format='iso8601', description='Timestamp'
+                                  'of the last update (ISO 8601)')
 })
 
 
@@ -25,7 +26,8 @@ class AmenityList(Resource):
     @api.response(400, 'Invalid input data')
     def post(self):
         """Register a new amenity"""
-        # api.payload automatically parses and validates the request JSON against amenity_model
+        # api.payload automatically parses and validates the request JSON
+        # against amenity_model
         data = api.payload
         try:
             # Call the facade to create a new amenity
@@ -68,10 +70,12 @@ class AmenityResource(Resource):
     @api.response(400, 'Invalid input data')
     def put(self, amenity_id):
         """Update an amenity's information"""
-        # api.payload automatically parses and validates the request JSON against amenity_model
+        # api.payload automatically parses and validates the request JSON
+        # against amenity_model
         new_amenity_data = api.payload
         try:
-            updated_amenity = facade.update_amenity(amenity_id, new_amenity_data)
+            updated_amenity = facade.update_amenity(amenity_id,
+                                                    new_amenity_data)
             # If the amenity is not found, return an error
             # Otherwise, return the updated amenity as a dictionary
             if not updated_amenity:

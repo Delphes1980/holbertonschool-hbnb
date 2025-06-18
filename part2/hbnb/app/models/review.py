@@ -1,5 +1,5 @@
 from app.models.baseEntity import (BaseEntity, type_validation,
-                                        strlen_validation)
+                                   strlen_validation)
 from app.models.place import Place
 from app.models.user import User
 

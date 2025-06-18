@@ -2,7 +2,6 @@ from app.models.baseEntity import (BaseEntity, type_validation,
                                    strlen_validation)
 
 
-
 class Amenity(BaseEntity):
     def __init__(self, name):
         super().__init__()

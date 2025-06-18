@@ -28,6 +28,7 @@ class BaseEntity:
             "updated_at": self.updated_at.isoformat(),
         }
 
+
 def type_validation(arg, arg_name: str, *arg_type):
     types_to_check = arg_type[0] if isinstance(arg_type[0], tuple) else arg_type
     if not isinstance(arg, types_to_check):
@@ -37,6 +38,7 @@ def type_validation(arg, arg_name: str, *arg_type):
         else:
             types_string = types_to_check.__name__
         raise TypeError(f"{arg_name} must be of type {types_string}")
+
 
 def strlen_validation(string: str, string_name: str, min_len, max_len):
     if len(string) < min_len or len(string) > max_len:

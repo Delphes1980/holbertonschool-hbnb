@@ -5,12 +5,12 @@ api = Namespace('places', description='Place operations')
 
 # Define the models for related entities
 amenity_model = api.model('PlaceAmenity', {
-    'id': fields.String(description='Amenity ID'),
+    'amenity_id': fields.String(description='Amenity ID'),
     'name': fields.String(description='Name of the amenity')
 })
 
 user_model = api.model('PlaceUser', {
-    'id': fields.String(description='User ID'),
+    'user_id': fields.String(description='User ID'),
     'first_name': fields.String(description='First name of the owner'),
     'last_name': fields.String(description='Last name of the owner'),
     'email': fields.String(description='Email of the owner')
@@ -21,18 +21,26 @@ place_model = api.model('Place', {
     'title': fields.String(required=True, description='Title of the place'),
     'description': fields.String(description='Description of the place'),
     'price': fields.Float(required=True, description='Price per night'),
-    'latitude': fields.Float(required=True, description='Latitude of the place'),
-    'longitude': fields.Float(required=True, description='Longitude of the place'),
+    'latitude': fields.Float(required=True, description='Latitude of the'
+                             'place'),
+    'longitude': fields.Float(required=True, description='Longitude of the'
+                              'place'),
     'owner_id': fields.String(required=True, description='ID of the owner'),
-    'amenities': fields.List(fields.String, required=True, description="List of amenities ID's")
+    'amenities': fields.List(fields.String, required=True, description="List"
+                             "of amenities ID's")
 })
 
 # Define the response model for returning place data
 place_response_model = api.inherit('PlaceResponse', place_model, {
     'id': fields.String(description='Unique identifier for the place'),
-    'created_at': fields.DateTime(dt_format='iso8601', description='Timestamp of creation (ISO 8601)'),
-    'updated_at': fields.DateTime(dt_format='iso8601', description='Timestamp of the last update (ISO 8601)')
+    'created_at': fields.DateTime(dt_format='iso8601', description='Timestamp'
+                                  'of creation (ISO 8601)'),
+    'updated_at': fields.DateTime(dt_format='iso8601', description='Timestamp'
+                                  'of the last update (ISO 8601)'),
+    'owner': fields.Nested(user_model),
+    'amenities': fields.List(fields.Nested(amenity_model))
 })
+
 
 @api.route('/')
 class PlaceList(Resource):
@@ -43,7 +51,8 @@ class PlaceList(Resource):
     @api.response(400, 'Invalid input data')
     def post(self):
         """Register a new place"""
-        # api.payload automatically parses and validates the request JSON against amenity_model
+        # api.payload automatically parses and validates the request JSON
+        # against amenity_model
         data = api.payload
         try:
             # Call the facade to create a new place
@@ -63,6 +72,7 @@ class PlaceList(Resource):
         # Convert each place to a dictionary & return the list
         return [place.to_dict() for place in places], 200
 
+
 @api.route('/<place_id>')
 class PlaceResource(Resource):
     @api.doc('get_place_by_id')
@@ -75,7 +85,22 @@ class PlaceResource(Resource):
         place = facade.get_place(place_id)
         if not place:
             api.abort(404, 'Place not found')
-        return place.to_dict(), 200
+        # Retrieve the owner & convert it to a dictionary
+        owner = facade.get_user(place.owner_id)
+        owner_dict = owner.to_dict() if owner else None
+        # Retrieve the amenities & convert them to a list of dictionaries
+        # If the place has no amenities, return an empty list
+        amenities_list = []
+        for amenity_id in place.amenities:
+            amenity = facade.amenity_repo.get(amenity_id)
+            if amenity:
+                amenities_list.append(amenity.to_dict())
+        # Convert the place to a dictionary & include owner & amenities
+        # informations
+        get_place = place.to_dict()
+        get_place['owner'] = owner_dict
+        get_place['amenities'] = amenities_list
+        return get_place, 200
 
     @api.doc('update_place')
     @api.expect(place_model)
@@ -85,7 +110,8 @@ class PlaceResource(Resource):
     @api.response(400, 'Invalid input data')
     def put(self, place_id):
         """Update a place's information"""
-        # api.payload automatically parses and validates the request JSON against amenity_model
+        # api.payload automatically parses and validates the request JSON
+        # against amenity_model
         new_place_data = api.payload
         try:
             updated_place = facade.update_place(place_id, new_place_data)

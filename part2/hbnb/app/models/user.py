@@ -1,5 +1,5 @@
 from app.models.baseEntity import (BaseEntity, type_validation,
-                                        strlen_validation)
+                                   strlen_validation)
 from validate_email_address import validate_email
 import re
 
@@ -74,3 +74,16 @@ class User(BaseEntity):
     def is_admin(self, is_admin: bool):
         type_validation(is_admin, "is_admin", bool)
         self.__is_admin = is_admin
+
+    def to_dict(self):
+        """ Convert the User object to a dictionary representation,
+        including BaseEntity fields """
+        base_dict = super().to_dict()
+        base_dict.update({
+            "user_id": self.id,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "email": self.email,
+            "is_admin": self.is_admin
+            })
+        return base_dict

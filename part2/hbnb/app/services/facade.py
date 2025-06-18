@@ -19,9 +19,12 @@ class HBnBFacade:
             owner = self.user_repo.get(place_data['owner_id'])
             if not owner:
                 raise ValueError("Owner does not exist")
-            # Delete owner_id from place_data if it's not needed for the Place model
-            place_data['owner'] = place_data.pop('owner_id')
-        # Delete amenities from place_data if they aren't needed for the Place model
+            # Delete owner_id from place_data if it's not needed for the Place
+            # model
+            place_data.pop('owner_id')
+            place_data['owner'] = owner.id
+        # Delete amenities from place_data if they aren't needed for the Place
+        # model
         place_data.pop('amenities', None)
         # Validate the place data
         new_place = Place(**place_data)
