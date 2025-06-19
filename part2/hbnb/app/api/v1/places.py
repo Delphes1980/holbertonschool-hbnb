@@ -3,34 +3,39 @@ from app.services import facade
 
 api = Namespace('places', description='Place operations')
 
+# Define a model for nested amenity objects within a place response
 amenity_model = api.model('PlaceAmenity', {
     'id': fields.String(required=True, description='Amenity ID'),
     'name': fields.String(required=True,
                           description='Name of the amenity')
 })
 
+# Define a model for nested owner (user) obkects within a place response
 user_model = api.model('PlaceOwner', {
     'id': fields.String(required=True, description='Owner ID'),
-    'first_name': fields.String(required=True, 
+    'first_name': fields.String(required=True,
                                 description='First name of the owner'),
-    'last_name': fields.String(required=True, 
+    'last_name': fields.String(required=True,
                                description='Last name of the owner'),
-    'email': fields.String(required=True, 
+    'email': fields.String(required=True,
                            description='Email of the owner')
 })
 
+# Define a model for nested review objects within a place response
 review_model = api.model('PlaceReview', {
     'id': fields.String(required=True, description='Review ID'),
     'text': fields.String(required=True,
                           description='Text of the review'),
-    'rating': fields.Integer(required=True, 
+    'rating': fields.Integer(required=True,
                              description='Rating of the place (1-5)'),
+    # 'attribute' maps the review's user obect to its ID for the response
     'user_id': fields.String(
         attribute=lambda review: f"{review.user.id}",
         required=True,
         description='ID of the user who left the review')
 })
 
+# Define the data model for place input (e.g., for POST/PUT requests)
 place_model = api.model('Place', {
     'title': fields.String(required=True,
                            description='Title of the place'),
@@ -49,13 +54,16 @@ place_model = api.model('Place', {
                              required=True,
                              description="List of amenities ID's")
 })
+
+# Define the data model for place responses (full detail, including nested
+# objects)
 place_response_model = api.model('PlaceResponse', {
-    'id': fields.String(required=True, 
+    'id': fields.String(required=True,
                         description='Unique identifier for the place'),
     'title': fields.String(required=True,
                            description='Title of the place'),
     'description': fields.String(
-        required=False, 
+        required=False,
         description='Description of the place'),
     'price': fields.Float(required=True,
                           description='Price per night'),
@@ -63,11 +71,14 @@ place_response_model = api.model('PlaceResponse', {
                              description='Latitude of the place'),
     'longitude': fields.Float(required=True,
                               description='Longitude of the place'),
+    # Embeds the full owner object using the 'user_model'
     'owner': fields.Nested(user_model, required=True,
                            description='Owner of the place'),
+    # Embeds the full amenity object using the 'amenity_model'
     'amenities': fields.List(fields.Nested(amenity_model),
                              required=True,
                              description='List of amenities'),
+    # Embeds a list of review objects using the 'review_model'
     'reviews': fields.List(fields.Nested(review_model),
                            required=True,
                            description='List of reviews')
@@ -75,12 +86,16 @@ place_response_model = api.model('PlaceResponse', {
 
 # place_response_model = api.inherit('PlaceResponse', place_model, {
 #     'id': fields.String(description='Unique identifier for the place'),
-#     'created_at': fields.DateTime(dt_format='iso8601', description='Timestamp of creation (ISO 8601)'),
-#     'updated_at': fields.DateTime(dt_format='iso8601', description='Timestamp of the last update (ISO 8601)')
+#     'created_at': fields.DateTime(dt_format='iso8601', description=
+# 'Timestamp of creation (ISO 8601)'),
+#     'updated_at': fields.DateTime(dt_format='iso8601', description=
+# 'Timestamp of the last update (ISO 8601)')
 # })
+
 
 @api.route('/')
 class PlaceList(Resource):
+    # Endpoint for creating a new place
     @api.doc('Returned the created place')
     @api.marshal_with(place_response_model,
                       code=_http.HTTPStatus.CREATED,
@@ -90,6 +105,7 @@ class PlaceList(Resource):
     @api.response(400, 'Invalid input data')
     def post(self):
         """Register a new place"""
+        # Automatically parses and validates request JSON
         place_data = api.payload
         try:
             place = facade.create_place(place_data)
@@ -98,6 +114,7 @@ class PlaceList(Resource):
             return {'error': str(e)}, 400
         return place, 201
 
+    # Endpoint for retrieving all places
     @api.doc('Returns a list of all registered places')
     @api.marshal_list_with(
         place_response_model,
@@ -112,8 +129,10 @@ class PlaceList(Resource):
         # return [place.to_dict() for place in places], 200
         return places, 200
 
+
 @api.route('/<place_id>')
 class PlaceResource(Resource):
+    # Endpoint for retrieving a single place by ID
     @api.doc('Returns place corresponding to given ID')
     @api.marshal_with(
         place_response_model,
@@ -134,6 +153,7 @@ class PlaceResource(Resource):
             return {'error': 'Place not found'}, 404
         return place, 200
 
+    # Endpoint for updating an existing place by ID
     @api.doc('Returns the updated place')
     @api.marshal_with(place_response_model,
                       code=_http.HTTPStatus.OK,
@@ -155,14 +175,15 @@ class PlaceResource(Resource):
             api.abort(404, error='Place not found')
             return {'error': 'Place not found'}, 404
         return updated_place, 200
-        
+
 
 @api.route('/<place_id>/reviews')
 class PlaceReviewsList(Resource):
+    # Endpoint for retrieving all reviwes associated with a specific place
     @api.doc('Returns list of reviews given to the concerned place')
-    @api.marshal_list_with(review_model,
-                      code=_http.HTTPStatus.OK,
-                      description='List of reviews given to the place retrieved successfully')
+    @api.marshal_list_with(review_model, code=_http.HTTPStatus.OK,
+                           description='List of reviews given to the place'
+                           'retrieved successfully')
     @api.response(200, 'List of reviews retrieved successfully')
     @api.response(400, "Invalid ID")
     @api.response(404, 'Place not found')

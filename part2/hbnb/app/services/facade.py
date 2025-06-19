@@ -23,7 +23,7 @@ class HBnBFacade:
         self.review_repo = InMemoryRepository()
         self.amenity_repo = InMemoryRepository()
 
-######## Services for Place CRUD operations ########
+# Services for Place CRUD operations #
 
     def create_place(self, place_data):
         """ Create a new place with the provided data """
@@ -45,9 +45,11 @@ class HBnBFacade:
         if amenities:
             for amenity_id in amenities:
                 if not is_valid_uuid4(amenity_id):
-                    raise ValueError(f"Given amenity_id={amenity_id} is not a valid UUID4")
+                    raise ValueError(f"Given amenity_id={amenity_id} is not"
+                                     "a valid UUID4")
                 place.add_amenity(self.get_amenity(amenity_id))
-        # # Delete amenities from place_data if they aren't needed for the Place model
+        # Delete amenities from place_data if they aren't needed for the
+        # Place model
         # place_data.pop('amenities', None)
         # # Validate the place data
         # new_place = Place(**place_data)
@@ -87,14 +89,15 @@ class HBnBFacade:
             amenities = []
             for amenity_id in amenities_ids:
                 if not is_valid_uuid4(amenity_id):
-                    raise ValueError(f"Given amenity_id={amenity_id} is not a valid UUID4")
+                    raise ValueError(f"Given amenity_id={amenity_id} is not"
+                                     "a valid UUID4")
                 amenities.append(self.get_amenity(amenity_id))
             place_data['amenities'] = amenities
         place.update(place_data)
         # updated_place = self.place_repo.get(place_id)
         return place
 
-#### Services for User CRUD operations ####
+# Services for User CRUD operations #
 
     def create_user(self, user_data):
         """ Create a new user with the provided data """
@@ -110,7 +113,7 @@ class HBnBFacade:
         """ Retrieve a user byt their email address """
         return self.user_repo.get_by_attribute('email', email)
 
-######## Services for Amenity CRUD operations ########
+# Services for Amenity CRUD operations #
 
     def create_amenity(self, amenity_data):
         """ Create a new amenity with the provided data """
@@ -138,7 +141,7 @@ class HBnBFacade:
         # return updated_amenity
         return amenity
 
-######## Services for Review CRUD operations ########
+# Services for Review CRUD operations #
 
     def create_review(self, review_data):
         # Placeholder for logic to create a review, including
@@ -184,7 +187,7 @@ class HBnBFacade:
         if not is_valid_uuid4(place_id):
             raise ValueError('Given place_id is not valid UUID4')
         place = self.get_place(place_id)
-        if not place :
+        if not place:
             return None
         return place.reviews
 

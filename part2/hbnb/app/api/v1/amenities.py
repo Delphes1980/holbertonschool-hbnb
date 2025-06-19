@@ -21,12 +21,16 @@ amenity_response_model = api.model('AmenityResponse', {
 #     'id': fields.String(
 #         required=True,
 #         description='Unique identifier for the amenity'),
-    # 'created_at': fields.DateTime(dt_format='iso8601', description='Timestamp of creation (ISO 8601)'),
-    # 'updated_at': fields.DateTime(dt_format='iso8601', description='Timestamp of the last update (ISO 8601)')
+# 'created_at': fields.DateTime(dt_format='iso8601', description=
+# 'Timestamp of creation (ISO 8601)'),
+# 'updated_at': fields.DateTime(dt_format='iso8601', description=
+# 'Timestamp of the last update (ISO 8601)')
 # })
+
 
 @api.route('/')
 class AmenityList(Resource):
+    # Endpoint for creating a new amenity
     @api.doc('Returns the created amenity')
     @api.marshal_with(amenity_response_model,
                       code=_http.HTTPStatus.CREATED,
@@ -37,7 +41,7 @@ class AmenityList(Resource):
     @api.response(400, 'Invalid input data')
     def post(self):
         """Register a new amenity"""
-        # api.payload automatically parses and validates the request JSON against amenity_model
+        # Automatically parses and validates the request JSON
         data = api.payload
         try:
             new_amenity = facade.create_amenity(data)
@@ -46,6 +50,7 @@ class AmenityList(Resource):
             return {'error': str(e)}, 400
         return new_amenity, 201
 
+    # Endpoint for retrieving all amenities
     @api.doc('Returns a list of all registered amenities')
     @api.marshal_list_with(
         amenity_response_model,
@@ -58,8 +63,10 @@ class AmenityList(Resource):
         # amenities = facade.get_all_amenities()
         # return [amenity.to_dict() for amenity in amenities], 200
 
+
 @api.route('/<amenity_id>')
 class AmenityResource(Resource):
+    # ENdpoint for retrieving a single amenity by ID
     @api.doc('Returns amenity corresponding to given ID')
     @api.marshal_with(
         amenity_response_model,
@@ -80,6 +87,7 @@ class AmenityResource(Resource):
             return {'error': 'Amenity not found'}, 404
         return amenity, 200
 
+    # Endpoint for updating an existing amenity by ID
     @api.doc('Returns the updated amenity')
     @api.marshal_with(amenity_response_model,
                       code=_http.HTTPStatus.OK,
@@ -90,7 +98,7 @@ class AmenityResource(Resource):
     @api.response(404, 'Amenity not found')
     def put(self, amenity_id):
         """Update an amenity's information"""
-        new_amenity_data = api.payload
+        new_amenity_data = api.payload  # Parses request JSON for update
         try:
             updated_amenity = facade.update_amenity(amenity_id,
                                                     new_amenity_data)
