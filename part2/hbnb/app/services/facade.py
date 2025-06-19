@@ -15,30 +15,46 @@ class HBnBFacade:
     def create_place(self, place_data):
         """ Create a new place with the provided data """
         # Check if the owner exists
-        if 'owner_id' in place_data:
-            owner = self.user_repo.get(place_data['owner_id'])
-            if not owner:
-                raise ValueError("Owner does not exist")
-            # Delete owner_id from place_data if it's not needed for the Place
-            # model
-            place_data.pop('owner_id')
-            place_data['owner'] = owner.id
-        # Delete amenities from place_data if they aren't needed for the Place
-        # model
-        place_data.pop('amenities', None)
-        # Validate the place data
-        new_place = Place(**place_data)
-        # Store the new place in the repository
+        if 'owner_id' not in place_data:
+            raise ValueError("Owner Id is required")
+        
+        owner_id = place_data['owner_id']
+        owner_obj = self.user_repo.get(owner_id)
+        if not owner_obj:
+            raise ValueError(f"Owner with ID '{owner_id}' does not exist")
+        amenity_ids_from_payload = place_data.pop('amenities', [])
+        place_init_data = {
+            "title": place_data.get('title'),
+            "description": place_data.get('description'),
+            "price": place_data.get('price'),
+            "latitude": place_data.get('latitude'),
+            "longitude": place_data.get('longitude'),
+            "owner": owner_obj.id
+        }
+        new_place = Place(**place_init_data)
+        for amenity_id in amenity_ids_from_payload:
+            amenity_obj = self.amenity_repo.get(amenity_id)
+            if amenity_obj:
+                new_place.add_amenity(amenity_obj)
+            else:
+                print(f"Amenity with ID '{amenity_id}' not found and skipped for Place creation")
         self.place_repo.add(new_place)
         return new_place
+
 
     def get_place(self, place_id):
         """ Retrieve a place by its ID """
         place = self.place_repo.get(place_id)
         if not place:
             return None
-        place.amenities = self.amenity_repo.get_all()
-        place.owner = self.user_repo.get(place.owner_id)
+        owner_id_from_place = place.owner
+        place.owner = self.user_repo.get(owner_id_from_place)
+        amenities = []
+        for amenity_id in place.amenities:
+            amenity_obj = self.amenity_repo.get(amenity_id)
+            if amenity_obj:
+                amenities.append(amenity_obj)
+        place.amenities = amenities
         return place
 
     def get_all_places(self):
@@ -51,10 +67,25 @@ class HBnBFacade:
         # Check if place exists
         if not place_to_update:
             return None
-        # Update the place with the provided data
-        place_to_update.update(place_data)
+        if 'owner_id' in place_data:
+            new_owner_id = place_data['owner_id']
+            new_owner_obj = self.user_repo.get(new_owner_id)
+            if not new_owner_obj:
+                raise ValueError("New owner does not exist")
+            place_to_update.owner = new_owner_obj.id
+            place_data.pop('owner_id')
+        amenity_ids_to_add = place_data.pop('amenities', None)
         updated_place = self.place_repo.get(place_id)
-        return updated_place
+        if amenity_ids_to_add is not None:
+            updated_place.amenities = []
+        for amenity_id in amenity_ids_to_add:
+            amenity_obj = self.amenity_repo.get(amenity_id)
+            if amenity_obj:
+                updated_place.add_amenity(amenity_obj)
+            else:
+                print("Amenity not found")
+
+        return self.get_place(place_id)
 
     def create_user(self, user_data):
         """ Create a new user with the provided data """

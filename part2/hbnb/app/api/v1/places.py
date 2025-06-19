@@ -5,12 +5,12 @@ api = Namespace('places', description='Place operations')
 
 # Define the models for related entities
 amenity_model = api.model('PlaceAmenity', {
-    'amenity_id': fields.String(description='Amenity ID'),
+    'id': fields.String(description='Amenity ID'),
     'name': fields.String(description='Name of the amenity')
 })
 
 user_model = api.model('PlaceUser', {
-    'user_id': fields.String(description='User ID'),
+    'id': fields.String(description='User ID'),
     'first_name': fields.String(description='First name of the owner'),
     'last_name': fields.String(description='Last name of the owner'),
     'email': fields.String(description='Email of the owner')
@@ -85,22 +85,18 @@ class PlaceResource(Resource):
         place = facade.get_place(place_id)
         if not place:
             api.abort(404, 'Place not found')
-        # Retrieve the owner & convert it to a dictionary
-        owner = facade.get_user(place.owner_id)
-        owner_dict = owner.to_dict() if owner else None
         # Retrieve the amenities & convert them to a list of dictionaries
         # If the place has no amenities, return an empty list
-        amenities_list = []
-        for amenity_id in place.amenities:
-            amenity = facade.amenity_repo.get(amenity_id)
-            if amenity:
-                amenities_list.append(amenity.to_dict())
+        #amenities_list = []
+        #for amenity_id in place.amenities:
+        #    amenity = facade.amenity_repo.get(amenity_id)
+        #    if amenity:
+        #        amenities_list.append(amenity.to_dict())
         # Convert the place to a dictionary & include owner & amenities
         # informations
-        get_place = place.to_dict()
-        get_place['owner'] = owner_dict
-        get_place['amenities'] = amenities_list
-        return get_place, 200
+        #get_place = place.to_dict()
+        #get_place['amenities'] = amenities_list
+        return place.to_dict(), 200
 
     @api.doc('update_place')
     @api.expect(place_model)

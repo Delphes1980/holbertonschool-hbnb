@@ -1,6 +1,7 @@
 from app.models.baseEntity import (BaseEntity, type_validation,
                                    strlen_validation)
 from app.models.user import User
+from datetime import datetime
 
 
 class Place(BaseEntity):
@@ -86,14 +87,31 @@ class Place(BaseEntity):
         """ Convert the Place object to a dictionary representation,
         including BaseEntity fields """
         base_dict = super().to_dict()
+        owner_data = self.owner.to_dict() if isinstance(self.owner, User) else None
+        amenities_data = [a.to_dict() for a in self.amenities if hasattr(a, 'to_dict')]
+
         base_dict.update({
             "title": self.title,
             "description": self.description,
             "price": self.price,
             "latitude": self.latitude,
             "longitude": self.longitude,
-            "owner_id": self.owner,
+            "owner_id": self.owner.id if isinstance(self.owner, User) else self.owner,
+            "owner": owner_data,
             "reviews": list(self.reviews),
-            "amenities": list(self.amenities)
+            "amenities": amenities_data
             })
         return base_dict
+
+    def update(self, data):
+        if 'title' in data and data['title'] is not None:
+            self.title = self.validate_title(data['title'])
+        if 'description' in data and data['description'] is not None:
+            self.description = self.validate_description(data['description'])
+        if 'price' in data and data['price'] is not None:
+            self.price = self.validate_price(data['price'])
+        if 'latitude' in data and data['latitude'] is not None:
+            self.latitude = self.validate_latitude(data['latitude'])
+        if 'longitude' in data and data['longitude'] is not None:
+            self.longitude = self.validate_longitude(data['longitude'])
+        self.updated_at = datetime.utcnow()
