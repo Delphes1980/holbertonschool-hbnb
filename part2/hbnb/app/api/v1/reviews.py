@@ -67,7 +67,7 @@ class ReviewResource(Resource):
         try:
             review = facade.get_review(review_id)
         except Exception as e:
-            api.abort(400, str(e))
+            api.abort(400, error=str(e))
             return {'error', str(e)}, 400
         if not review:
             api.abort(404, error='Review not found')

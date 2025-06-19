@@ -73,7 +73,7 @@ class AmenityResource(Resource):
         try:
             amenity = facade.get_amenity(amenity_id)
         except Exception as e:
-            api.abort(400, str(e))
+            api.abort(400, error=str(e))
             return {'error': str(e)}, 400
         if not amenity:
             api.abort(404, error='Amenity not found')

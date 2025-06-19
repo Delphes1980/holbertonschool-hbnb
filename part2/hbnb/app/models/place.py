@@ -69,6 +69,8 @@ class Place(BaseEntity):
 
     def validate_price(self, price: float):
         """Verify is the price is an integer."""
+        if not price:
+            raise ValueError("Price is required")
         type_validation(price, "Price", (float, int))
         if price <= 0:
             raise ValueError("Price must be a positive number (larger "
@@ -84,6 +86,8 @@ class Place(BaseEntity):
 
     def validate_latitude(self, latitude):
         """Verify is the latitude is a float between -90.0 & 90.0."""
+        if not latitude:
+            raise ValueError("Latitude is required")
         type_validation(latitude, "Latitude", (float, int))
         if not (-90.0 <= latitude <= 90.0):
             raise ValueError("Latitude must be between -90.0 and 90.0.")
@@ -97,7 +101,10 @@ class Place(BaseEntity):
         self.__longitude = self.validate_longitude(value)
         
     def validate_longitude(self, longitude):
-        """Verify is the longitude is a float between -180.0 & 180.0."""
+        """Verify is the longitude is a float between -180.0 &
+        180.0."""
+        if not longitude:
+            raise ValueError("Longitude is required")
         type_validation(longitude, "Longitude", (float, int))
         if not (-180.0 <= longitude <= 180.0):
             raise ValueError("Longitude must be between -180.0 and"
@@ -109,6 +116,8 @@ class Place(BaseEntity):
         return self.__owner
     @owner.setter
     def owner(self, value):
+        if not value:
+            raise ValueError("Owner is required")
         type_validation(value, "owner", User)
         self.__owner = value
 
