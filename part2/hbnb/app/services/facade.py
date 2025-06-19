@@ -115,8 +115,26 @@ class HBnBFacade:
     def create_review(self, review_data):
         # Placeholder for logic to create a review, including
         # validation for user_id, place_id, and rating
-        
-        pass
+        if not is_valid_uuid4(review_data['user_id']):
+            raise ValueError('Given user_id is not valid UUID4')
+        if not is_valid_uuid4(review_data['place_id']):
+            raise ValueError('Given place_id is not valid UUID4')
+        exisiting_user = self.user_repo.get(review_data['user_id'])
+        if not exisiting_user:
+            raise ValueError('No User corresponding to given ID')
+        review_data.pop('user_id')
+        review_data['user'] = exisiting_user
+        existing_place = self.place_repo.get(review_data['place_id'])
+        if not existing_place:
+            raise ValueError('No Place corresponding to given place '
+                             'ID')
+        review_data.pop('place_id')
+        review_data['place'] = existing_place
+        review = Review(**review_data)
+        self.review_repo.add(review)
+        return review
+
+
 
     def get_review(self, review_id):
         # Placeholder for logic to retrieve a review by ID
@@ -128,6 +146,9 @@ class HBnBFacade:
 
     def get_reviews_by_place(self, place_id):
         # Placeholder for logic to retrieve all reviews for a specific place
+        pass
+
+    def get_review_by_place_and_user(self, place_id, user_id):
         pass
 
     def update_review(self, review_id, review_data):
