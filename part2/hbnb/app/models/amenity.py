@@ -2,7 +2,6 @@ from app.models.baseEntity import (BaseEntity, type_validation,
                                    strlen_validation)
 
 
-
 class Amenity(BaseEntity):
     def __init__(self, name):
         super().__init__()
@@ -17,9 +16,9 @@ class Amenity(BaseEntity):
         strlen_validation(name, "Name of the Amenity", 1, 50)
         return name
 
-    def to_dict(self):
-        """ Convert the Amenity object to a dictionary representation,
-        including BaseEntity fields """
-        base_dict = super().to_dict()
-        base_dict.update({"name": self.name})
-        return base_dict
+    # def to_dict(self):
+    #     """ Convert the Amenity object to a dictionary representation,
+    #     including BaseEntity fields """
+    #     base_dict = super().to_dict()
+    #     base_dict.update({"name": self.name})
+    #     return base_dict

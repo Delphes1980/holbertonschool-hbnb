@@ -82,18 +82,18 @@ class HBnBFacade:
         """ Retrieve a user byt their email address """
         return self.user_repo.get_by_attribute('email', email)
 
-#### Services for Amenity CRUD operations ####
+######## Services for Amenity CRUD operations ########
 
     def create_amenity(self, amenity_data):
         """ Create a new amenity with the provided data """
-        # Validate the amenity data
         new_amenity = Amenity(**amenity_data)
-        # Store the new amenity in the repository
         self.amenity_repo.add(new_amenity)
         return new_amenity
 
     def get_amenity(self, amenity_id):
         """ Retrieve an amenity by its ID """
+        if not is_valid_uuid4(amenity_id):
+            raise ValueError('Given amenity_id is not valid UUID4')
         return self.amenity_repo.get(amenity_id)
 
     def get_all_amenities(self):
@@ -102,16 +102,15 @@ class HBnBFacade:
 
     def update_amenity(self, amenity_id, amenity_data):
         """ Update an amenity with the provided data """
-        amenity_to_update = self.amenity_repo.get(amenity_id)
-        # Check if amenity exists
-        if not amenity_to_update:
+        amenity = self.get_amenity(amenity_id)
+        if not amenity:
             return None
-        # Update the amenity with the provided data
-        amenity_to_update.update(amenity_data)
-        updated_amenity = self.amenity_repo.get(amenity_id)
-        return updated_amenity
+        amenity.update(amenity_data)
+        # updated_amenity = self.amenity_repo.get(amenity_id)
+        # return updated_amenity
+        return amenity
 
-#### Services for Review CRUD operations ####
+######## Services for Review CRUD operations ########
 
     def create_review(self, review_data):
         # Placeholder for logic to create a review, including
@@ -174,7 +173,8 @@ class HBnBFacade:
         review = self.get_review(review_id)
         if not review:
             return None
-        self.review_repo.update(review_id, review_data)
+        # self.review_repo.update(review_id, review_data)
+        review.update(review_data)
         return review
 
     def delete_review(self, review_id):
