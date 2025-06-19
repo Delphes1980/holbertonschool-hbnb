@@ -57,12 +57,9 @@ class HBnBFacade:
 
     def get_place(self, place_id):
         """ Retrieve a place by its ID """
-        place = self.place_repo.get(place_id)
-        if not place:
-            return None
-        place.amenities = self.amenity_repo.get_all()
-        place.owner = self.user_repo.get(place.owner_id)
-        return place
+        if not is_valid_uuid4(place_id):
+            raise ValueError('Given place_id is not valid UUID4')
+        return self.place_repo.get(place_id)
 
     def get_all_places(self):
         """ Retrieve all places """
@@ -70,14 +67,32 @@ class HBnBFacade:
 
     def update_place(self, place_id, place_data):
         """ Update a place with the provided data """
-        place_to_update = self.place_repo.get(place_id)
-        # Check if place exists
-        if not place_to_update:
+        place = self.get_place(place_id)
+        if not place:
             return None
-        # Update the place with the provided data
-        place_to_update.update(place_data)
-        updated_place = self.place_repo.get(place_id)
-        return updated_place
+        owner_id = place_data.get('owner_id')
+        if not owner_id:
+            raise ValueError('Place data does not contain owner_id key')
+        type_validation(owner_id, 'owner_id', str)
+        if not is_valid_uuid4(owner_id):
+            raise ValueError('Given owner_id is not valid UUID4')
+        existing_user = self.get_user(owner_id)
+        if not existing_user:
+            raise ValueError('No User corresponding to owner_id')
+        place_data.pop('owner_id')
+        place_data['owner'] = existing_user
+        amenities_ids = place_data.get('amenities')
+        if amenities_ids:
+            place_data.pop('amenities')
+            amenities = []
+            for amenity_id in amenities_ids:
+                if not is_valid_uuid4(amenity_id):
+                    raise ValueError(f"Given amenity_id={amenity_id} is not a valid UUID4")
+                amenities.append(self.get_amenity(amenity_id))
+            place_data['amenities'] = amenities
+        place.update(place_data)
+        # updated_place = self.place_repo.get(place_id)
+        return place
 
 #### Services for User CRUD operations ####
 

@@ -26,6 +26,7 @@ review_model = api.model('PlaceReview', {
     'rating': fields.Integer(required=True, 
                              description='Rating of the place (1-5)'),
     'user_id': fields.String(
+        attribute=lambda review: f"{review.user.id}",
         required=True,
         description='ID of the user who left the review')
 })
@@ -97,70 +98,82 @@ class PlaceList(Resource):
             return {'error': str(e)}, 400
         return place, 201
 
-    @api.doc('list_places')
-    @api.marshal_list_with(place_response_model)
+    @api.doc('Returns a list of all registered places')
+    @api.marshal_list_with(
+        place_response_model,
+        code=_http.HTTPStatus.OK,
+        description='List of places retrieved successfully')
     @api.response(200, 'List of places retrieved successfully')
     def get(self):
         """Retrieve a list of all places"""
         # Call the facade to get all places
         places = facade.get_all_places()
         # Convert each place to a dictionary & return the list
-        return [place.to_dict() for place in places], 200
+        # return [place.to_dict() for place in places], 200
+        return places, 200
 
 @api.route('/<place_id>')
 class PlaceResource(Resource):
-    @api.doc('get_place_by_id')
-    @api.marshal_with(place_response_model)
+    @api.doc('Returns place corresponding to given ID')
+    @api.marshal_with(
+        place_response_model,
+        code=_http.HTTPStatus.OK,
+        description='Review details retrieved successfully')
     @api.response(200, 'Place details retrieved successfully')
+    @api.response(400, 'Invalid ID: not a UUID4')
     @api.response(404, 'Place not found')
     def get(self, place_id):
         """Get place details by ID"""
-        # Call the facade to retrieve a place by ID
-        place = facade.get_place(place_id)
+        try:
+            place = facade.get_place(place_id)
+        except Exception as e:
+            api.abort(400, str(e))
+            return {'error': str(e)}, 400
         if not place:
             api.abort(404, error='Place not found')
-        return place.to_dict(), 200
+            return {'error': 'Place not found'}, 404
+        return place, 200
 
-    @api.doc('update_place')
+    @api.doc('Returns the updated place')
+    @api.marshal_with(place_response_model,
+                      code=_http.HTTPStatus.OK,
+                      description='Place updated successfully')
     @api.expect(place_model)
-    @api.marshal_with(place_response_model)
     @api.response(200, 'Place updated successfully')
-    @api.response(404, 'Place not found')
     @api.response(400, 'Invalid input data')
+    @api.response(404, 'Place not found')
     def put(self, place_id):
         """Update a place's information"""
-        # api.payload automatically parses and validates the request JSON against amenity_model
-        new_place_data = api.payload
+        place_data = api.payload
         try:
-            updated_place = facade.update_place(place_id, new_place_data)
-            # If the place is not found, return an error
-            # Otherwise, return the updated place as a dictionary
-            if not updated_place:
-                api.abort(404, error='Place not found')
-                return {'returned error': 
-                        'returned Place not found'}, 404
-            return updated_place.to_dict(), 200
-        except ValueError as e:
-            api.abort(400, message=str(e))
+            updated_place = facade.update_place(place_id,
+                                                place_data)
+        except Exception as e:
+            api.abort(400, error=str(e))
+            return {'error': str(e)}, 400
+        if not updated_place:
+            api.abort(404, error='Place not found')
+            return {'error': 'Place not found'}, 404
+        return updated_place, 200
+        
 
 @api.route('/<place_id>/reviews')
 class PlaceReviewsList(Resource):
-    @api.doc('Returns list of reviews given to the selected place')
+    @api.doc('Returns list of reviews given to the concerned place')
+    @api.marshal_list_with(review_model,
+                      code=_http.HTTPStatus.OK,
+                      description='List of reviews given to the place retrieved successfully')
     @api.response(200, 'List of reviews retrieved successfully')
-    @api.response(404, 'Place not found')
     @api.response(400, "Invalid ID")
+    @api.response(404, 'Place not found')
     def get(self, place_id):
         """Get list of reviews for a place given its ID"""
-        if not is_valid_uuid4(place_id):
-            return {'error': 'Invalid UUID: provided ID is not a valid'
-                             ' UUID4'}, 400
-        place = facade.get_place(place_id)
-        if not place:
+        try:
+            reviews_by_place = facade.get_reviews_by_place(place_id)
+        except Exception as e:
+            api.abort(400, error=str(e))
+            return {'error': str(e)}, 400
+        if not reviews_by_place:
+            api.abort(404, error='Place not found')
             return {'error': 'Place not found'}, 404
-        place.reviews
-        return [{"id": review.id,
-                 "rating": review.rating,
-                 "text": review.text,
-                 "place_id": review.place.id,
-                 "user_id": review.user.id
-                 } for review in place.reviews], 200
+        return reviews_by_place, 200

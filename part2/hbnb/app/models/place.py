@@ -7,7 +7,7 @@ class Place(BaseEntity):
     def __init__(self, title:str, description=None, price:float=-1,
                  latitude:float=-360, longitude:float=-360, owner=None):
         super().__init__()
-        self.title = self.validate_title(title)
+        self.title = title
         self.description = self.validate_description(description)
         self.price = self.validate_price(price)
         self.latitude = self.validate_latitude(latitude)
@@ -28,6 +28,13 @@ class Place(BaseEntity):
         type_validation(amenity, "Amenity", Amenity)
         self.amenities.append(amenity)
 
+    @property
+    def title(self):
+        return self.__title
+    @title.setter
+    def title(self, value):
+        self.__title = self.validate_title(value)
+    
     def validate_title(self, title):
         """Verify if the title is a string < 100 characters."""
         if not title:
@@ -36,6 +43,13 @@ class Place(BaseEntity):
         title = title.strip()
         strlen_validation(title, "Title", 4, 100)
         return title
+
+    @property
+    def description(self):
+        return self.__description
+    @description.setter
+    def description(self, value):
+        self.__description = self.validate_description(value)
 
     def validate_description(self, description):
         """Verify if the description is a string."""
@@ -46,6 +60,13 @@ class Place(BaseEntity):
         strlen_validation(description, "Description", 0, 50)
         return description
 
+    @property
+    def price(self):
+        return self.__price
+    @price.setter
+    def price(self, value):
+        self.__price = self.validate_price(value)
+
     def validate_price(self, price: float):
         """Verify is the price is an integer."""
         type_validation(price, "Price", (float, int))
@@ -54,6 +75,13 @@ class Place(BaseEntity):
                              "than 0)")
         return float(price)
 
+    @property
+    def latitude(self):
+        return self.__latitude
+    @latitude.setter
+    def latitude(self, value):
+        self.__latitude = self.validate_latitude(value)
+
     def validate_latitude(self, latitude):
         """Verify is the latitude is a float between -90.0 & 90.0."""
         type_validation(latitude, "Latitude", (float, int))
@@ -61,6 +89,13 @@ class Place(BaseEntity):
             raise ValueError("Latitude must be between -90.0 and 90.0.")
         return float(latitude)
 
+    @property
+    def longitude(self):
+        return self.__longitude
+    @longitude.setter
+    def longitude(self, value):
+        self.__longitude = self.validate_longitude(value)
+        
     def validate_longitude(self, longitude):
         """Verify is the longitude is a float between -180.0 & 180.0."""
         type_validation(longitude, "Longitude", (float, int))
@@ -68,6 +103,15 @@ class Place(BaseEntity):
             raise ValueError("Longitude must be between -180.0 and"
                              " 180.0")
         return float(longitude)
+
+    @property
+    def owner(self):
+        return self.__owner
+    @owner.setter
+    def owner(self, value):
+        type_validation(value, "owner", User)
+        self.__owner = value
+
 
     # def is_owner(self, user_id):
     #     """Verify is the user owns the place."""

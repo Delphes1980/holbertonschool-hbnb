@@ -94,7 +94,7 @@ class ReviewResource(Resource):
             return {'error': str(e)}, 400
         if not updated_review:
             api.abort(404, error='Review not found')
-            return {'error': 'Review not found'}
+            return {'error': 'Review not found'}, 404
         return updated_review, 200
 
     @api.doc('Deletes review')

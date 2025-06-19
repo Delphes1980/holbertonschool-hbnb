@@ -9,6 +9,13 @@ class Amenity(BaseEntity):
             raise ValueError("Name of the Amenity is required")
         self.name = self.set_name(name)
 
+    @property
+    def name(self):
+        return self.__name
+    @name.setter
+    def name(self, value):
+        self.__name = self.set_name(value)
+
     def set_name(self, name):
         """Verify if the name is a string < 50 characters."""
         type_validation(name, "Name of the Amenity", str)
