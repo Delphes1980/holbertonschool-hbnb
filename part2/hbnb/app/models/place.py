@@ -87,8 +87,10 @@ class Place(BaseEntity):
         """ Convert the Place object to a dictionary representation,
         including BaseEntity fields """
         base_dict = super().to_dict()
-        owner_data = self.owner.to_dict() if isinstance(self.owner, User) else None
-        amenities_data = [a.to_dict() for a in self.amenities if hasattr(a, 'to_dict')]
+        owner_data = self.owner.to_dict() if isinstance(self.owner,
+                                                        User) else None
+        amenities_data = [a.to_dict() for a in self.amenities if
+                          hasattr(a, 'to_dict')]
 
         base_dict.update({
             "title": self.title,
@@ -96,7 +98,8 @@ class Place(BaseEntity):
             "price": self.price,
             "latitude": self.latitude,
             "longitude": self.longitude,
-            "owner_id": self.owner.id if isinstance(self.owner, User) else self.owner,
+            "owner_id": self.owner.id if isinstance(self.owner, User)
+            else self.owner,
             "owner": owner_data,
             "reviews": list(self.reviews),
             "amenities": amenities_data

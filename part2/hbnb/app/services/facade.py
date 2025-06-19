@@ -17,12 +17,18 @@ class HBnBFacade:
         # Check if the owner exists
         if 'owner_id' not in place_data:
             raise ValueError("Owner Id is required")
-        
+
+        # Retrieve & validate owner objet from user repository
         owner_id = place_data['owner_id']
         owner_obj = self.user_repo.get(owner_id)
         if not owner_obj:
             raise ValueError(f"Owner with ID '{owner_id}' does not exist")
+
+        # Extract amenity IDs from payload & pop to clean data for Place
+        # constructor
         amenity_ids_from_payload = place_data.pop('amenities', [])
+
+        # Prepare data for Place model initialization
         place_init_data = {
             "title": place_data.get('title'),
             "description": place_data.get('description'),
@@ -31,35 +37,59 @@ class HBnBFacade:
             "longitude": place_data.get('longitude'),
             "owner": owner_obj.id
         }
+        # Create new Place instance
         new_place = Place(**place_init_data)
+
+        # Iterate through amenity IDs from payload & add corresponding Amenity
+        # objects
         for amenity_id in amenity_ids_from_payload:
             amenity_obj = self.amenity_repo.get(amenity_id)
             if amenity_obj:
-                new_place.add_amenity(amenity_obj)
+                new_place.add_amenity(amenity_obj)  # Add amenity_obj to place
             else:
-                print(f"Amenity with ID '{amenity_id}' not found and skipped for Place creation")
+                print(f"Amenity with ID '{amenity_id}' not found and skipped"
+                      "for Place creation")
+
+        # Add the new place to the place repository
         self.place_repo.add(new_place)
         return new_place
-
 
     def get_place(self, place_id):
         """ Retrieve a place by its ID """
         place = self.place_repo.get(place_id)
         if not place:
             return None
+
+        # Hydrate the owner object
         owner_id_from_place = place.owner
-        place.owner = self.user_repo.get(owner_id_from_place)
+        if owner_id_from_place:
+            place.owner = self.user_repo.get(owner_id_from_place)
+        else:
+            place.owner = None
+
+        # Hydrate the amenities list, ensures list contains Amenity objects,
+        # not just IDs
+        current_amnity_reference = place.amenities
         amenities = []
-        for amenity_id in place.amenities:
-            amenity_obj = self.amenity_repo.get(amenity_id)
-            if amenity_obj:
-                amenities.append(amenity_obj)
+        for ref in current_amnity_reference:
+            if isinstance(ref, Amenity):  # If already an Amenity object
+                amenities.append(ref)
+            elif isinstance(ref, str):  # If it's an amenity ID string
+                amenity_obj = self.amenity_repo.get(ref)
+                if amenity_obj:
+                    amenities.append(amenity_obj)
+        # Update the place's amenity list
         place.amenities = amenities
         return place
 
     def get_all_places(self):
         """ Retrieve all places """
-        return self.place_repo.get_all()
+        all_places = self.place_repo.get_all()
+        places = []
+        # Iterate & hydrate each place using get_place method
+        for place in all_places:
+            places.append(self.get_place(place.id))
+        return places
 
     def update_place(self, place_id, place_data):
         """ Update a place with the provided data """
@@ -67,24 +97,35 @@ class HBnBFacade:
         # Check if place exists
         if not place_to_update:
             return None
+        # Handle owner update if 'owner_id' is in payload
         if 'owner_id' in place_data:
             new_owner_id = place_data['owner_id']
             new_owner_obj = self.user_repo.get(new_owner_id)
             if not new_owner_obj:
                 raise ValueError("New owner does not exist")
+            # Update the owner ID directly on the Place object
             place_to_update.owner = new_owner_obj.id
+            # Remove owner_id from place_data to avoid conflicts
             place_data.pop('owner_id')
-        amenity_ids_to_add = place_data.pop('amenities', None)
-        updated_place = self.place_repo.get(place_id)
-        if amenity_ids_to_add is not None:
-            updated_place.amenities = []
-        for amenity_id in amenity_ids_to_add:
-            amenity_obj = self.amenity_repo.get(amenity_id)
-            if amenity_obj:
-                updated_place.add_amenity(amenity_obj)
-            else:
-                print("Amenity not found")
 
+        amenity_ids_from_payload = place_data.pop('amenities', None)
+        # Update other attributes via repository
+        try:
+            self.place_repo.update(place_id, place_data)
+        except ValueError as e:
+            raise ValueError("Failed to update place attributes")
+
+        # Handle amenity updates if 'amenities' was in payload
+        if amenity_ids_from_payload is not None:
+            place_to_update.amenities = []
+            for amenity_id in amenity_ids_from_payload:
+                # Retrive Amenity object by ID
+                amenity_obj = self.amenity_repo.get(amenity_id)
+                if amenity_obj:
+                    # Add Amenity object
+                    place_to_update.add_amenity(amenity_obj)
+                else:
+                    print("Amenity not found")
         return self.get_place(place_id)
 
     def create_user(self, user_data):

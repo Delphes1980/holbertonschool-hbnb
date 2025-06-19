@@ -85,17 +85,6 @@ class PlaceResource(Resource):
         place = facade.get_place(place_id)
         if not place:
             api.abort(404, 'Place not found')
-        # Retrieve the amenities & convert them to a list of dictionaries
-        # If the place has no amenities, return an empty list
-        #amenities_list = []
-        #for amenity_id in place.amenities:
-        #    amenity = facade.amenity_repo.get(amenity_id)
-        #    if amenity:
-        #        amenities_list.append(amenity.to_dict())
-        # Convert the place to a dictionary & include owner & amenities
-        # informations
-        #get_place = place.to_dict()
-        #get_place['amenities'] = amenities_list
         return place.to_dict(), 200
 
     @api.doc('update_place')
