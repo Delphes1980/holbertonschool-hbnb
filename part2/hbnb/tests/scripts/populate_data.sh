@@ -33,7 +33,7 @@ for i in $(seq 1 3)
 do
   RESPONSE=$(curl -s -X POST "$API_URL/places/" \
     -H "Content-Type: application/json" \
-    -d "{\"title\": \"Place$i\", \"description\": \"A nice place $i\", \"price\": 100, \"latitude\": 10.0, \"longitude\": 20.0, \"owner\": \"$OWNER_ID\"}")
+    -d "{\"title\": \"Place$i\", \"description\": \"A nice place $i\", \"price\": 100, \"latitude\": 10.0, \"longitude\": 20.0, \"owner_id\": \"$OWNER_ID\"}")
   echo "Place $i response: $RESPONSE"
   PLACE_ID=$(echo "$RESPONSE" | grep -o '"id"[ ]*:[ ]*"[^\"]*"' | head -1 | cut -d '"' -f4)
   if [ -n "$PLACE_ID" ]; then

@@ -23,24 +23,37 @@ class HBnBFacade:
         self.review_repo = InMemoryRepository()
         self.amenity_repo = InMemoryRepository()
 
-#### Services for Place CRUD operations ####
+######## Services for Place CRUD operations ########
 
     def create_place(self, place_data):
         """ Create a new place with the provided data """
-        # Check if the owner exists
-        if 'owner_id' in place_data:
-            owner = self.user_repo.get(place_data['owner_id'])
-            if not owner:
-                raise ValueError("Owner does not exist")
-            # Delete owner_id from place_data if it's not needed for the Place model
-            place_data['owner'] = place_data.pop('owner_id')
-        # Delete amenities from place_data if they aren't needed for the Place model
-        place_data.pop('amenities', None)
-        # Validate the place data
-        new_place = Place(**place_data)
+        owner_id = place_data.get('owner_id')
+        if not owner_id:
+            raise ValueError('Place data does not contain owner_id key')
+        type_validation(owner_id, 'owner_id', str)
+        if not is_valid_uuid4(owner_id):
+            raise ValueError('Given owner_id is not valid UUID4')
+        existing_user = self.user_repo.get(owner_id)
+        if not existing_user:
+            raise ValueError('No User corresponding to owner_id')
+        place_data.pop('owner_id')
+        place_data['owner'] = existing_user
+        amenities = place_data.get('amenities')
+        if amenities:
+            place_data.pop('amenities')
+        place = Place(**place_data)
+        if amenities:
+            for amenity_id in amenities:
+                if not is_valid_uuid4(amenity_id):
+                    raise ValueError(f"Given amenity_id={amenity_id} is not a valid UUID4")
+                place.add_amenity(self.get_amenity(amenity_id))
+        # # Delete amenities from place_data if they aren't needed for the Place model
+        # place_data.pop('amenities', None)
+        # # Validate the place data
+        # new_place = Place(**place_data)
         # Store the new place in the repository
-        self.place_repo.add(new_place)
-        return new_place
+        self.place_repo.add(place)
+        return place
 
     def get_place(self, place_id):
         """ Retrieve a place by its ID """

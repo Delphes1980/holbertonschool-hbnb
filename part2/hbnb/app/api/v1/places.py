@@ -1,69 +1,101 @@
-from flask_restx import Namespace, Resource, fields
+from flask_restx import Namespace, Resource, fields, _http
 from app.services import facade
-from app.services.facade import is_valid_uuid4
-
 
 api = Namespace('places', description='Place operations')
 
-# Define the models for related entities
 amenity_model = api.model('PlaceAmenity', {
-    'id': fields.String(description='Amenity ID'),
-    'name': fields.String(description='Name of the amenity')
+    'id': fields.String(required=True, description='Amenity ID'),
+    'name': fields.String(required=True,
+                          description='Name of the amenity')
 })
 
-user_model = api.model('PlaceUser', {
-    'id': fields.String(description='User ID'),
-    'first_name': fields.String(description='First name of the owner'),
-    'last_name': fields.String(description='Last name of the owner'),
-    'email': fields.String(description='Email of the owner')
+user_model = api.model('PlaceOwner', {
+    'id': fields.String(required=True, description='Owner ID'),
+    'first_name': fields.String(required=True, 
+                                description='First name of the owner'),
+    'last_name': fields.String(required=True, 
+                               description='Last name of the owner'),
+    'email': fields.String(required=True, 
+                           description='Email of the owner')
 })
 
-# Adding the review model
 review_model = api.model('PlaceReview', {
-    'id': fields.String(description='Review ID'),
-    'text': fields.String(description='Text of the review'),
-    'rating': fields.Integer(description='Rating of the place (1-5)'),
-    'user_id': fields.String(description='ID of the user')
+    'id': fields.String(required=True, description='Review ID'),
+    'text': fields.String(required=True,
+                          description='Text of the review'),
+    'rating': fields.Integer(required=True, 
+                             description='Rating of the place (1-5)'),
+    'user_id': fields.String(
+        required=True,
+        description='ID of the user who left the review')
 })
 
-# Define the place model for input validation and documentation
 place_model = api.model('Place', {
-    'title': fields.String(required=True, description='Title of the place'),
-    'description': fields.String(description='Description of the place'),
-    'price': fields.Float(required=True, description='Price per night'),
-    'latitude': fields.Float(required=True, description='Latitude of the place'),
-    'longitude': fields.Float(required=True, description='Longitude of the place'),
-    'owner_id': fields.String(required=True, description='ID of the owner'),
-    'owner': fields.Nested(user_model, description='Owner of the place'),
-    'amenities': fields.List(fields.Nested(amenity_model), description='List of amenities'),
-    'reviews': fields.List(fields.Nested(review_model), description='List of reviews')
+    'title': fields.String(required=True,
+                           description='Title of the place'),
+    'description': fields.String(
+        required=False,
+        description='Description of the place'),
+    'price': fields.Float(required=True,
+                          description='Price per night'),
+    'latitude': fields.Float(required=True,
+                             description='Latitude of the place'),
+    'longitude': fields.Float(required=True,
+                              description='Longitude of the place'),
+    'owner_id': fields.String(required=True,
+                              description='ID of the owner'),
+    'amenities': fields.List(fields.String,
+                             required=True,
+                             description="List of amenities ID's")
+})
+place_response_model = api.model('PlaceResponse', {
+    'id': fields.String(required=True, 
+                        description='Unique identifier for the place'),
+    'title': fields.String(required=True,
+                           description='Title of the place'),
+    'description': fields.String(
+        required=False, 
+        description='Description of the place'),
+    'price': fields.Float(required=True,
+                          description='Price per night'),
+    'latitude': fields.Float(required=True,
+                             description='Latitude of the place'),
+    'longitude': fields.Float(required=True,
+                              description='Longitude of the place'),
+    'owner': fields.Nested(user_model, required=True,
+                           description='Owner of the place'),
+    'amenities': fields.List(fields.Nested(amenity_model),
+                             required=True,
+                             description='List of amenities'),
+    'reviews': fields.List(fields.Nested(review_model),
+                           required=True,
+                           description='List of reviews')
 })
 
-# Define the response model for returning place data
-place_response_model = api.inherit('PlaceResponse', place_model, {
-    'id': fields.String(description='Unique identifier for the place'),
-    'created_at': fields.DateTime(dt_format='iso8601', description='Timestamp of creation (ISO 8601)'),
-    'updated_at': fields.DateTime(dt_format='iso8601', description='Timestamp of the last update (ISO 8601)')
-})
+# place_response_model = api.inherit('PlaceResponse', place_model, {
+#     'id': fields.String(description='Unique identifier for the place'),
+#     'created_at': fields.DateTime(dt_format='iso8601', description='Timestamp of creation (ISO 8601)'),
+#     'updated_at': fields.DateTime(dt_format='iso8601', description='Timestamp of the last update (ISO 8601)')
+# })
 
 @api.route('/')
 class PlaceList(Resource):
-    @api.doc('create place')
-    @api.marshal_with(place_response_model)
+    @api.doc('Returned the created place')
+    @api.marshal_with(place_response_model,
+                      code=_http.HTTPStatus.CREATED,
+                      description='Place successfully created')
     @api.expect(place_model)
     @api.response(201, 'Place successfully created')
     @api.response(400, 'Invalid input data')
     def post(self):
         """Register a new place"""
-        # api.payload automatically parses and validates the request JSON against amenity_model
-        data = api.payload
+        place_data = api.payload
         try:
-            # Call the facade to create a new place
-            new_place = facade.create_place(data)
-            # Return the created place as a dictionary
-            return new_place.to_dict(), 201
-        except ValueError as e:
-            api.abort(400, message=str(e))
+            place = facade.create_place(place_data)
+        except Exception as e:
+            api.abort(400, error=str(e))
+            return {'error': str(e)}, 400
+        return place, 201
 
     @api.doc('list_places')
     @api.marshal_list_with(place_response_model)
