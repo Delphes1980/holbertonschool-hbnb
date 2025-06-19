@@ -146,12 +146,16 @@ class HBnBFacade:
         return review
 
     def get_review(self, review_id):
+        if not is_valid_uuid4(review_id):
+            raise ValueError('Given review_id is not valid UUID4')
         return self.review_repo.get(review_id)
 
     def get_all_reviews(self):
         return self.review_repo.get_all()
 
     def get_reviews_by_place(self, place_id):
+        if not is_valid_uuid4(place_id):
+            raise ValueError('Given place_id is not valid UUID4')
         place = self.get_place(place_id)
         if not place :
             return None
@@ -167,9 +171,18 @@ class HBnBFacade:
         return None
 
     def update_review(self, review_id, review_data):
-        # Placeholder for logic to update a review
-        pass
+        review = self.get_review(review_id)
+        if not review:
+            return None
+        self.review_repo.update(review_id, review_data)
+        return review
 
     def delete_review(self, review_id):
-        # Placeholder for logic to delete a review
-        pass
+        review = self.get_review(review_id)
+        if not review:
+            raise ValueError('Review not found')
+        for review_in_place in review.place.reviews:
+            if review_in_place.id == review.id:
+                review.place.reviews.remove(review)
+        self.review_repo.delete(review_id)
+        del review
