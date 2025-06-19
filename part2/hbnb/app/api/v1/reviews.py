@@ -1,4 +1,4 @@
-from flask_restx import Namespace, Resource, fields
+from flask_restx import Namespace, Resource, fields, _http
 from app.services import facade
 
 api = Namespace('reviews', description='Review operations')
@@ -11,15 +11,37 @@ review_model = api.model('Review', {
     'place_id': fields.String(required=True, description='ID of the place')
 })
 
+review_response_model = api.model('ReviewResponse', {
+    'id': fields.String(required=True, description='ID of the review'),
+    'user_id': fields.String(
+        attribute=lambda review: f"{review.user.id}",
+        required=True, description='ID of the user'),
+    'place_id': fields.String(
+        attribute=lambda review: f"{review.place.id}",
+        required=True, description='ID of the place'),
+    'text': fields.String(required=True,
+                          description='Text of the review'),
+    'rating': fields.Integer(required=True,
+                             description='Rating of the place (1-5)')
+})
+
 @api.route('/')
 class ReviewList(Resource):
+    @api.doc('Returns the created review')
+    @api.marshal_with(review_response_model,
+                      code=_http.HTTPStatus.CREATED)
     @api.expect(review_model)
     @api.response(201, 'Review successfully created')
     @api.response(400, 'Invalid input data')
     def post(self):
         """Register a new review"""
-        # Placeholder for the logic to register a new review
-        pass
+        review_data = api.payload
+        try:
+            review = facade.create_review(review_data)
+        except Exception as e:
+            api.abort(400, error=str(e))
+            return {'error', str(e)}, 400
+        return review, 201
 
     @api.response(200, 'List of reviews retrieved successfully')
     def get(self):

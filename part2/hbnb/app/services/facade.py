@@ -3,6 +3,7 @@ from app.models.amenity import Amenity
 from app.models.place import Place
 from app.models.user import User
 from app.models.review import Review
+from app.models.baseEntity import type_validation
 from uuid import UUID
 
 
@@ -115,41 +116,55 @@ class HBnBFacade:
     def create_review(self, review_data):
         # Placeholder for logic to create a review, including
         # validation for user_id, place_id, and rating
-        if not is_valid_uuid4(review_data['user_id']):
+        user_id = review_data.get('user_id')
+        if not user_id:
+            raise ValueError('Review data does not contain user_id key')
+        type_validation(user_id, 'user_id', str)
+        if not is_valid_uuid4(user_id):
             raise ValueError('Given user_id is not valid UUID4')
-        if not is_valid_uuid4(review_data['place_id']):
+        place_id = review_data.get('place_id')
+        if not place_id:
+            raise ValueError('Review data does not contain place_id key')
+        if not is_valid_uuid4(place_id):
             raise ValueError('Given place_id is not valid UUID4')
-        exisiting_user = self.user_repo.get(review_data['user_id'])
+        exisiting_user = self.user_repo.get(user_id)
         if not exisiting_user:
             raise ValueError('No User corresponding to given ID')
-        review_data.pop('user_id')
-        review_data['user'] = exisiting_user
-        existing_place = self.place_repo.get(review_data['place_id'])
+        existing_place = self.place_repo.get(place_id)
         if not existing_place:
             raise ValueError('No Place corresponding to given place '
                              'ID')
+        if self.get_review_by_place_and_user(place_id, user_id):
+            raise ValueError(
+                'User already left a review for this place')
+        review_data.pop('user_id')
+        review_data['user'] = exisiting_user
         review_data.pop('place_id')
         review_data['place'] = existing_place
         review = Review(**review_data)
         self.review_repo.add(review)
         return review
 
-
-
     def get_review(self, review_id):
-        # Placeholder for logic to retrieve a review by ID
-        pass
+        return self.review_repo.get(review_id)
 
     def get_all_reviews(self):
-        # Placeholder for logic to retrieve all reviews
-        pass
+        return self.review_repo.get_all()
 
     def get_reviews_by_place(self, place_id):
-        # Placeholder for logic to retrieve all reviews for a specific place
-        pass
+        place = self.get_place(place_id)
+        if not place :
+            return None
+        return place.reviews
 
     def get_review_by_place_and_user(self, place_id, user_id):
-        pass
+        reviews = self.get_reviews_by_place(place_id)
+        if not reviews:
+            return None
+        for review in reviews:
+            if review.user.id == user_id:
+                return review
+        return None
 
     def update_review(self, review_id, review_data):
         # Placeholder for logic to update a review

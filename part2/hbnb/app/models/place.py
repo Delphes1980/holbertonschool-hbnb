@@ -4,8 +4,8 @@ from app.models.user import User
 
 
 class Place(BaseEntity):
-    def __init__(self, title, description=None, price=-1,
-                 latitude=-360, longitude=-360, owner=None):
+    def __init__(self, title:str, description=None, price:float=-1,
+                 latitude:float=-360, longitude:float=-360, owner=None):
         super().__init__()
         self.title = self.validate_title(title)
         self.description = self.validate_description(description)

@@ -12,8 +12,6 @@ class Review(BaseEntity):
         self.place = self.set_place(place)
         self.user = self.set_user(user)
         place.add_review(self)
-        print("The existence of the user has not been validated")
-        print("The existence of the place has not been validated")
 
     @property
     def text(self):
@@ -60,3 +58,8 @@ class Review(BaseEntity):
                              " reviewed")
         type_validation(place, "Place", Place)
         return place
+
+    # def to_dict(self):
+    #     return {'id': self.id, 
+    #             'user_id': self.user.id,
+    #             'place_id': self.place.id}
