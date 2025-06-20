@@ -26,7 +26,7 @@ Methods:
 """
 
 from app.models.user import User
-from app.services.facade import is_valid_uuid4
+from app.services.ressources import is_valid_uuid4
 from app.api.v1.apiRessources import validate_init_args
 from validate_email_address import validate_email
 
@@ -77,7 +77,7 @@ class UserService:
         """
         if not is_valid_uuid4(user_id):
             raise ValueError('Invalid ID: given user_id is not a valid'
-                             'UUID4')
+                             ' UUID4')
         return facade.user_repo.get(user_id)
 
     @classmethod
