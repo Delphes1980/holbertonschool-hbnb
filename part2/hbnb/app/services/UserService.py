@@ -39,8 +39,8 @@ class UserService:
     facade.
     """
 
-    @staticmethod
-    def create_user(facade, user_data):
+    @classmethod
+    def create_user(cls, facade, user_data):
         """Create a new user with the provided data.
 
         Args:
@@ -54,7 +54,7 @@ class UserService:
         email = user_data.get('email')
         if not email:
             raise ValueError('Invalid email: email is required')
-        existing_user = facade.get_user_by_email(email)
+        existing_user = cls.get_user_by_email(facade, email)
         if existing_user:
             raise ValueError('Invalid email: email already registered')
         validate_init_args(User, **user_data)
@@ -129,7 +129,7 @@ class UserService:
         user = cls.get_user(facade, user_id)
         if not user:
             return None
-        user_by_email = facade.get_user_by_email(
+        user_by_email = cls.get_user_by_email(facade,
             user_data.get('email'))
         if user_by_email and user_by_email.id != user.id:
             raise ValueError('Invalid email: email already used by '
