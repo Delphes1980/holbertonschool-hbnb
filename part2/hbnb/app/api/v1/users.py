@@ -1,6 +1,6 @@
 from flask_restx import Namespace, Resource, fields, _http
 from app.services import facade
-from uuid import UUID
+from app.api.v1.apiRessources import compare_data_and_model
 
 api = Namespace('users', description='User operations')
 
@@ -31,13 +31,14 @@ class UserList(Resource):
     @api.marshal_with(user_response_model,
                       code=_http.HTTPStatus.CREATED,
                       description='User successfully created')
-    @api.expect(user_model)#, validate=True)
+    @api.expect(user_model, validate=False)
     @api.response(201, 'User successfully created')
     @api.response(400, 'Email already registered / Invalid input data')
     def post(self):
         """Register a new user"""
         user_data = api.payload
         try:
+            compare_data_and_model(user_data, user_model)
             new_user = facade.create_user(user_data)
         except Exception as e:
             api.abort(400, error=str(e))
@@ -47,7 +48,8 @@ class UserList(Resource):
     @api.doc('Returns list of registered users')
     @api.marshal_list_with(user_response_model,
                       code=_http.HTTPStatus.OK,
-                      description='List of users retrieved successfully')
+                      description='List of users retrieved '
+                                  'successfully')
     @api.response(200, 'List of users retrieved successfully')
     def get(self):
         """Get a list of registered users"""
@@ -78,33 +80,20 @@ class UserResource(Resource):
     @api.marshal_with(user_response_model,
                       code=_http.HTTPStatus.OK,
                       description='User updated successfully')
-    @api.expect(user_model)#, validate=True)
+    @api.expect(user_model, validate=False)
     @api.response(200, 'User successfully updated')
     @api.response(400, 'Invalid input data')
     @api.response(404, 'User not found')
     def put(self, user_id):
         """Update the user data of a registered user by ID"""
-
-        
-        try:
-            UUID(user_id)
-        except ValueError:
-            return {'error': 'Invalid UUID'}, 400
-        user_by_id = facade.get_user(user_id)
-        if not user_by_id:
-            return {'error': 'User does not exist'}, 404
         user_data = api.payload
-        user_by_email = facade.get_user_by_email(user_data["email"])
-        if (user_by_email and
-                user_by_email.id != user_by_id.id):
-            return {'error': 'email already registered with another '
-                    'account'}, 400
         try:
-            facade.user_repo.update(user_id, user_data)
+            compare_data_and_model(user_data, user_model)
+            updated_user = facade.update_user(user_id, user_data)
         except Exception as e:
+            api.abort(400, error=str(e))
             return {'error': str(e)}, 400
-        return {'id': user_by_id.id, 
-                'first_name': user_by_id.first_name,
-                'last_name': user_by_id.last_name,
-                'email': user_by_id.email}, 200
-        
+        if not updated_user:
+            api.abort(404, error='User not found')
+            return {'error': 'User not found'}, 404
+        return updated_user, 200

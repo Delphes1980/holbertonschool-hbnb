@@ -1,7 +1,7 @@
 from app.persistence.repository import InMemoryRepository
 from app.models.amenity import Amenity
 from app.models.place import Place
-from app.models.user import User
+from app.services.UserService import UserService
 from app.models.review import Review
 from app.models.baseEntity import type_validation
 from uuid import UUID
@@ -23,7 +23,66 @@ class HBnBFacade:
         self.review_repo = InMemoryRepository()
         self.amenity_repo = InMemoryRepository()
 
-######## Services for Place CRUD operations ########
+# Services for User CRUD operations ####
+
+    def create_user(self, user_data):
+        """Create a new user with the provided data."""
+        return UserService.create_user(self, user_data)
+
+    def get_user(self, user_id):
+        """Retrieve a user by their ID."""
+        return UserService.get_user(self, user_id)
+
+    def get_all_users(self):
+        """Retrieve all users from the repository."""
+        return self.user_repo.get_all()
+
+    def get_user_by_email(self, email):
+        """Retrieve a user by their email address."""
+        return UserService.get_user_by_email(self, email)
+
+    def update_user(self, user_id, user_data):
+        """Update an existing user's data."""
+        return UserService.update_user(self, user_id, user_data)
+
+# def create_user(self, user_data):
+#         """ Create a new user with the provided data """
+#         email = user_data.get('email')
+#         if not email:
+#             raise ValueError('email is required')
+#         existing_user = self.get_user_by_email(email)
+#         if existing_user:
+#             raise ValueError('Email already registered')
+#         user = User(**user_data)
+#         self.user_repo.add(user)
+#         return user
+
+#     def get_user(self, user_id):
+#         """ Retrieve a user by their ID """
+#         if not is_valid_uuid4(user_id):
+#             raise ValueError('Given user_id is not valid UUID4')
+#         return self.user_repo.get(user_id)
+
+#     def get_all_users(self):
+#         return self.user_repo.get_all()
+
+#     def get_user_by_email(self, email):
+#         """ Retrieve a user byt their email address """
+#         return self.user_repo.get_by_attribute('email', email)
+
+#     def update_user(self, user_id, user_data):
+#         validate_init_args(User, **user_data)
+#         user = self.get_user(user_id)
+#         if not user:
+#             return None
+#         user_by_email = self.get_user_by_email(user_data.get('email'))
+#         if user_by_email and user_by_email.id != user.id:
+#             raise ValueError('email already used by another user')
+#         # self.review_repo.update(review_id, review_data)
+#         user.update(user_data)
+#         return user
+
+# Services for Place CRUD operations ########
 
     def create_place(self, place_data):
         """ Create a new place with the provided data """
@@ -45,13 +104,16 @@ class HBnBFacade:
         if amenities:
             for amenity_id in amenities:
                 if not is_valid_uuid4(amenity_id):
-                    raise ValueError(f"Given amenity_id={amenity_id} is not a valid UUID4")
+                    raise ValueError(f"Given amenity_id={amenity_id} "
+                                     "is not a valid UUID4")
                 place.add_amenity(self.get_amenity(amenity_id))
-        # # Delete amenities from place_data if they aren't needed for the Place model
+        # Delete amenities from place_data if they aren't needed for
+        # the Place model
         # place_data.pop('amenities', None)
-        # # Validate the place data
+        # Validate the place data
         # new_place = Place(**place_data)
-        # Store the new place in the repository
+        # Store the new place in the
+        # repository
         self.place_repo.add(place)
         return place
 
@@ -87,41 +149,15 @@ class HBnBFacade:
             amenities = []
             for amenity_id in amenities_ids:
                 if not is_valid_uuid4(amenity_id):
-                    raise ValueError(f"Given amenity_id={amenity_id} is not a valid UUID4")
+                    raise ValueError(f"Given amenity_id={amenity_id} "
+                                     "is not a valid UUID4")
                 amenities.append(self.get_amenity(amenity_id))
             place_data['amenities'] = amenities
         place.update(place_data)
         # updated_place = self.place_repo.get(place_id)
         return place
 
-#### Services for User CRUD operations ####
-
-    def create_user(self, user_data):
-        """ Create a new user with the provided data """
-        email = user_data.get('email')
-        if not email:
-            raise ValueError('email is required')
-        existing_user = self.get_user_by_email(email)
-        if existing_user:
-            raise ValueError('Email already registered')
-        user = User(**user_data)
-        self.user_repo.add(user)
-        return user
-
-    def get_user(self, user_id):
-        """ Retrieve a user by their ID """
-        if not is_valid_uuid4(user_id):
-            raise ValueError('Given user_id is not valid UUID4')
-        return self.user_repo.get(user_id)
-
-    def get_all_users(self):
-        return self.user_repo.get_all()
-    
-    def get_user_by_email(self, email):
-        """ Retrieve a user byt their email address """
-        return self.user_repo.get_by_attribute('email', email)
-
-######## Services for Amenity CRUD operations ########
+# Services for Amenity CRUD operations ########
 
     def create_amenity(self, amenity_data):
         """ Create a new amenity with the provided data """
@@ -149,7 +185,7 @@ class HBnBFacade:
         # return updated_amenity
         return amenity
 
-######## Services for Review CRUD operations ########
+# Services for Review CRUD operations ########
 
     def create_review(self, review_data):
         # Placeholder for logic to create a review, including
@@ -195,7 +231,7 @@ class HBnBFacade:
         if not is_valid_uuid4(place_id):
             raise ValueError('Given place_id is not valid UUID4')
         place = self.get_place(place_id)
-        if not place :
+        if not place:
             return None
         return place.reviews
 
