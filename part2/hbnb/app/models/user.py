@@ -22,10 +22,10 @@ class User(BaseEntity):
         for name in names_list:
             if not re.match(r"^[^\W\d_]+([.'-][^\W\d_]+)*[.]?$", name,
                             re.UNICODE):
-                raise ValueError(f"{names_name} must contain only "
-                                 "letters, apostrophes, dashes, or "
-                                  "dots (no digits or other special "
-                                  "characters)")
+                raise ValueError(f"Invalid {names_name}: {names_name} "
+                                 "must contain only letters, "
+                                 "apostrophes, dashes, or dots (no "
+                                 "digits or other special characters)")
         return " ".join(names_list)
 
     def email_validation(self, email: str):
@@ -41,7 +41,7 @@ class User(BaseEntity):
     @first_name.setter
     def first_name(self, first_name):
         self.__first_name = self.name_validation(first_name,
-                                                 "First name")
+                                                 "first_name")
 
     @property
     def last_name(self):
@@ -49,7 +49,7 @@ class User(BaseEntity):
 
     @last_name.setter
     def last_name(self, last_name):
-        self.__last_name = self.name_validation(last_name, "Last name")
+        self.__last_name = self.name_validation(last_name, "last_name")
 
     @property
     def email(self):
