@@ -14,3 +14,6 @@ if __name__ == '__main__':
 # Implement PATCH if possible
 # Implement Delete for all entities
 # Implement add amenity
+# Place does not expect keyword amenities
+# fields=0 are taken as non given (latitude/longitude/price...)
+#
