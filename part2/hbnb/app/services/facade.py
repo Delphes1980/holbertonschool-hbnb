@@ -98,14 +98,25 @@ class HBnBFacade:
 
     def create_user(self, user_data):
         """ Create a new user with the provided data """
+        email = user_data.get('email')
+        if not email:
+            raise ValueError('email is required')
+        existing_user = self.get_user_by_email(email)
+        if existing_user:
+            raise ValueError('Email already registered')
         user = User(**user_data)
         self.user_repo.add(user)
         return user
 
     def get_user(self, user_id):
         """ Retrieve a user by their ID """
+        if not is_valid_uuid4(user_id):
+            raise ValueError('Given user_id is not valid UUID4')
         return self.user_repo.get(user_id)
 
+    def get_all_users(self):
+        return self.user_repo.get_all()
+    
     def get_user_by_email(self, email):
         """ Retrieve a user byt their email address """
         return self.user_repo.get_by_attribute('email', email)
