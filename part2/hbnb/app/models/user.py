@@ -33,6 +33,7 @@ class User(BaseEntity):
         if not validate_email(email):
             raise ValueError("Invalid email: email must have format"
                              " example@exam.ple")
+        return email
 
     @property
     def first_name(self):
@@ -57,8 +58,7 @@ class User(BaseEntity):
 
     @email.setter
     def email(self, email: str):
-        self.email_validation(email)
-        self.__email = email
+        self.__email = self.email_validation(email)
 
     @property
     def is_admin(self):
