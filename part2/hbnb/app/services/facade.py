@@ -35,43 +35,6 @@ class HBnBFacade:
         """Update an existing user's data."""
         return UserService.update_user(self, user_id, user_data)
 
-# def create_user(self, user_data):
-#         """ Create a new user with the provided data """
-#         email = user_data.get('email')
-#         if not email:
-#             raise ValueError('email is required')
-#         existing_user = self.get_user_by_email(email)
-#         if existing_user:
-#             raise ValueError('Email already registered')
-#         user = User(**user_data)
-#         self.user_repo.add(user)
-#         return user
-
-#     def get_user(self, user_id):
-#         """ Retrieve a user by their ID """
-#         if not is_valid_uuid4(user_id):
-#             raise ValueError('Given user_id is not valid UUID4')
-#         return self.user_repo.get(user_id)
-
-#     def get_all_users(self):
-#         return self.user_repo.get_all()
-
-#     def get_user_by_email(self, email):
-#         """ Retrieve a user byt their email address """
-#         return self.user_repo.get_by_attribute('email', email)
-
-#     def update_user(self, user_id, user_data):
-#         validate_init_args(User, **user_data)
-#         user = self.get_user(user_id)
-#         if not user:
-#             return None
-#         user_by_email = self.get_user_by_email(user_data.get('email'))
-#         if user_by_email and user_by_email.id != user.id:
-#             raise ValueError('email already used by another user')
-#         # self.review_repo.update(review_id, review_data)
-#         user.update(user_data)
-#         return user
-
 # Services for Place CRUD operations ########
 
     def create_place(self, place_data):
