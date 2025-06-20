@@ -4,6 +4,14 @@ API_URL="http://127.0.0.1:5000/api/v1"
 
 echo "Create user via API"
 
+RESPONSE0=$(curl -s -X POST "$API_URL/users/" \
+    -H "Content-Type: application/json" \
+    -d '{"first_name": "John"}')
+echo "response: $RESPONSE0"
+USER_ID0=$(echo "$RESPONSE0" | grep -o '"id"[ ]*:[ ]*"[^\"]*"' | head -1 | cut -d '"' -f4)
+echo "User ID: $USER_ID0"
+
+
 RESPONSE1=$(curl -s -X POST "$API_URL/users/" \
     -H "Content-Type: application/json" \
     -d "{\"first_name\": \"John\", \"last_name\": \"Doe\", \"email\": \"john@example.com\"}")
