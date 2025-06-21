@@ -29,6 +29,7 @@ from app.models.user import User
 from app.services.ressources import is_valid_uuid4
 from app.api.v1.apiRessources import validate_init_args
 from validate_email_address import validate_email
+from app.models.baseEntity import type_validation
 
 
 class UserService:
@@ -52,6 +53,7 @@ class UserService:
             ValueError: If email is missing or already registered.
         """
         email = user_data.get('email')
+        type_validation(email, 'email', str)
         if not email:
             raise ValueError('Invalid email: email is required')
         existing_user = cls.get_user_by_email(facade, email)
@@ -75,6 +77,7 @@ class UserService:
         Raises:
             ValueError: If user_id is not a valid UUID4.
         """
+        type_validation(user_id, 'user_id', str)
         if not is_valid_uuid4(user_id):
             raise ValueError('Invalid ID: given user_id is not a valid'
                              ' UUID4')
@@ -103,6 +106,7 @@ class UserService:
         Returns:
             User or None: The user object if found, else None.
         """
+        type_validation(email, 'email', str)
         if not validate_email(email):
             raise ValueError("Invalid email: email must have format"
                              " example@exam.ple")
@@ -126,6 +130,7 @@ class UserService:
                 an unexpected key-value pair is contained in the
                 provided data.
         """
+        type_validation(user_id, 'user_id', str)
         user = cls.get_user(facade, user_id)
         if not user:
             return None
@@ -136,4 +141,5 @@ class UserService:
                              'another user')
         validate_init_args(User, **user_data)
         user.update(user_data)
-        return user
+        updated_user = facade.user_repo.get(user_id)
+        return updated_user
