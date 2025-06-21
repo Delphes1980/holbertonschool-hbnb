@@ -62,7 +62,7 @@ class UserResource(Resource):
                       code=_http.HTTPStatus.OK,
                       description='User details retrieved successfully')
     @api.response(200, 'User details retrieved successfully')
-    @api.response(400, 'Invalid ID: not a UUID4')
+    @api.response(400, 'Invalid ID: not a UUID4 / Invalid input data')
     @api.response(404, 'User not found')
     def get(self, user_id):
         """Get user details by ID"""

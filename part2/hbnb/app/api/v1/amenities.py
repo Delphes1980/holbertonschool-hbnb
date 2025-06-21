@@ -1,5 +1,6 @@
 from flask_restx import Namespace, Resource, fields, _http
 from app.services import facade
+from app.api.v1.apiRessources import compare_data_and_model
 
 api = Namespace('amenities', description='Amenity operations')
 
@@ -31,17 +32,17 @@ class AmenityList(Resource):
     @api.marshal_with(amenity_response_model,
                       code=_http.HTTPStatus.CREATED,
                       description='Amenity successfully created')
-    @api.expect(amenity_model, validate=True)
+    @api.expect(amenity_model, validate=False)
     @api.response(201, 'Amenity successfully created',
                   amenity_response_model)
-    @api.response(400, 'Invalid input data')
+    @api.response(400, 'Name already assigned / Invalid input data')
     def post(self):
         """Register a new amenity"""
-        # api.payload automatically parses and validates the request JSON against amenity_model
-        data = api.payload
+        amenity_data = api.payload
         try:
-            new_amenity = facade.create_amenity(data)
-        except ValueError as e:
+            compare_data_and_model(amenity_data, amenity_model)
+            new_amenity = facade.create_amenity(amenity_data)
+        except Exception as e:
             api.abort(400, error=str(e))
             return {'error': str(e)}, 400
         return new_amenity, 201
@@ -66,7 +67,7 @@ class AmenityResource(Resource):
         code=_http.HTTPStatus.OK,
         description='Amenity details retrieved successfully')
     @api.response(200, 'Amenity details retrieved successfully')
-    @api.response(400, 'Invalid ID: not a UUID4')
+    @api.response(400, 'Invalid ID: not a UUID4 / Invalid input data')
     @api.response(404, 'Amenity not found')
     def get(self, amenity_id):
         """Get amenity details by ID"""
@@ -84,16 +85,17 @@ class AmenityResource(Resource):
     @api.marshal_with(amenity_response_model,
                       code=_http.HTTPStatus.OK,
                       description='Amenity updated successfully')
-    @api.expect(amenity_model)
+    @api.expect(amenity_model, validate=False)
     @api.response(200, 'Amenity updated successfully')
     @api.response(400, 'Invalid input data')
     @api.response(404, 'Amenity not found')
     def put(self, amenity_id):
         """Update an amenity's information"""
-        new_amenity_data = api.payload
+        amenity_data = api.payload
         try:
+            compare_data_and_model(amenity_data, amenity_model)
             updated_amenity = facade.update_amenity(amenity_id,
-                                                    new_amenity_data)
+                                                    amenity_data)
         except Exception as e:
             api.abort(400, error=str(e))
             return {'error': str(e)}, 400
@@ -101,5 +103,5 @@ class AmenityResource(Resource):
         # Otherwise, return the updated amenity as a dictionary
         if not updated_amenity:
             api.abort(404, error='Amenity not found')
-            return {'error': 'Amenity not found'}
+            return {'error': 'Amenity not found'}, 404
         return updated_amenity, 200

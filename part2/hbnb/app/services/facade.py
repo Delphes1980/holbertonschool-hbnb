@@ -1,7 +1,7 @@
 from app.persistence.repository import InMemoryRepository
-from app.models.amenity import Amenity
 from app.models.place import Place
 from app.services.UserService import UserService
+from app.services.AmenityService import AmenityService
 from app.models.review import Review
 from app.models.baseEntity import type_validation
 
@@ -34,6 +34,28 @@ class HBnBFacade:
     def update_user(self, user_id, user_data):
         """Update an existing user's data."""
         return UserService.update_user(self, user_id, user_data)
+
+# Services for Amenity CRUD operations ########
+
+    def create_amenity(self, amenity_data):
+        """Create a new amenity with the provided data."""
+        return AmenityService.create_amenity(self, amenity_data)
+
+    def get_amenity(self, amenity_id):
+        """ Retrieve an amenity by its ID """
+        return AmenityService.get_amenity(self, amenity_id)
+
+    def get_all_amenities(self):
+        """ Retrieve all amenities """
+        return self.amenity_repo.get_all()
+
+    def get_amenity_by_name(self, name):
+        return AmenityService.get_amenity_by_name(self, name)
+
+    def update_amenity(self, amenity_id, amenity_data):
+        """ Update an amenity with the provided data """
+        return AmenityService.update_amenity(self, amenity_id,
+                                             amenity_data)
 
 # Services for Place CRUD operations ########
 
@@ -109,34 +131,6 @@ class HBnBFacade:
         place.update(place_data)
         # updated_place = self.place_repo.get(place_id)
         return place
-
-# Services for Amenity CRUD operations ########
-
-    def create_amenity(self, amenity_data):
-        """ Create a new amenity with the provided data """
-        new_amenity = Amenity(**amenity_data)
-        self.amenity_repo.add(new_amenity)
-        return new_amenity
-
-    def get_amenity(self, amenity_id):
-        """ Retrieve an amenity by its ID """
-        if not is_valid_uuid4(amenity_id):
-            raise ValueError('Given amenity_id is not valid UUID4')
-        return self.amenity_repo.get(amenity_id)
-
-    def get_all_amenities(self):
-        """ Retrieve all amenities """
-        return self.amenity_repo.get_all()
-
-    def update_amenity(self, amenity_id, amenity_data):
-        """ Update an amenity with the provided data """
-        amenity = self.get_amenity(amenity_id)
-        if not amenity:
-            return None
-        amenity.update(amenity_data)
-        # updated_amenity = self.amenity_repo.get(amenity_id)
-        # return updated_amenity
-        return amenity
 
 # Services for Review CRUD operations ########
 
