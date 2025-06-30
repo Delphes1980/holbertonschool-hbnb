@@ -4,7 +4,7 @@ from app.services.UserService import UserService
 from app.services.AmenityService import AmenityService
 from app.models.review import Review
 from app.models.baseEntity import type_validation
-
+from app.services.ressources import is_valid_uuid4
 
 class HBnBFacade:
     def __init__(self):
