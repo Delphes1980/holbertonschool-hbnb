@@ -27,36 +27,56 @@ class TestUser(unittest.TestCase):
         self.assertIsInstance(user.created_at, datetime)
         self.assertIsInstance(user.updated_at, datetime)
 
-    def test_user_creation_bad_email(self):
-        with self.assertRaises(ValueError) as cm:
-            User(first_name="Jane", last_name="Doe", email="invalid-email")
-        self.assertIn("Invalid email", str(cm.exception))
-
-    def test_missing_first_name(self):
+    def test_empty_string_first_name(self):
         with self.assertRaises(ValueError) as e:
             User("", "Doe", "john.doe@example.com")
-        self.assertIn("First name", str(e.exception))
+        self.assertIn("Invalid first_name", str(e.exception))
+
+    def test_long_first_name(self):
+        with self.assertRaises(ValueError) as e:
+            User("JohnDuudly do whatever somethin tsknslkslkskind kdi", "Doe",
+                 "email@email.com")
+        self.assertIn("Invalid first_name", str(e.exception))
+
+    def test_name_not_a_string(self):
+        with self.assertRaises(TypeError) as e:
+            User(23, "Doe", "email@email.com") # type: ignore
+        self.assertIn("Invalid first_name", str(e.exception))
+
+    def test_name_None(self):
+        with self.assertRaises(TypeError) as e:
+            User(None, "Doe", "email@email.com") # type: ignore
+        self.assertIn("first_name", str(e.exception))
 
     def test_missing_last_name(self):
         with self.assertRaises(ValueError) as e:
             User("John", "", "john.doe@example.com")
-        self.assertIn("Last name", str(e.exception))
+        self.assertIn("Invalid last_name", str(e.exception))
 
-    def test_invalid_email_no_at(self):
+    def test_empty_string_last_name(self):
         with self.assertRaises(ValueError) as e:
-            User("John", "Doe", "johndoeexample.com")
-        self.assertIn("Invalid email", str(e.exception))
+            User("John", "", "john.doe@example.com")
+        self.assertIn("Invalid last_name", str(e.exception))
 
-    def test_invalid_email_empty(self):
-        with self.assertRaises(ValueError) as e:
-            User("John", "Doe", "")
-        self.assertIn("Invalid email", str(e.exception))
-
-    def test_long_first_name(self):
-        with self.assertRaises(ValueError) as e:
-            User("JohnDuudly do whatever somethin tkind", "Doe",
+    def test_long_last_name_but_ok(self):
+        user = User("John", "JohnDuudly do whatever somethin tkind",
                  "email@email.com")
-        self.assertIn("First name", str(e.exception))
+        self.assertEqual(user.first_name, "John")
+        self.assertEqual(user.last_name, "JohnDuudly do whatever somethin tkind")
+        self.assertEqual(user.email, "email@email.com")
+        self.assertIsInstance(user.id, str)
+        self.assertIsInstance(user.created_at, datetime)
+        self.assertIsInstance(user.updated_at, datetime)
+
+    def test_last_name_not_a_string(self):
+        with self.assertRaises(TypeError) as e:
+            User("John", 42, "email@email.com") # type: ignore
+        self.assertIn("Invalid last_name", str(e.exception))
+
+    def test_last_name_None(self):
+        with self.assertRaises(TypeError) as e:
+            User("Jon", None, "email@email.com") # type: ignore
+        self.assertIn("Invalid last_name", str(e.exception))
 
     def test_name_with_accents_and_special_characters(self):
         # Acceptable names with accents, dots, apostrophes, and dashes
@@ -64,7 +84,8 @@ class TestUser(unittest.TestCase):
             "José", "François", "Müller", "Çelik", "Łukasz", "Zoë",
             "Dvořák", "O'Connor", "Jean-Pierre", "Ana-Maria",
             "Dvořák-Smith", "Zoë-Marie", "J.R.R.", "J. K.",
-            "Smith-Jones", "D'Arcy", "St. John"
+            "Smith-Jones", "D'Arcy", "St. John",
+            "Pierre Marie de la Rosa"
         ]
         for name in valid_names:
             user = User(first_name=name, last_name="Doe",
@@ -88,7 +109,26 @@ class TestUser(unittest.TestCase):
             with self.assertRaises(ValueError):
                 User(first_name="John", last_name=name,
                      email="test@example.com")
-                
+
+    def test_user_creation_bad_email(self):
+        with self.assertRaises(ValueError) as cm:
+            User(first_name="Jane", last_name="Doe", email="invalid-email")
+        self.assertIn("Invalid email", str(cm.exception))
+
+    def test_invalid_email_no_at(self):
+        with self.assertRaises(ValueError) as e:
+            User("John", "Doe", "johndoeexample.com")
+        self.assertIn("Invalid email", str(e.exception))
+
+    def test_invalid_email_empty(self):
+        with self.assertRaises(ValueError) as e:
+            User("John", "Doe", "")
+        self.assertIn("Invalid email", str(e.exception))
+    
+    def test_invalid_email_None(self):
+        with self.assertRaises(TypeError) as e:
+            User("John", "Doe", None) # type: ignore
+        self.assertIn("email", str(e.exception))
 
 if __name__ == "__main__":
     unittest.main()

@@ -146,7 +146,7 @@ class PlaceResource(Resource):
         try:
             place = facade.get_place(place_id)
         except Exception as e:
-            api.abort(400, str(e))
+            api.abort(400, error=str(e))
             return {'error': str(e)}, 400
         if not place:
             api.abort(404, error='Place not found')
