@@ -19,3 +19,6 @@ if __name__ == '__main__':
 # Check that email and name (unique keys) are case-independent and that
 #   name is independent of number of spaces between words
 # Error due to conflict (e.g., Amenity name already exists) is code 409
+# Add a message to all server responses: "{{msg: User created
+# successfully}, {id: "00diunfw", name: "john", ...}} instead of just
+# the object or the error message.
