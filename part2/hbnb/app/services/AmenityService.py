@@ -1,0 +1,60 @@
+from app.models.amenity import Amenity
+from app.services.ressources import is_valid_uuid4
+from app.api.v1.apiRessources import validate_init_args    
+from app.models.baseEntity import type_validation
+
+class AmenityService:
+
+    @classmethod
+    def create_amenity(cls, facade, amenity_data):
+        """Create a new amenity with the provided data."""
+        name = amenity_data.get('name')
+        type_validation(name, 'name', str)
+        if not name:
+            raise ValueError('Invalid name: name is required')
+        existing_amenity = cls.get_amenity_by_name(facade, name)
+        if existing_amenity:
+            raise ValueError('Invalid name: name already registered')
+        validate_init_args(Amenity, **amenity_data)
+        new_amenity = Amenity(**amenity_data)
+        facade.amenity_repo.add(new_amenity)
+        return facade.amenity_repo.get(new_amenity.id)
+
+    @classmethod
+    def get_amenity(cls, facade, amenity_id):
+        """ Retrieve an amenity by its ID """
+        type_validation(amenity_id, 'amenity_id', str)
+        if not is_valid_uuid4(amenity_id):
+            raise ValueError('Invalid ID: amenity_id is not a valid '
+                             'UUID4')
+        return facade.amenity_repo.get(amenity_id)
+
+    @classmethod
+    def get_all_amenities(cls, facade):
+        """ Retrieve all amenities """
+        return facade.amenity_repo.get_all()
+
+    @classmethod
+    def get_amenity_by_name(cls, facade, name):
+        type_validation(name, 'name', str)
+        if not name:
+            raise ValueError('Invalid name: name is required')
+        return facade.amenity_repo.get_by_attribute('name', name)
+
+    @classmethod
+    def update_amenity(cls, facade, amenity_id, amenity_data):
+        """ Update an amenity with the provided data """
+        type_validation(amenity_id, 'amenity_id', str)
+        amenity = cls.get_amenity(facade, amenity_id)
+        if not amenity:
+            return None
+        amenity_by_name = cls.get_amenity_by_name(
+                facade,
+                amenity_data.get('name'))
+        if amenity_by_name and amenity_by_name.id != amenity.id:
+            raise ValueError('Invalid name: name is already used for '
+                             'another amenity')
+        validate_init_args(Amenity, **amenity_data)
+        amenity.update(amenity_data)
+        updated_amenity = facade.amenity_repo.get(amenity_id)
+        return updated_amenity
