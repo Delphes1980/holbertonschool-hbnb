@@ -20,6 +20,6 @@ referencing==0.36.2
 requests==2.32.4
 rpds-py==0.25.1
 typing_extensions==4.14.0
-urllib3==2.4.0
+urllib3==2.5.0
 validate-email-address==1
 Werkzeug==3.1.3
