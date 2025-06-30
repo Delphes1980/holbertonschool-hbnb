@@ -1,5 +1,5 @@
 from app.models.baseEntity import (BaseEntity, type_validation,
-                                        strlen_validation)
+                                   strlen_validation)
 from validate_email_address import validate_email
 import re
 

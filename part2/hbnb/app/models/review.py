@@ -1,5 +1,5 @@
 from app.models.baseEntity import (BaseEntity, type_validation,
-                                        strlen_validation)
+                                   strlen_validation)
 from app.models.place import Place
 from app.models.user import User
 
@@ -60,6 +60,6 @@ class Review(BaseEntity):
         return place
 
     # def to_dict(self):
-    #     return {'id': self.id, 
+    #     return {'id': self.id,
     #             'user_id': self.user.id,
     #             'place_id': self.place.id}
