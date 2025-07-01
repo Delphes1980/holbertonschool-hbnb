@@ -1,8 +1,8 @@
 from flask_restx import Namespace, Resource, fields
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import (create_access_token, jwt_required,
+                                get_jwt)
 from app.services import facade
 from app.api.v1.apiRessources import compare_data_and_model
-
 
 api = Namespace('auth', description='Authentication operations')
 
@@ -20,6 +20,12 @@ token_model = api.model('Token', {
 
 error_model = api.model('Error', {
     'error': fields.String(description='Error message')
+})
+
+protected_access_model = api.model('ProtectedAccess', {
+    'message': fields.String(required=True,
+                             description='Protected ressource has been\
+                                accessed')
 })
 
 @api.route('/login')
@@ -47,9 +53,28 @@ class Login(Resource):
 
         # Step 3: Create a JWT token with the user's id and is_admin flag
         access_token = create_access_token(
-            identity={'id': str(user.id), 'is_admin': user.is_admin}
+            identity=str(user.id),
+            additional_claims={'id': str(user.id), 
+                               'is_admin': user.is_admin}
             )
         
         # Step 4: Return the JWT token to the client
         return {'access_token': access_token}, 200
     
+
+@api.route('/protected')
+class ProtectedResource(Resource):
+    @api.doc('Confirms access to protected ressource',
+             security='Bearer')
+    @api.response(200, 'Ressource accessed successfully', 
+                  protected_access_model)
+    @jwt_required()
+    def get(self):
+        """A protected endpoint that requires a valid JWT token"""
+        # current_user = get_jwt_identity()  # Retrieve the user's
+        # identity from the token
+        current_user = get_jwt()
+        return {'message': f'Hello, user {current_user["id"]} who is '
+                f'{" " if current_user["is_admin"] else "not"} '
+                'admin'}, 200
+        # return {'message': f'Hello, user {current_user["id"]}'}, 200
