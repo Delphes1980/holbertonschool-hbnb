@@ -1,8 +1,14 @@
 from app.models.baseEntity import (BaseEntity, type_validation,
                                    strlen_validation)
+from app import db
+from sqlalchemy import Column, Integer, String
 
 
 class Amenity(BaseEntity):
+    __tablename__ = 'amenities'
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    name = db.Column(db.String(128), nullable=False)
+
     def __init__(self, name):
         super().__init__()
         self.name = name

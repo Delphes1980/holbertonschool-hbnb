@@ -2,9 +2,16 @@ from app.models.baseEntity import (BaseEntity, type_validation,
                                    strlen_validation)
 from app.models.place import Place
 from app.models.user import User
+from app import bcrypt, db
+from sqlalchemy import Column, Integer, String
 
 
 class Review(BaseEntity):
+    __tablename__ = 'reviews'
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.Text, nullable=False)
+    rating = db.Column(db.Integer, nullable=False)
+
     def __init__(self, text, rating, place, user):
         super().__init__()
         self.text = text

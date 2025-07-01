@@ -1,11 +1,22 @@
 from app.models.baseEntity import (BaseEntity, type_validation,
                                    strlen_validation)
 from app.models.user import User
+from app import db
+from sqlalchemy import Column, Integer, String
 
 
 class Place(BaseEntity):
-    def __init__(self, title: str, description = None, price: float = -1,
-                 latitude: float = -360, longitude: float = -360, owner = None):
+    __tablename__ = 'places'
+    id = db.Column(db.Integer, primary_key=True, unique=True)
+    title = db.Column(db.String(128), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    price = db.Column(db.Float, nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+
+    def __init__(self, title: str, description=None, price: float = -1,
+                 latitude: float = -360, longitude: float = -360,
+                 owner=None):
         super().__init__()
         self.title = title
         self.description = description

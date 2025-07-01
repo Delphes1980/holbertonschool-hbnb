@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime, timezone
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
+from app import db
 
 
 Base = declarative_base()
@@ -9,9 +10,17 @@ Base = declarative_base()
 
 class BaseEntity(Base):
     __abstract__ = True
-    id = Column(String(50), default=uuid.uuid4, primary_key=True, nullable=False, unique=True)
-    created_at = Column(DateTime = any, nullable=False, default=lambda: datetime.now(timezone.utc))
-    updated_at = Column(Datetime = any, nullable=False, default=lambda: datetime.now(timezone.utc))
+    id = db.Column(db.String(50), default=lambda: str(uuid.uuid4()), primary_key=True,
+                       nullable=False, unique=True)
+    created_at = db.Column(db.DateTime, nullable=False,
+                               default=datetime.now(timezone.utc))
+    updated_at = db.Column(db.Datetime, nullable=False,
+                               default=datetime.now(timezone.utc), onupdate=datetime.timezone.utc)
+
+    def __init__(self):
+        self.id = str(uuid.uuid4())
+        self.created_at = datetime.now(timezone.utc)
+        self.updated_at = datetime.now(timezone.utc)
 
     def save(self):
         """Update the updated_at timestamp whenever the object is modified"""

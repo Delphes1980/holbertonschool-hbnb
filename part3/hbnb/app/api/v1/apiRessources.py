@@ -56,7 +56,7 @@ def validate_init_args(some_class, **kwargs):
 def compare_data_and_model(data: dict, model):
     """
     Check input provided data against Flask-RESTX model.
-    
+
     Checks if all required fields defined in a Flask-RESTX model are
     present in the input data, and if it contains unexpected additional
     data.
