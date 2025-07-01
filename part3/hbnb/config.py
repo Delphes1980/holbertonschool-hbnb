@@ -6,6 +6,8 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
+    ERROR_INCLUDE_MESSAGE = False
+    BCRYPT_LOG_ROUNDS = 12
 
 config = {
     'development': DevelopmentConfig,
