@@ -11,7 +11,7 @@ for i in $(seq 1 5)
 do
   RESPONSE=$(curl -s -X POST "$API_URL/users/" \
     -H "Content-Type: application/json" \
-    -d "{\"first_name\": \"User\", \"last_name\": \"Test\", \"email\": \"user$i@example.com\"}")
+    -d "{\"first_name\": \"User\", \"last_name\": \"Test\", \"email\": \"user$i@example.com\", \"password\": \"string\"}")
   echo "User $i response: $RESPONSE"
   USER_ID=$(echo "$RESPONSE" | grep -o '"id"[ ]*:[ ]*"[^\"]*"' | head -1 | cut -d '"' -f4)
   if [ -n "$USER_ID" ]; then
