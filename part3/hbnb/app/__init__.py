@@ -13,14 +13,27 @@ from flask_jwt_extended import JWTManager
 bcrypt = Bcrypt()
 jwt = JWTManager()
 
+authorizations = {
+    'Bearer': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'Authorization',
+        'description': (
+            'JWT Authorization header using the Bearer scheme.\n'
+            'Enter your JWT token as: Bearer &lt;your_token&gt;\n\n'
+            'Example: <code>Bearer eyJhbGciOiJIUzI1NiIsInR5...</code>')
+    }
+}
+
 def create_app(config_class="config.DevelopmentConfig"):
     app = Flask(__name__)
     app.config.from_object(config_class)
-    app.config['ERROR_INCLUDE_MESSAGE'] = False
+    # app.config['ERROR_INCLUDE_MESSAGE'] = False
     bcrypt.init_app(app)
     jwt.init_app(app)
     api = Api(app, version='1.0', title='HBnB API',
-              description='HBnB Application API', doc='/api/v1/')
+              description='HBnB Application API', doc='/api/v1/',
+              authorizations=authorizations)
     
     api.add_namespace(users_ns, path='/api/v1/users')
     api.add_namespace(amenities_ns, path='/api/v1/amenities')
