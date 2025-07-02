@@ -1,7 +1,7 @@
 from app.models.baseEntity import (BaseEntity, type_validation,
                                    strlen_validation)
 from validate_email_address import validate_email
-import app
+from app import bcrypt
 import re
 
 
@@ -22,16 +22,17 @@ class User(BaseEntity):
     
     @password.setter
     def password(self, password):
+        type_validation(password, 'password', str)
         self.__password = self.hash_password(password)
 
     def hash_password(self, password):
         """Hashes the password before storing it."""
-        return app.bcrypt.generate_password_hash(password).\
+        return bcrypt.generate_password_hash(password).\
             decode('utf-8')
 
     def verify_password(self, password):
         """Verifies if the provided pw matches the hashed password."""
-        return app.bcrypt.check_password_hash(self.password, password)
+        return bcrypt.check_password_hash(self.password, password)
 
     def name_validation(self, names: str, names_name: str):
         type_validation(names, names_name, str)
