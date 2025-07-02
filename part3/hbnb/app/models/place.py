@@ -29,6 +29,18 @@ class Place(BaseEntity):
         self.amenities.append(amenity)
 
     @property
+    def amenities(self):
+        return self.__amenities
+    
+    @amenities.setter
+    def amenities(self, amenities):
+        from app.models.amenity import Amenity
+        type_validation(amenities, "amenities", list)
+        for amenity in amenities:
+            type_validation(amenity, 'amenity', Amenity)
+        self.__amenities = amenities
+
+    @property
     def title(self):
         return self.__title
 
