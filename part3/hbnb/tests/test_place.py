@@ -8,7 +8,8 @@ from app.models.amenity import Amenity
 class TestPlace(unittest.TestCase):
     def setUp(self):
         self.owner = User(first_name="John", last_name="Doe",
-                          email="john@doe.com", is_admin=False)
+                          email="john@doe.com", is_admin=False,
+                          password="password")
         self.valid_data = {
             'title': 'Nice Place',
             'description': 'A lovely place to stay',
@@ -34,8 +35,18 @@ class TestPlace(unittest.TestCase):
             Place(title='abc', description='desc', price=10,
                   latitude=0, longitude=0, owner=self.owner)
         with self.assertRaises(TypeError):
-            Place(title=123, description='desc', price=10, latitude=0,
-                  longitude=0, owner=self.owner)
+            Place(title=123, description='desc', # type: ignore
+                  price=10, latitude=0, longitude=0, owner=self.owner)
+            Place(title=None, description='desc', # type: ignore
+                  price=10, latitude=0, longitude=0, owner=self.owner)
+
+    def test_no_description(self):
+        place = Place(title='Valid Title', price=10, latitude=0,
+                      longitude=0, owner=self.owner)
+        self.assertEqual(place.title, 'Valid Title')
+        self.assertEqual(place.description, None)
+        self.assertEqual(place.price, 10)
+        self.assertEqual(place.latitude, 0)
 
     def test_invalid_description(self):
         with self.assertRaises(ValueError):
@@ -47,24 +58,31 @@ class TestPlace(unittest.TestCase):
 
     def test_invalid_price(self):
         with self.assertRaises(TypeError):
-            Place(title='Valid', description='Valid', price='free',
+            Place(title='Valid', description='Valid',
+                  price='free', # type: ignore
                   latitude=0, longitude=0, owner=self.owner)
         with self.assertRaises(ValueError):
             Place(title='Valid', description='Valid', price=-10,
                   latitude=0, longitude=0, owner=self.owner)
+            Place(title='Valid', description='Valid', price=0,
+                  latitude=0, longitude=0, owner=self.owner)
 
     def test_invalid_latitude(self):
         with self.assertRaises(TypeError):
-            Place(title='Valid', description='Valid', price=10,
-                  latitude='north', longitude=0, owner=self.owner)
+            Place(title='Valid', description=None, price=10,
+                  latitude='north', # type: ignore
+                  longitude=0, owner=self.owner)
         with self.assertRaises(ValueError):
             Place(title='Valid', description='Valid', price=10,
                   latitude=100, longitude=0, owner=self.owner)
+            Place(title='Valid', description='Valid', price=10,
+                  latitude=-480, longitude=0, owner=self.owner)
 
     def test_invalid_longitude(self):
         with self.assertRaises(TypeError):
             Place(title='Valid', description='Valid', price=10,
-                  latitude=0, longitude='east', owner=self.owner)
+                  latitude=0, longitude='east', # type: ignore
+                  owner=self.owner)
         with self.assertRaises(ValueError):
             Place(title='Valid', description='Valid', price=10,
                   latitude=0, longitude=200, owner=self.owner)
@@ -72,9 +90,14 @@ class TestPlace(unittest.TestCase):
     def test_invalid_owner(self):
         with self.assertRaises(TypeError):
             Place(title='Valid', description='Valid', price=10,
-                  latitude=0, longitude=0, owner='not_a_user')
+                  latitude=0, longitude=0,
+                  owner='not_a_user') # type: ignore
 
     def test_add_review_and_amenity(self):
+        visitor = User("Johnny", "Walker", "johnny@yahoo.com",
+                       "password")
+        visitor2 = User("Jamie", "Walker", "jamie@yahoo.com",
+                       "password2")
         place = Place(**self.valid_data)
         # Should raise TypeError for wrong types
         with self.assertRaises(TypeError):
@@ -82,13 +105,20 @@ class TestPlace(unittest.TestCase):
         with self.assertRaises(TypeError):
             place.add_amenity("not_an_amenity")
         # Should work for correct types
-        review = Review("Great stay!", 5, place, self.owner)
+        review = Review("Great stay!", 5, place, visitor)
         amenity = Amenity("Wi-Fi")
+        review2 = Review("Horrible kitchen!", 2, place, visitor2)
+        amenity2 = Amenity("Kitchen")
         place.add_review(review)
         place.add_amenity(amenity)
         self.assertIn(review, place.reviews)
         self.assertIn(amenity, place.amenities)
-
+        place.add_review(review2)
+        place.add_amenity(amenity2)
+        self.assertIn(review, place.reviews)
+        self.assertIn(amenity, place.amenities)
+        self.assertIn(review2, place.reviews)
+        self.assertIn(amenity2, place.amenities)
 
 if __name__ == "__main__":
     unittest.main()
