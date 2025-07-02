@@ -23,3 +23,4 @@ if __name__ == '__main__':
 # successfully}, {id: "00diunfw", name: "john", ...}} instead of just
 # the object or the error message.
 # Avoid amenities with same name with just different capitalization
+# Avoid adding the same amenitiy multiple times to a Place
