@@ -22,3 +22,4 @@ if __name__ == '__main__':
 # Add a message to all server responses: "{{msg: User created
 # successfully}, {id: "00diunfw", name: "john", ...}} instead of just
 # the object or the error message.
+# Avoid amenities with same name with just different capitalization
