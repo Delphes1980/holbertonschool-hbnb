@@ -54,7 +54,7 @@ class UserService:
         """
         email = user_data.get('email')
         type_validation(email, 'email', str)
-        if not email:
+        if email is None:
             raise ValueError('Invalid email: email is required')
         existing_user = cls.get_user_by_email(facade, email)
         if existing_user:
@@ -132,7 +132,7 @@ class UserService:
         """
         type_validation(user_id, 'user_id', str)
         user = cls.get_user(facade, user_id)
-        if not user:
+        if user is None:
             return None
         user_by_email = cls.get_user_by_email(facade,
             user_data.get('email'))
