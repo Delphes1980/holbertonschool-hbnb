@@ -57,7 +57,7 @@ class HBnBFacade:
         return AmenityService.update_amenity(self, amenity_id,
                                              amenity_data)
 
-# Services for Place CRUD operations ########
+# Services for Place CRUD operations ####
 
     def create_place(self, place_data):
         """ Create a new place with the provided data """
@@ -65,9 +65,7 @@ class HBnBFacade:
 
     def get_place(self, place_id):
         """ Retrieve a place by its ID """
-        if not is_valid_uuid4(place_id):
-            raise ValueError('Given place_id is not valid UUID4')
-        return self.place_repo.get(place_id)
+        return PlaceService.get_place(self, place_id)
 
     def get_all_places(self):
         """ Retrieve all places """

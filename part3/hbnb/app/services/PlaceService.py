@@ -50,3 +50,11 @@ class PlaceService:
         # repository
         facade.place_repo.add(new_place)
         return facade.place_repo.get(new_place.id)
+
+    @classmethod
+    def get_place(cls, facade, place_id):
+        type_validation(place_id, 'place_id', str)
+        if not is_valid_uuid4(place_id):
+            raise ValueError('Invalid ID: given place_id is not a '
+                             'valid UUID4')
+        return facade.place_repo.get(place_id)
