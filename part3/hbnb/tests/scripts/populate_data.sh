@@ -7,7 +7,7 @@ PLACE_IDS=()
 
 # Create 5 users and store their IDs
 echo "Creating users..."
-for i in $(seq 1 5)
+for i in $(seq 1 4)
 do
   RESPONSE=$(curl -s -X POST "$API_URL/users/" \
     -H "Content-Type: application/json" \
@@ -53,7 +53,7 @@ curl -s "$API_URL/places/" | jq .
 
 # Create 10 amenities
 echo "Creating amenities..."
-for i in $(seq 1 10)
+for i in $(seq 1 5)
 do
   curl -s -X POST "$API_URL/amenities/" \
     -H "Content-Type: application/json" \
