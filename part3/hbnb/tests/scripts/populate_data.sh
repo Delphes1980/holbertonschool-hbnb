@@ -111,16 +111,23 @@ done
 # Create reviews: each user reviews each place once
 echo "Creating reviews..."
 REVIEW_NUM=1
-for USER_ID in "${USER_IDS[@]}"
+for j in $(seq 1 3)
 do
-  for PLACE_ID in "${PLACE_IDS[@]}"
+  TOKEN_INDEX=$(( (j-1) % ${#JWT_TOKENS[@]} ))
+  JWT="${JWT_TOKENS[$TOKEN_INDEX]}"
+  # USER_ID="${USER_IDS[$TOKEN_INDEX]}"
+  for USER_ID in "${USER_IDS[@]}"
   do
-    RESPONSE=$(curl -s -X POST "$API_URL/reviews/" \
-      -H "Content-Type: application/json" \
-      -d "{\"text\": \"Review $REVIEW_NUM by user $USER_ID for place $PLACE_ID\", \"rating\": $(( (REVIEW_NUM % 5) + 1 )), \"place_id\": \"$PLACE_ID\", \"user_id\": \"$USER_ID\"}")
-    echo "Review $REVIEW_NUM response: $RESPONSE"
-    ((REVIEW_NUM++))
-    sleep 0.1
+    for PLACE_ID in "${PLACE_IDS[@]}"
+    do
+      RESPONSE=$(curl -s -X POST "$API_URL/reviews/" \
+        -H "Authorization: Bearer $JWT" \
+        -H "Content-Type: application/json" \
+        -d "{\"text\": \"Review $REVIEW_NUM by user $USER_ID for place $PLACE_ID\", \"rating\": $(( (REVIEW_NUM % 5) + 1 )), \"place_id\": \"$PLACE_ID\", \"user_id\": \"$USER_ID\"}")
+      echo "Review $REVIEW_NUM response: $RESPONSE"
+      ((REVIEW_NUM++))
+      sleep 0.1
+    done
   done
 done
 
