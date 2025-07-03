@@ -10,7 +10,7 @@ class AmenityService:
         """Create a new amenity with the provided data."""
         name = amenity_data.get('name')
         type_validation(name, 'name', str)
-        if not name:
+        if name is None:
             raise ValueError('Invalid name: name is required')
         existing_amenity = cls.get_amenity_by_name(facade, name)
         if existing_amenity:
@@ -36,9 +36,9 @@ class AmenityService:
 
     @classmethod
     def get_amenity_by_name(cls, facade, name):
-        type_validation(name, 'name', str)
-        if not name:
+        if name is None:
             raise ValueError('Invalid name: name is required')
+        type_validation(name, 'name', str)
         return facade.amenity_repo.get_by_attribute('name', name)
 
     @classmethod
@@ -46,7 +46,7 @@ class AmenityService:
         """ Update an amenity with the provided data """
         type_validation(amenity_id, 'amenity_id', str)
         amenity = cls.get_amenity(facade, amenity_id)
-        if not amenity:
+        if amenity is None:
             return None
         amenity_by_name = cls.get_amenity_by_name(
                 facade,
@@ -54,7 +54,7 @@ class AmenityService:
         if amenity_by_name and amenity_by_name.id != amenity.id:
             raise ValueError('Invalid name: name is already used for '
                              'another amenity')
-        validate_init_args(Amenity, **amenity_data)
+        # validate_init_args(Amenity, **amenity_data)
         amenity.update(amenity_data)
         updated_amenity = facade.amenity_repo.get(amenity_id)
         return updated_amenity
