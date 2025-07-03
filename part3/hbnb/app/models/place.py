@@ -1,6 +1,8 @@
 from app.models.baseEntity import (BaseEntity, type_validation,
                                    strlen_validation)
 from app.models.user import User
+from app.api.v1.apiRessources import CustomError
+
 
 class Place(BaseEntity):
     def __init__(self, title: str, description = None, *,
@@ -14,7 +16,7 @@ class Place(BaseEntity):
         self.longitude = longitude
         self.owner = owner
         self.reviews = []  # List to store related reviews
-        self.amenities = []  # List to store related amenities
+        self.__amenities = []  # List to store related amenities
 
     def add_review(self, review):
         """Add a review to the place."""
@@ -26,11 +28,17 @@ class Place(BaseEntity):
 
     def add_amenity(self, amenity):
         """Add an amenity to the place."""
+        self.amenities.append(self.amenity_validation(amenity))
+
+    def amenity_validation(self, amenity):
         if amenity is None:
-            raise ValueError('Expected amenity but received None')
+            raise ValueError('Invalid amenity: expected amenity but received None')
         from app.models.amenity import Amenity
         type_validation(amenity, "Amenity", Amenity)
-        self.amenities.append(amenity)
+        if any(place_amenity == amenity 
+               for place_amenity in self.amenities):
+            raise CustomError(f'Amenity "{amenity.name}" already listed for this place', 400)
+        return amenity
 
     @property
     def amenities(self):
@@ -39,14 +47,12 @@ class Place(BaseEntity):
     @amenities.setter
     def amenities(self, amenities):
         if amenities is None:
-            raise ValueError('Invalid amenities: expected list of amenities but received None')
-        from app.models.amenity import Amenity
+            self.__amenities = []
+            return None
         type_validation(amenities, "amenities", list)
         for amenity in amenities:
-            if amenity is None:
-                raise ValueError('Invalid amenity: expected amenity but received None')
-            type_validation(amenity, 'amenity', Amenity)
-        self.__amenities = amenities
+            self.add_amenity(amenity)
+            # self.__amenities.append(self.amenity_validation(amenity))
 
     @property
     def title(self):
@@ -84,11 +90,11 @@ class Place(BaseEntity):
 
     @property
     def price(self):
-        return self.__price
+        return self.price_
 
     @price.setter
     def price(self, value):
-        self.__price = self.validate_price(value)
+        self.price_ = self.validate_price(value)
 
     def validate_price(self, price: float):
         """Verify is the price is an integer."""
