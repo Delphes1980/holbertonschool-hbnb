@@ -29,6 +29,17 @@ user_response_model = api.model('UserResponse', {
                            description='Email of the user')
 })
 
+user_update_model = api.model('UserUpdate', {
+    'first_name': fields.String(required=True,
+                                description='First name of the user'),
+    'last_name': fields.String(required=True,
+                               description='Last name of the user'),
+    'email': fields.String(required=False,
+                           description='Email of the user'),
+    'password': fields.String(required=False,
+                              description='Password of the user')
+})
+
 error_model = api.model('Error', {
     'error': fields.String(description='Error message')
 })
@@ -93,7 +104,7 @@ class UserResource(Resource):
     @api.marshal_with(user_response_model,
                       code=_http.HTTPStatus.OK,
                       description='User updated successfully')
-    @api.expect(user_model, validate=False)
+    @api.expect(user_update_model, validate=False)
     @api.response(200, 'User successfully updated',
                   user_response_model)
     @api.response(400, 'Invalid input data', error_model)
@@ -105,14 +116,18 @@ class UserResource(Resource):
         """Update the user data of a registered user by ID"""
         user_data = api.payload
         try:
-            compare_data_and_model(user_data, user_model)
+            compare_data_and_model(user_data, user_update_model)
             current_user = get_jwt_identity()
             user = facade.get_user(user_id)
-            if current_user != user_id: # check the user_id in the URL 
+            if user is None:
+                raise CustomError('Invalid user_id: no user found corresponding to that user_id', 404)
+            if current_user != user.id: # check the user_id in the URL 
                                     # matches the authenticated user
-                raise CustomError('Unauthorized action', 403)
-            if (user.email != user_data.get("email") or
-                not user.verify_password(user_data.get("password"))):
+                raise CustomError('Unauthorized action: you can not modify the user account of somebody else', 403)
+            given_email = user_data.get('email')
+            given_password = user_data.get("password")
+            if ((given_email is not None and user.email != given_email) or
+                (given_password is not None and not user.verify_password(given_password))):
                 raise CustomError('You cannot modify email or password action', 400)
             updated_user = facade.update_user(user_id, user_data)
         except CustomError as e:
