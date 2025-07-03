@@ -13,7 +13,7 @@ class Review(BaseEntity):
         self.place = place
         self.user = user
         if any(review.user == user for review in place.reviews):
-            raise CustomError('You have already reviewed this place',
+            raise CustomError('This user has already reviewed this place',
                               400)
         place.add_review(self)
 
@@ -63,7 +63,7 @@ class Review(BaseEntity):
                              " writes the review")
         type_validation(user, "User", User)
         if user == self.place.owner:
-            raise CustomError("You cannot review your own place", 400)
+            raise CustomError("User cannot review their own place", 400)
         return user
 
     @property
