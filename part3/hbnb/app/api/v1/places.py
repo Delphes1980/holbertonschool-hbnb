@@ -2,19 +2,20 @@ from flask_restx import Namespace, Resource, fields, _http
 from app.services import facade
 from app.api.v1.apiRessources import (compare_data_and_model,
                                       CustomError)
+from app.models.baseEntity import type_validation
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 api = Namespace('places', description='Place operations')
 
 # Define a model for nested amenity objects within a place response
-amenity_model = api.model('PlaceAmenity', {
+amenity_response_model = api.model('PlaceAmenity', {
     'id': fields.String(required=True, description='Amenity ID'),
     'name': fields.String(required=True,
                           description='Name of the amenity')
 })
 
 # Define a model for nested owner (user) objects within a place response
-user_model = api.model('PlaceOwner', {
+user_response_model = api.model('PlaceOwner', {
     'id': fields.String(required=True, description='Owner ID'),
     'first_name': fields.String(required=True,
                                 description='First name of the owner'),
@@ -25,7 +26,7 @@ user_model = api.model('PlaceOwner', {
 })
 
 # Define a model for nested review objects within a place response
-review_model = api.model('PlaceReview', {
+review_response_model = api.model('PlaceReview', {
     'id': fields.String(required=True, description='Review ID'),
     'text': fields.String(required=True,
                           description='Text of the review'),
@@ -51,8 +52,8 @@ place_model = api.model('Place', {
                              description='Latitude of the place'),
     'longitude': fields.Float(required=True,
                               description='Longitude of the place'),
-    'owner_id': fields.String(required=True,
-                              description='ID of the owner'),
+    # 'owner_id': fields.String(required=True,
+    #                           description='ID of the owner'),
     'amenities_ids': fields.List(fields.String,
                              required=False,
                              description="List of amenities ID's")
@@ -75,14 +76,14 @@ place_response_model = api.model('PlaceResponse', {
     'longitude': fields.Float(required=True,
                               description='Longitude of the place'),
     # Embeds the full owner object using the 'user_model'
-    'owner': fields.Nested(user_model, required=True,
+    'owner': fields.Nested(user_response_model, required=True,
                            description='Owner of the place'),
     # Embeds the full amenity object using the 'amenity_model'
-    'amenities': fields.List(fields.Nested(amenity_model),
+    'amenities': fields.List(fields.Nested(amenity_response_model),
                              required=True,
                              description='List of amenities'),
     # Embeds a list of review objects using the 'review_model'
-    'reviews': fields.List(fields.Nested(review_model),
+    'reviews': fields.List(fields.Nested(review_response_model),
                            required=True,
                            description='List of reviews')
 })
@@ -102,7 +103,7 @@ error_model = api.model('Error', {
 @api.route('/')
 class PlaceList(Resource):
     # Endpoint for creating a new place
-    @api.doc('Returned the created place')
+    @api.doc('Returned the created place', security='Bearer')
     @api.marshal_with(place_response_model,
                       code=_http.HTTPStatus.CREATED,
                       description='Place successfully created')
@@ -110,12 +111,15 @@ class PlaceList(Resource):
     @api.response(201, 'Place successfully created',
                   place_response_model)
     @api.response(400, 'Invalid input data', error_model)
+    @jwt_required() # ensure the user is authenticated
     def post(self):
         """Register a new place"""
         # Automatically parses and validates request JSON
         place_data = api.payload
         try:
             compare_data_and_model(place_data, place_model)
+            current_user = get_jwt_identity()
+            place_data['owner_id'] = current_user
             new_place = facade.create_place(place_data)
         except Exception as e:
             api.abort(400, error=str(e))
@@ -147,9 +151,10 @@ class PlaceResource(Resource):
         place_response_model,
         code=_http.HTTPStatus.OK,
         description='Review details retrieved successfully')
-    @api.response(200, 'Place details retrieved successfully')
-    @api.response(400, 'Invalid ID: not a UUID4')
-    @api.response(404, 'Place not found')
+    @api.response(200, 'Place details retrieved successfully',
+                  place_response_model)
+    @api.response(400, 'Invalid ID: not a UUID4', error_model)
+    @api.response(404, 'Place not found', error_model)
     def get(self, place_id):
         """Get place details by ID"""
         try:
@@ -163,24 +168,40 @@ class PlaceResource(Resource):
         return place, 200
 
     # Endpoint for updating an existing place by ID
-    @api.doc('Returns the updated place')
+    @api.doc('Returns the updated place', security='Bearer')
     @api.marshal_with(place_response_model,
                       code=_http.HTTPStatus.OK,
                       description='Place updated successfully')
-    @api.expect(place_model)
-    @api.response(200, 'Place updated successfully')
-    @api.response(400, 'Invalid input data')
-    @api.response(404, 'Place not found')
+    @api.expect(place_model, validate=False)
+    @api.response(200, 'Place updated successfully',
+                  place_response_model)
+    @api.response(400, 'Invalid input data', error_model)
+    @api.response(401, 'Missing authorization header', error_model)
+    @api.response(403, 'Unauthorized action', error_model)
+    @api.response(404, 'Place not found', error_model)
+    @jwt_required()
     def put(self, place_id):
         """Update a place's information"""
         place_data = api.payload
         try:
+            compare_data_and_model(place_data, place_model)
+            current_user = get_jwt_identity()
+            place = facade.get_place(place_id)
+            if place is None:
+                raise CustomError('Invalid place_id: place not found',
+                                  404)
+            if current_user != place.owner.id:
+                raise CustomError('Unauthorized action', 403)
+            place_data['owner_id'] = current_user
             updated_place = facade.update_place(place_id,
                                                 place_data)
+        except CustomError as e:
+            api.abort(e.status_code, error=str(e))
+            return {'error': str(e)}, e.status_code
         except Exception as e:
             api.abort(400, error=str(e))
             return {'error': str(e)}, 400
-        if not updated_place:
+        if updated_place is None:
             api.abort(404, error='Place not found')
             return {'error': 'Place not found'}, 404
         return updated_place, 200
@@ -188,14 +209,17 @@ class PlaceResource(Resource):
 
 @api.route('/<place_id>/reviews')
 class PlaceReviewsList(Resource):
-    # Endpoint for retrieving all reviwes associated with a specific place
+    # Endpoint for retrieving all reviews associated with a specific
+    # place
     @api.doc('Returns list of reviews given to the concerned place')
-    @api.marshal_list_with(review_model, code=_http.HTTPStatus.OK,
-                           description='List of reviews given to the place'
-                           'retrieved successfully')
-    @api.response(200, 'List of reviews retrieved successfully')
-    @api.response(400, "Invalid ID")
-    @api.response(404, 'Place not found')
+    @api.marshal_list_with(review_response_model, 
+                           code=_http.HTTPStatus.OK,
+                           description='List of reviews given to the '
+                           'place retrieved successfully')
+    @api.response(200, 'List of reviews retrieved successfully',
+                  review_response_model)
+    @api.response(400, "Invalid ID", error_model)
+    @api.response(404, 'Place not found', error_model)
     def get(self, place_id):
         """Get list of reviews for a place given its ID"""
         try:
@@ -203,7 +227,7 @@ class PlaceReviewsList(Resource):
         except Exception as e:
             api.abort(400, error=str(e))
             return {'error': str(e)}, 400
-        if not reviews_by_place:
+        if reviews_by_place is None:
             api.abort(404, error='Place not found')
             return {'error': 'Place not found'}, 404
         return reviews_by_place, 200
