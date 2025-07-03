@@ -9,6 +9,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from app.persistence.repository import SQLAlchemyRepository
 from datetime import datetime, timezone
 import uuid
+from flask_bcrypt import generate_password_hash, check_password_hash
 
 
 class User(BaseEntity):
@@ -27,11 +28,11 @@ class User(BaseEntity):
                  email: str, is_admin: bool = False,
                  password: str = None):
         super().__init__()
-        self.first_name = first_name
-        self.last_name = last_name
-        self.email = email
+        self.first_name = self.name_validation(first_name, "first_name")
+        self.last_name = self.name_validation(last_name, "last_name")
+        self.email = self.email_validation(email)
         self.is_admin = is_admin
-        self.password = password
+        self.password = self.hash_password(password)
 
     def name_validation(self, names: str, names_name: str):
         type_validation(names, names_name, str)
@@ -54,15 +55,17 @@ class User(BaseEntity):
                              " example@exam.ple")
         return email
 
-    def hash_password(self, password):
+    def hash_password(self, plain_password):
         """Hashes the password before storing it"""
-        return bcrypt.generate_password_hash(password).decode('utf-8')
+        if not isinstance(plain_password, str):
+            raise TypeError("Password must be a string")
+        return bcrypt.generate_password_hash(plain_password).decode('utf-8')
 
-    def verify_password(self, password):
+    def verify_password(self, plain_password):
         """ Verifies if the provided password matches the hashed password"""
         if not self.password:
             return False
-        return bcrypt.check_password_hash(self.password, password)
+        return bcrypt.check_password_hash(self.password, plain_password)
     
     # def update_first_name(self, new_first_name):
     #     self.first_name = self.name_validation(new_first_name, "first_name")
