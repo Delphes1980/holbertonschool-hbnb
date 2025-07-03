@@ -22,7 +22,7 @@ class PlaceService:
         amenities_ids = place_data.get('amenities_ids')
         if amenities_ids is not None:
             place_data.pop('amenities_ids')
-            type_validation(amenities_ids, 'amenities', (str | list))
+            type_validation(amenities_ids, 'amenities_ids', (str | list))
         validate_init_args(Place, **place_data)
         new_place = Place(**place_data)
         if amenities_ids is not None:
@@ -99,7 +99,7 @@ class PlaceService:
                                          "'{amenity_id}' was not "
                                          "found", 404)
                     amenities.append(current_amenity)
-        validate_init_args(Place, **place_data)
+        # validate_init_args(Place, **place_data)
         place.update(place_data)
         place.amenities = amenities
         updated_place = facade.place_repo.get(place_id)
