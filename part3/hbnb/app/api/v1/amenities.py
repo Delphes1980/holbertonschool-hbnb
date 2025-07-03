@@ -83,7 +83,7 @@ class AmenityResource(Resource):
         except Exception as e:
             api.abort(400, error=str(e))
             return {'error': str(e)}, 400
-        if not amenity:
+        if amenity is None:
             api.abort(404, error='Amenity not found')
             return {'error': 'Amenity not found'}, 404
         return amenity, 200
@@ -110,7 +110,7 @@ class AmenityResource(Resource):
             return {'error': str(e)}, 400
         # If the amenity is not found, return an error
         # Otherwise, return the updated amenity as a dictionary
-        if not updated_amenity:
+        if updated_amenity is None:
             api.abort(404, error='Amenity not found')
             return {'error': 'Amenity not found'}, 404
         return updated_amenity, 200
