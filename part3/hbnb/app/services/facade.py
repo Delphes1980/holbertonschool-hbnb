@@ -1,5 +1,6 @@
 from app.persistence.repository import SQLAlchemyRepository
 from app.persistence.UserRepository import UserRepository
+from app.persistence.PlaceRepository import PlaceRepository
 from app.models.place import Place
 from app.services.UserService import UserService
 from app.services.AmenityService import AmenityService
@@ -21,7 +22,7 @@ def is_valid_uuid4(uuid_str):
 class HBnBFacade:
     def __init__(self):
         self.user_repo = UserRepository()
-        self.place_repo = SQLAlchemyRepository(Place)
+        self.place_repo = PlaceRepository()
         self.review_repo = SQLAlchemyRepository(Review)
         self.amenity_repo = SQLAlchemyRepository(AmenityService)
 
