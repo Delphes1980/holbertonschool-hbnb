@@ -5,6 +5,7 @@ from app.api.v1.apiRessources import (compare_data_and_model,
 from app.models.baseEntity import type_validation
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
+
 api = Namespace('places', description='Place operations')
 
 # Define a model for nested amenity objects within a place response
@@ -52,8 +53,8 @@ place_model = api.model('Place', {
                              description='Latitude of the place'),
     'longitude': fields.Float(required=True,
                               description='Longitude of the place'),
-    # 'owner_id': fields.String(required=True,
-    #                           description='ID of the owner'),
+    'owner_id': fields.String(required=False,
+                              description='ID of the owner'),
     'amenities_ids': fields.List(fields.String,
                              required=False,
                              description="List of amenities ID's")
@@ -119,8 +120,15 @@ class PlaceList(Resource):
         try:
             compare_data_and_model(place_data, place_model)
             current_user = get_jwt_identity()
-            place_data['owner_id'] = current_user
+            given_owner_id = place_data.get('owner_id')
+            if given_owner_id is None:
+                place_data['owner_id'] = current_user
+            elif current_user != facade.get_user(given_owner_id).id:
+                raise CustomError('Unauthorized action: user does not match the provided place owner', 403)
             new_place = facade.create_place(place_data)
+        except CustomError as e:
+            api.abort(e.status_code, error=str(e))
+            return {'error': str(e)}, e.status_code
         except Exception as e:
             api.abort(400, error=str(e))
             return {'error': str(e)}, 400
@@ -159,10 +167,13 @@ class PlaceResource(Resource):
         """Get place details by ID"""
         try:
             place = facade.get_place(place_id)
+        except CustomError as e:
+            api.abort(e.status_code, error=str(e))
+            return {'error': str(e)}, e.status_code
         except Exception as e:
             api.abort(400, error=str(e))
             return {'error': str(e)}, 400
-        if not place:
+        if place is None:
             api.abort(404, error='Place not found')
             return {'error': 'Place not found'}, 404
         return place, 200
@@ -186,13 +197,17 @@ class PlaceResource(Resource):
         try:
             compare_data_and_model(place_data, place_model)
             current_user = get_jwt_identity()
+            given_owner_id = place_data.get('owner_id')
+            if given_owner_id is None:
+                place_data['owner_id'] = current_user
+            elif current_user != facade.get_user(given_owner_id).id:
+                raise CustomError('Unauthorized action: given owner_id doesn\' match authenticated user', 403)
             place = facade.get_place(place_id)
             if place is None:
                 raise CustomError('Invalid place_id: place not found',
                                   404)
             if current_user != place.owner.id:
-                raise CustomError('Unauthorized action', 403)
-            place_data['owner_id'] = current_user
+                raise CustomError('Unauthorized action: user is not owner of place', 403)
             updated_place = facade.update_place(place_id,
                                                 place_data)
         except CustomError as e:
@@ -224,6 +239,9 @@ class PlaceReviewsList(Resource):
         """Get list of reviews for a place given its ID"""
         try:
             reviews_by_place = facade.get_reviews_by_place(place_id)
+        except CustomError as e:
+            api.abort(e.status_code, error=str(e))
+            return {'error': str(e)}, e.status_code
         except Exception as e:
             api.abort(400, error=str(e))
             return {'error': str(e)}, 400
