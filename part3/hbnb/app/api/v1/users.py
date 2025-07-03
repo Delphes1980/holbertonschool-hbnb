@@ -84,7 +84,7 @@ class UserResource(Resource):
         except Exception as e:
             api.abort(400, error=str(e))
             return {'error', str(e)}, 400
-        if not user:
+        if user is None:
             api.abort(404, error='User not found')
             return {'error': 'User not found'}, 404
         return user, 200
@@ -107,10 +107,10 @@ class UserResource(Resource):
         try:
             compare_data_and_model(user_data, user_model)
             current_user = get_jwt_identity()
+            user = facade.get_user(user_id)
             if current_user != user_id: # check the user_id in the URL 
                                     # matches the authenticated user
                 raise CustomError('Unauthorized action', 403)
-            user = facade.get_user(user_id)
             if (user.email != user_data.get("email") or
                 not user.verify_password(user_data.get("password"))):
                 raise CustomError('You cannot modify email or password action', 400)
@@ -121,7 +121,7 @@ class UserResource(Resource):
         except Exception as e:
             api.abort(400, error=str(e))
             return {'error': str(e)}, 400
-        if not updated_user:
+        if updated_user is None:
             api.abort(404, error='User not found')
             return {'error': 'User not found'}, 404
         return updated_user, 200
