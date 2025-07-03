@@ -2,15 +2,19 @@ from app.models.baseEntity import (BaseEntity, type_validation,
                                    strlen_validation)
 from app.models.place import Place
 from app.models.user import User
-
+from app.api.v1.apiRessources import CustomError
 
 class Review(BaseEntity):
-    def __init__(self, text, rating, place, user):
+    def __init__(self, text: str, rating: int, place: Place,
+                 user: User):
         super().__init__()
         self.text = text
         self.rating = rating
-        self.place = self.set_place(place)
-        self.user = self.set_user(user)
+        self.place = place
+        self.user = user
+        if any(review.user == user for review in place.reviews):
+            raise CustomError('You have already reviewed this place',
+                              400)
         place.add_review(self)
 
     @property
@@ -19,7 +23,7 @@ class Review(BaseEntity):
 
     @text.setter
     def text(self, text):
-        if not text:
+        if text is None:
             raise ValueError("text is required: provide content for"
                              " the review")
         type_validation(text, "Text", str)
@@ -33,27 +37,45 @@ class Review(BaseEntity):
 
     @rating.setter
     def rating(self, rating):
-        if not rating:
+        self.__rating = self.rating_validation(rating)
+
+    def rating_validation(self, rating):
+        if rating is None:
             raise ValueError("rating is required: provide an integer"
                              " between 1 and 5 to rate the place")
         type_validation(rating, "Rating", int)
-        self.rating_validation(rating)
-        self.__rating = rating
-
-    def rating_validation(self, rating):
         if not (1 <= rating <= 5):
             raise ValueError("Rating must be an integer between 1 and"
                              " 5, both inclusive")
+        return rating
+
+    @property
+    def user(self):
+        return self.__user
+
+    @user.setter
+    def user(self, user):
+        self.__user = self.set_user(user)
 
     def set_user(self, user):
-        if not user:
+        if user is None:
             raise ValueError("user is required: provide user who"
                              " writes the review")
         type_validation(user, "User", User)
+        if user == self.place.owner:
+            raise CustomError("You cannot review your own place", 400)
         return user
 
+    @property
+    def place(self):
+        return self.__place
+
+    @place.setter
+    def place(self, place):
+        self.__place = self.set_place(place)
+
     def set_place(self, place):
-        if not place:
+        if place is None:
             raise ValueError("place is required: provide place being"
                              " reviewed")
         type_validation(place, "Place", Place)
