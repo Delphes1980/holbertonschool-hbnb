@@ -22,19 +22,27 @@ class User(BaseEntity):
     
     @password.setter
     def password(self, password):
+        if password is None:
+            raise ValueError('Expected password but received None')
         type_validation(password, 'password', str)
         self.__password = self.hash_password(password)
 
     def hash_password(self, password):
         """Hashes the password before storing it."""
+        if password is None:
+            raise ValueError('Expected password but received None')
         return bcrypt.generate_password_hash(password).\
             decode('utf-8')
 
     def verify_password(self, password):
         """Verifies if the provided pw matches the hashed password."""
+        if password is None:
+            raise ValueError('Expected password but received None')
         return bcrypt.check_password_hash(self.password, password)
 
     def name_validation(self, names: str, names_name: str):
+        if names is None:
+            raise ValueError(f'Expected {names_name} but received None')
         type_validation(names, names_name, str)
         names = names.strip()
         strlen_validation(names, names_name, 1, 50)
@@ -49,6 +57,8 @@ class User(BaseEntity):
         return " ".join(names_list)
 
     def email_validation(self, email: str):
+        if email is None:
+            raise ValueError('Expected email but received None')
         type_validation(email, "email", str)
         if not validate_email(email):
             raise ValueError("Invalid email: email must have format"
@@ -86,5 +96,7 @@ class User(BaseEntity):
 
     @is_admin.setter
     def is_admin(self, is_admin: bool):
+        if is_admin is None:
+            raise ValueError('Expected boolean but received None')
         type_validation(is_admin, "is_admin", bool)
         self.__is_admin = is_admin
