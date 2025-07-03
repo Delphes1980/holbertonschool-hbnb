@@ -1,10 +1,12 @@
 from app.persistence.repository import SQLAlchemyRepository
+from app.persistence.UserRepository import UserRepository
 from app.models.place import Place
 from app.services.UserService import UserService
 from app.services.AmenityService import AmenityService
 from app.models.review import Review
 from app.models.baseEntity import type_validation
 from uuid import UUID
+
 
 
 def is_valid_uuid4(uuid_str):
@@ -18,10 +20,10 @@ def is_valid_uuid4(uuid_str):
 
 class HBnBFacade:
     def __init__(self):
-        self.user_repository = SQLAlchemyRepository(UserService)
-        self.place_repository = SQLAlchemyRepository(Place)
-        self.review_repository = SQLAlchemyRepository(Review)
-        self.amenity_repository = SQLAlchemyRepository(AmenityService)
+        self.user_repo = UserRepository()
+        self.place_repo = SQLAlchemyRepository(Place)
+        self.review_repo = SQLAlchemyRepository(Review)
+        self.amenity_repo = SQLAlchemyRepository(AmenityService)
 
 # Services for User CRUD operations ####
 

@@ -14,19 +14,18 @@ user_model = api.model('User', {
                                description='Last name of the user'),
     'email': fields.String(required=True,
                            description='Email of the user'),
-    'password': fields.String(required=True, description='Password of'
-                              'the user')
+    'password': fields.String(required=True, description='User password')
 })
 
 user_response_model = api.model('UserResponse', {
     'id': fields.String(required=True,
                         description='ID of the user'),
     'first_name': fields.String(required=True,
-                                description='First name of the user'),
+                                description='First name of the user', attribute='first_name'),
     'last_name': fields.String(required=True,
-                               description='Last name of the user'),
+                               description='Last name of the user', attribute='last_name'),
     'email': fields.String(required=True,
-                           description='Email of the user')
+                           description='Email of the user', attribute='email')
 })
 
 update_user_model = api.model('UpdateUser', {

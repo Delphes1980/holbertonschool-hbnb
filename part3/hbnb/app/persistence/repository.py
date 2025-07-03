@@ -1,4 +1,4 @@
-import app
+from app import db
 from abc import ABC, abstractmethod
 
 
@@ -33,8 +33,8 @@ class SQLAlchemyRepository(Repository):
         self.model = model
 
     def add(self, obj):
-        app.db.session.add(obj)
-        app.db.session.commit()
+        db.session.add(obj)
+        db.session.commit()
 
     def get(self, obj_id):
         return self.model.query.get(obj_id)
@@ -47,13 +47,13 @@ class SQLAlchemyRepository(Repository):
         if obj:
             for key, value in data.items():
                 setattr(obj, key, value)
-            app.db.session.commit()
+            db.session.commit()
 
     def delete(self, obj_id):
         obj = self.get(obj_id)
         if obj:
-            app.db.session.delete(obj)
-            app.db.session.commit()
+            db.session.delete(obj)
+            db.session.commit()
 
     def get_by_attribute(self, attr_name, attr_value):
         return self.model.query.filter_by(**{attr_name: attr_value}).first()
