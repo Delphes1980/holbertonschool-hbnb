@@ -18,14 +18,14 @@ class User(BaseEntity):
 
     @property
     def password(self):
-        return self.__password
+        return self.password_hash
     
     @password.setter
     def password(self, password):
         if password is None:
             raise ValueError('Expected password but received None')
         type_validation(password, 'password', str)
-        self.__password = self.hash_password(password)
+        self.password_hash = self.hash_password(password)
 
     def hash_password(self, password):
         """Hashes the password before storing it."""
