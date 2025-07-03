@@ -11,7 +11,7 @@ class TestAmenity(unittest.TestCase):
         self.assertIsInstance(amenity.name, str)
 
     def test_amenity_name_empty(self):
-        with self.assertRaises(TypeError) as e:
+        with self.assertRaises(ValueError) as e:
             Amenity(None)
         self.assertIn("Invalid name", str(e.exception))
 

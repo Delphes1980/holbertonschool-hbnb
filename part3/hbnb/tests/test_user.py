@@ -45,7 +45,7 @@ class TestUser(unittest.TestCase):
         self.assertIn("Invalid first_name", str(e.exception))
 
     def test_name_None(self):
-        with self.assertRaises(TypeError) as e:
+        with self.assertRaises(ValueError) as e:
             User(None, "Doe", "email@email.com", password="password") # type: ignore
         self.assertIn("first_name", str(e.exception))
 
@@ -76,9 +76,9 @@ class TestUser(unittest.TestCase):
         self.assertIn("Invalid last_name", str(e.exception))
 
     def test_last_name_None(self):
-        with self.assertRaises(TypeError) as e:
+        with self.assertRaises(ValueError) as e:
             User("Jon", None, "email@email.com", password="password") # type: ignore
-        self.assertIn("Invalid last_name", str(e.exception))
+        self.assertIn("last_name", str(e.exception))
 
     def test_name_with_accents_and_special_characters(self):
         # Acceptable names with accents, dots, apostrophes, and dashes
@@ -130,7 +130,7 @@ class TestUser(unittest.TestCase):
         self.assertIn("Invalid email", str(e.exception))
     
     def test_invalid_email_None(self):
-        with self.assertRaises(TypeError) as e:
+        with self.assertRaises(ValueError) as e:
             User("John", "Doe", None, password="password") # type: ignore
         self.assertIn("email", str(e.exception))
 

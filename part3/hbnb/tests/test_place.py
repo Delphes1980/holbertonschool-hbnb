@@ -37,7 +37,7 @@ class TestPlace(unittest.TestCase):
         with self.assertRaises(TypeError):
             Place(title=123, description='desc', # type: ignore
                   price=10, latitude=0, longitude=0, owner=self.owner)
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             Place(title=None, description='desc', # type: ignore
                   price=10, latitude=0, longitude=0, owner=self.owner)
 
