@@ -2,9 +2,9 @@
 This repository has as objective to recreate ann Airbnb-like application.
 
 It will be composed of four parts:
-- [current stage of development] Technical documentation (UML)
+- Technical documentation (UML)
 - Business Logic and API
-- Authentification and Database
+- [current stage of development] Authentification and Database
 - Simple Web Client
 
 ## Technical documentation
