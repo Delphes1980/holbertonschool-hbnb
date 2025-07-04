@@ -45,29 +45,33 @@ def create_app(config_class="config.DevelopmentConfig"):
     api.add_namespace(reviews_ns, path='/api/v1/reviews')
     api.add_namespace(auth_ns, path='/api/v1/auth')
 
-    from app.services import facade
-    from app.models.user import User
-    admin_email = app.config.get('ADMIN_EMAIL', None)
-    admin_password = app.config.get('ADMIN_PASSWORD', None)
-    if admin_email is not None and admin_password is not None:
-        admin_user = User(
-            first_name='Admin',
-            last_name='User',
-            email=admin_email,
-            password=admin_password,
-            is_admin=True
-        )
-        facade.user_repo.add(admin_user)
-    regular_user_email = app.config.get('REGULAR_USER_EMAIL', None)
-    regular_user_password = app.config.get('REGULAR_USER_PASSWORD', None)
-    if regular_user_email is not None and regular_user_password is not None:
-        regular_user = User(
-            first_name='Regular',
-            last_name='User',
-            email=regular_user_email,
-            password=regular_user_password,
-            is_admin=False
-        )
-        facade.user_repo.add(regular_user)
+    # with app.app_context():
+    #     db.create_all()
+    # from app.services import facade
+    # from app.models.user import User
+    # admin_email = app.config.get('ADMIN_EMAIL', None)
+    # admin_password = app.config.get('ADMIN_PASSWORD', None)
+    # if admin_email is not None and admin_password is not None:
+    #     admin_user = User(
+    #         first_name='Admin',
+    #         last_name='User',
+    #         email=admin_email,
+    #         password=admin_password,
+    #         is_admin=True
+    #     )
+    #     with app.app_context():
+    #         facade.user_repo.add(admin_user)
+    # regular_user_email = app.config.get('REGULAR_USER_EMAIL', None)
+    # regular_user_password = app.config.get('REGULAR_USER_PASSWORD', None)
+    # if regular_user_email is not None and regular_user_password is not None:
+    #     regular_user = User(
+    #         first_name='Regular',
+    #         last_name='User',
+    #         email=regular_user_email,
+    #         password=regular_user_password,
+    #         is_admin=False
+    #     )
+    #     with app.app_context():
+    #         facade.user_repo.add(regular_user)
 
     return app
