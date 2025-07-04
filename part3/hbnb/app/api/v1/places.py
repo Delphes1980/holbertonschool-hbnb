@@ -118,7 +118,6 @@ class PlaceList(Resource):
             api.abort(403, error=str(e))
             return {'error': str(e)}, 403
         place_data['owner_id'] = current_user['id']
-
         try:
             place = facade.create_place(place_data)
         except Exception as e:

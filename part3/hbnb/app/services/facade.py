@@ -9,7 +9,6 @@ from app.models.baseEntity import type_validation
 from uuid import UUID
 
 
-
 def is_valid_uuid4(uuid_str):
     """Determines if given str is a uuid4"""
     try:
