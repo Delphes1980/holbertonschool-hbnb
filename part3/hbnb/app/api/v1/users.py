@@ -80,26 +80,6 @@ class AdminUserCreate(Resource):
     
 @api.route('/')
 class UserList(AdminUserCreate):
-    # @api.doc('Returns the created user')
-    # @api.marshal_with(user_response_model,
-    #                   code=_http.HTTPStatus.CREATED,
-    #                   description='User successfully created')
-    # @api.expect(user_model, validate=False)
-    # @api.response(201, 'User successfully created',
-    #               user_response_model)
-    # @api.response(400, 'Email already registered / Invalid input data',
-    #               error_model)
-    # def post(self):
-    #     """Register a new user"""
-    #     user_data = api.payload
-    #     try:
-    #         compare_data_and_model(user_data, user_model)
-    #         new_user = facade.create_user(user_data)
-    #     except Exception as e:
-    #         api.abort(400, error=str(e))
-    #         return {'error': str(e)}, 400
-    #     return new_user, 201
-    
     @api.doc('Returns list of registered users')
     @api.marshal_list_with(user_response_model,
                       code=_http.HTTPStatus.OK,
@@ -151,17 +131,24 @@ class UserResource(Resource):
         user_data = api.payload
         try:
             compare_data_and_model(user_data, user_update_model)
-            current_user = get_jwt_identity()
             user = facade.get_user(user_id)
             if user is None:
                 raise CustomError('Invalid user_id: no user found corresponding to that user_id', 404)
-            if current_user != user.id: # check the user_id in the URL 
+            current_user = get_jwt_identity()
+            is_admin = get_jwt().get('is_admin')
+            if is_admin is None:
+                raise CustomError('is_admin claim was not found in the jwt', 401)
+            if not is_admin and current_user != user.id: # check the user_id in the URL 
                                     # matches the authenticated user
                 raise CustomError('Unauthorized action: you can not modify the user account of somebody else', 403)
             given_email = user_data.get('email')
             given_password = user_data.get("password")
-            if ((given_email is not None and user.email != given_email) or
-                (given_password is not None and not user.verify_password(given_password))):
+            if not is_admin and (
+                (given_email is not None and
+                 user.email != given_email) or 
+                 (given_password is not None and
+                  not user.verify_password(given_password))
+                ):
                 raise CustomError('You cannot modify email or password action', 400)
             updated_user = facade.update_user(user_id, user_data)
         except CustomError as e:
