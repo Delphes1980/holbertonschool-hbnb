@@ -2,7 +2,7 @@ from flask_restx import Namespace, Resource, fields, _http
 from app.services import facade
 from app.api.v1.apiRessources import (compare_data_and_model,
                                       CustomError)
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 api = Namespace('users', description='User operations')
 
@@ -44,9 +44,9 @@ error_model = api.model('Error', {
     'error': fields.String(description='Error message')
 })
 
-@api.route('/')
-class UserList(Resource):
-    @api.doc('Returns the created user')
+
+class AdminUserCreate(Resource):
+    @api.doc('Returns the created user', security='Bearer')
     @api.marshal_with(user_response_model,
                       code=_http.HTTPStatus.CREATED,
                       description='User successfully created')
@@ -55,16 +55,50 @@ class UserList(Resource):
                   user_response_model)
     @api.response(400, 'Email already registered / Invalid input data',
                   error_model)
+    @api.response(403, 'Admin privilees required', error_model)
+    @jwt_required()
     def post(self):
         """Register a new user"""
+        current_user = get_jwt()
+        if not current_user.get('is_admin'):
+            api.abort(403, error='Admin privileges required')
+            return {'error': 'Admin privileges required'}, 403
         user_data = api.payload
         try:
             compare_data_and_model(user_data, user_model)
             new_user = facade.create_user(user_data)
+        except CustomError as e:
+            api.abort(e.status_code, error=str(e))
+            return {'error': str(e)}, e.status_code
         except Exception as e:
             api.abort(400, error=str(e))
             return {'error': str(e)}, 400
+        if new_user is None:
+            api.abort(500, error='Something happened and the user was not created')
+            return {'error': 'Something happened and the user was not created'}, 400
         return new_user, 201
+    
+@api.route('/')
+class UserList(AdminUserCreate):
+    # @api.doc('Returns the created user')
+    # @api.marshal_with(user_response_model,
+    #                   code=_http.HTTPStatus.CREATED,
+    #                   description='User successfully created')
+    # @api.expect(user_model, validate=False)
+    # @api.response(201, 'User successfully created',
+    #               user_response_model)
+    # @api.response(400, 'Email already registered / Invalid input data',
+    #               error_model)
+    # def post(self):
+    #     """Register a new user"""
+    #     user_data = api.payload
+    #     try:
+    #         compare_data_and_model(user_data, user_model)
+    #         new_user = facade.create_user(user_data)
+    #     except Exception as e:
+    #         api.abort(400, error=str(e))
+    #         return {'error': str(e)}, 400
+    #     return new_user, 201
     
     @api.doc('Returns list of registered users')
     @api.marshal_list_with(user_response_model,
