@@ -1,9 +1,10 @@
-from app.persistence.repository import InMemoryRepository
+# from app.persistence.repository import InMemoryRepository
 from app.services.PlaceService import PlaceService
 from app.persistence.repository import SQLAlchemyRepository
 from app.persistence.UserRepository import UserRepository
 from app.persistence.PlaceRepository import PlaceRepository
 from app.models.place import Place
+from app.models.review import Review
 from app.services.UserService import UserService
 from app.services.AmenityService import AmenityService
 from app.services.ReviewService import ReviewService
