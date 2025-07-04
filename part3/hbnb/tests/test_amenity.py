@@ -11,7 +11,7 @@ class TestAmenity(unittest.TestCase):
         self.assertIsInstance(amenity.name, str)
 
     def test_amenity_name_empty(self):
-        with self.assertRaises(TypeError) as e:
+        with self.assertRaises(ValueError) as e:
             Amenity(None)
         self.assertIn("Invalid name", str(e.exception))
 
@@ -32,7 +32,7 @@ class TestAmenity(unittest.TestCase):
 
     def test_amenity_too_many_args(self):
         with self.assertRaises(TypeError) as e:
-            amenity = Amenity("Swimming pool", "Swimsuit") # type: ignore
+            Amenity("Swimming pool", "Swimsuit") # type: ignore
         self.assertIn("Amenity.__init__()", str(e.exception))
 
     def test_amenity_name_strip(self):

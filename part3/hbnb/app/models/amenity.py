@@ -23,6 +23,8 @@ class Amenity(BaseEntity):
 
     def name_validation(self, name: str):
         """Verify if the name is a string < 50 characters."""
+        if name is None:
+            raise ValueError('Invalid name: expected name but received None')
         type_validation(name, "name", str)
         name = " ".join(name.split())
         strlen_validation(name, "name", 1, 50)

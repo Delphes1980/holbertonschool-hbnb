@@ -3,6 +3,7 @@ from app.models.baseEntity import (BaseEntity, type_validation,
 from app.models.user import User
 from app import db
 from sqlalchemy import Column, Integer, String
+from app.api.v1.apiRessources import CustomError
 
 
 class Place(BaseEntity):
@@ -14,9 +15,9 @@ class Place(BaseEntity):
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
 
-    def __init__(self, title: str, description=None, price: float = -1,
-                 latitude: float = -360, longitude: float = -360,
-                 owner=None):
+    def __init__(self, title: str, description = None, *,
+                 price: float, latitude: float,
+                 longitude: float, owner: User):
         super().__init__()
         self.title = title
         self.description = description
@@ -25,19 +26,43 @@ class Place(BaseEntity):
         self.longitude = longitude
         self.owner = owner
         self.reviews = []  # List to store related reviews
-        self.amenities = []  # List to store related amenities
+        self.__amenities = []  # List to store related amenities
 
     def add_review(self, review):
         """Add a review to the place."""
+        if review is None:
+            raise ValueError('Expected review but received None')
         from app.models.review import Review
         type_validation(review, "Review", Review)
         self.reviews.append(review)
 
     def add_amenity(self, amenity):
         """Add an amenity to the place."""
+        self.amenities.append(self.amenity_validation(amenity))
+
+    def amenity_validation(self, amenity):
+        if amenity is None:
+            raise ValueError('Invalid amenity: expected amenity but received None')
         from app.models.amenity import Amenity
         type_validation(amenity, "Amenity", Amenity)
-        self.amenities.append(amenity)
+        if any(place_amenity == amenity 
+               for place_amenity in self.amenities):
+            raise CustomError(f'Amenity "{amenity.name}" already listed for this place', 400)
+        return amenity
+
+    @property
+    def amenities(self):
+        return self.__amenities
+    
+    @amenities.setter
+    def amenities(self, amenities):
+        if amenities is None:
+            self.__amenities = []
+            return None
+        type_validation(amenities, "amenities", list)
+        for amenity in amenities:
+            self.add_amenity(amenity)
+            # self.__amenities.append(self.amenity_validation(amenity))
 
     @property
     def title(self):
@@ -49,8 +74,8 @@ class Place(BaseEntity):
 
     def validate_title(self, title):
         """Verify if the title is a string < 100 characters."""
-        if not title:
-            raise ValueError("Title is required")
+        if title is None:
+            raise ValueError('Invalid title: expected a title but received None')
         type_validation(title, "Title", str)
         title = title.strip()
         strlen_validation(title, "Title", 4, 100)
@@ -67,24 +92,24 @@ class Place(BaseEntity):
     def validate_description(self, description):
         """Verify if the description is a string."""
         if description is None:
-            return ""
+            return None # ""
         type_validation(description, "Description", str)
         description = description.strip()
-        strlen_validation(description, "Description", 0, 50)
+        strlen_validation(description, "Description", 3, 50)
         return description
 
     @property
     def price(self):
-        return self.__price
+        return self.price_
 
     @price.setter
     def price(self, value):
-        self.__price = self.validate_price(value)
+        self.price_ = self.validate_price(value)
 
     def validate_price(self, price: float):
         """Verify is the price is an integer."""
-        if not price:
-            raise ValueError("Price is required")
+        if price is None:
+            raise ValueError("Invalid price: expected float or int but received None")
         type_validation(price, "Price", (float, int))
         if price <= 0:
             raise ValueError("Price must be a positive number (larger "
@@ -101,8 +126,8 @@ class Place(BaseEntity):
 
     def validate_latitude(self, latitude):
         """Verify is the latitude is a float between -90.0 & 90.0."""
-        if not latitude:
-            raise ValueError("Latitude is required")
+        if latitude is None:
+            raise ValueError("Invalid latitude: expected float or int but received None")
         type_validation(latitude, "Latitude", (float, int))
         if not (-90.0 <= latitude <= 90.0):
             raise ValueError("Latitude must be between -90.0 and 90.0.")
@@ -119,8 +144,8 @@ class Place(BaseEntity):
     def validate_longitude(self, longitude):
         """Verify is the longitude is a float between -180.0 &
         180.0."""
-        if not longitude:
-            raise ValueError("Longitude is required")
+        if longitude is None:
+            raise ValueError("Invalid longitude: expected float or int but received None")
         type_validation(longitude, "Longitude", (float, int))
         if not (-180.0 <= longitude <= 180.0):
             raise ValueError("Longitude must be between -180.0 and"
@@ -133,8 +158,8 @@ class Place(BaseEntity):
 
     @owner.setter
     def owner(self, value):
-        if not value:
-            raise ValueError("Owner is required")
+        if value is None:
+            raise ValueError("Invalid owner: expected user but received None")
         type_validation(value, "owner", User)
         self.__owner = value
 

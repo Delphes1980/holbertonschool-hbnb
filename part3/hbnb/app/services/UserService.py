@@ -27,9 +27,10 @@ Methods:
 
 from app.models.user import User
 from app.services.ressources import is_valid_uuid4
-from app.api.v1.apiRessources import validate_init_args
+from app.api.v1.apiRessources import (validate_init_args, CustomError)
 from validate_email_address import validate_email
 from app.models.baseEntity import type_validation
+
 
 
 class UserService:
@@ -54,11 +55,11 @@ class UserService:
         """
         email = user_data.get('email')
         type_validation(email, 'email', str)
-        if not email:
+        if email is None:
             raise ValueError('Invalid email: email is required')
         existing_user = cls.get_user_by_email(facade, email)
         if existing_user:
-            raise ValueError('Invalid email: email already registered')
+            raise CustomError('Invalid email: email already registered', 400)
         validate_init_args(User, **user_data)
         user = User(**user_data)
         facade.user_repo.add(user)
@@ -132,14 +133,14 @@ class UserService:
         """
         type_validation(user_id, 'user_id', str)
         user = cls.get_user(facade, user_id)
-        if not user:
+        if user is None:
             return None
         user_by_email = cls.get_user_by_email(facade,
             user_data.get('email'))
         if user_by_email and user_by_email.id != user.id:
             raise ValueError('Invalid email: email already used by '
                              'another user')
-        validate_init_args(User, **user_data)
+        # validate_init_args(User, **user_data)
         user.update(user_data)
         updated_user = facade.user_repo.get(user_id)
         return updated_user

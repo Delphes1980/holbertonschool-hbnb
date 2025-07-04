@@ -9,16 +9,25 @@ db = SQLAlchemy()
 bcrypt = Bcrypt()
 jwt = JWTManager()
 
+authorizations = {
+    'Bearer': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'Authorization',
+        'description': (
+            'JWT Authorization header using the Bearer scheme.\n'
+            'Enter your JWT token as: Bearer &lt;your_token&gt;\n\n'
+            'Example: <code>Bearer eyJhbGciOiJIUzI1NiIsInR5...</code>')
+    }
+}
 
 def create_app(config_class="config.DevelopmentConfig"):
     app = Flask(__name__)
     app.config.from_object(config_class)
-    app.config['ERROR_INCLUDE_MESSAGE'] = False
-
-    # Initialize extensions with the app instance
+    # app.config['ERROR_INCLUDE_MESSAGE'] = False
     bcrypt.init_app(app)
-    db.init_app(app)
     jwt.init_app(app)
+    db.init_app(app)
 
     from app.api.v1.amenities import api as amenities_ns
     from app.api.v1.places import api as places_ns
@@ -27,11 +36,38 @@ def create_app(config_class="config.DevelopmentConfig"):
     from app.api.v1.auth import api as auth_ns
 
     api = Api(app, version='1.0', title='HBnB API',
-              description='HBnB Application API', doc='/api/v1/')
+              description='HBnB Application API', doc='/api/v1/',
+              authorizations=authorizations)
+    
     api.add_namespace(users_ns, path='/api/v1/users')
     api.add_namespace(amenities_ns, path='/api/v1/amenities')
     api.add_namespace(places_ns, path='/api/v1/places')
     api.add_namespace(reviews_ns, path='/api/v1/reviews')
     api.add_namespace(auth_ns, path='/api/v1/auth')
+
+    from app.services import facade
+    from app.models.user import User
+    admin_email = app.config.get('ADMIN_EMAIL', None)
+    admin_password = app.config.get('ADMIN_PASSWORD', None)
+    if admin_email is not None and admin_password is not None:
+        admin_user = User(
+            first_name='Admin',
+            last_name='User',
+            email=admin_email,
+            password=admin_password,
+            is_admin=True
+        )
+        facade.user_repo.add(admin_user)
+    regular_user_email = app.config.get('REGULAR_USER_EMAIL', None)
+    regular_user_password = app.config.get('REGULAR_USER_PASSWORD', None)
+    if regular_user_email is not None and regular_user_password is not None:
+        regular_user = User(
+            first_name='Regular',
+            last_name='User',
+            email=regular_user_email,
+            password=regular_user_password,
+            is_admin=False
+        )
+        facade.user_repo.add(regular_user)
 
     return app
