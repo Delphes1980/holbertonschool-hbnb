@@ -1,6 +1,6 @@
 from flask_restx import Namespace, Resource, fields, _http
 from app.services import facade
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 
 api = Namespace('reviews', description='Review operations')
@@ -10,7 +10,7 @@ review_model = api.model('Review', {
     'text': fields.String(required=True, description='Text of the review'),
     'rating': fields.Integer(required=True, description='Rating of the place'
                              '(1-5)'),
-    'user_id': fields.String(required=True, description='ID of the user'),
+    'user_id': fields.String(required=False, description='ID of the user'),
     'place_id': fields.String(required=True, description='ID of the place')
 })
 
@@ -31,6 +31,11 @@ review_response_model = api.model('ReviewResponse', {
                              description='Rating of the place (1-5)')
 })
 
+update_review_model = api.model('UpdateReview', {
+	'text': fields.String(required=False, description='New text of the review'),
+    'rating': fields.Integer(required=False, description='New rating of the place'
+                             '(1-5)')
+})
 
 @api.route('/')
 class ReviewList(Resource):
@@ -46,7 +51,7 @@ class ReviewList(Resource):
     @jwt_required()
     def post(self):
         """Register a new review"""
-        current_user = get_jwt_identity()
+        current_user_id = get_jwt_identity()
         # Automatically parses and validates request JSON
         review_data = api.payload
         # Retrieve the place_id
@@ -61,27 +66,27 @@ class ReviewList(Resource):
             return {'error': str(e)}, 404
 
         # Check if the current user tries to review their own place
-        if place_to_review.owner_id == current_user['id']:
+        if place_to_review.owner_id == current_user_id:
             api.abort(403, error='You cannot review your own place')
             return {'error': 'You cannot review your own place'}, 403
 
         # Check if the review already exists
         existing_review = facade.get_review_by_place_and_user(
-            place_id_to_review, current_user['id'])
+            place_id_to_review, current_user_id)
         if existing_review:
             api.abort(403, error='You have already reviewed this place')
             return {'error': 'You have already reviewed this place'}, 403
 
         # Ensure user_id in payload matches authenticated user
         if 'user_id' in review_data and \
-                review_data['user_id'] != current_user['id']:
+                review_data['user_id'] != current_user_id:
             api.abort(403, error='You are not allowed to create a review for'
                       'another user')
             return {'error': 'You are not allowed to create a review for'
                     'another user'}, 403
 
         # Set user_id to the authenticated user's ID
-        review_data['user_id'] = current_user['id']
+        review_data['user_id'] = current_user_id
         try:
             review = facade.create_review(review_data)
         except Exception as e:
@@ -126,7 +131,7 @@ class ReviewResource(Resource):
     @api.doc('Returns the updated review')
     @api.marshal_with(review_response_model, code=_http.HTTPStatus.OK,
                       description='Review updated successfully')
-    @api.expect(review_model)
+    @api.expect(update_review_model)
     @api.response(200, 'Review updated successfully')
     @api.response(400, 'Invalid input data')
     @api.response(404, 'Review not found')
@@ -134,7 +139,8 @@ class ReviewResource(Resource):
     @jwt_required()
     def put(self, review_id):
         """Update a review's information"""
-        current_user = get_jwt_identity()
+        current_user_id = get_jwt_identity()
+        review_data = api.payload
         # Retrieve the review to validate ownership
         review_to_update = facade.get_review(review_id)
 
@@ -144,11 +150,9 @@ class ReviewResource(Resource):
             return {'error': str(e)}, 404
 
         # Check if the authenticated user is the creator of the review
-        if review_to_update.user_id != current_user['id']:
+        if review_to_update.user_id != current_user_id:
             api.abort(403, error=str(e))
             return {'error': str(e)}, 403
-
-        review_data = api.payload
 
         try:
             updated_review = facade.update_review(review_id,
@@ -169,7 +173,7 @@ class ReviewResource(Resource):
     @jwt_required()
     def delete(self, review_id):
         """Delete a review"""
-        current_user = get_jwt_identity()
+        current_user_id = get_jwt_identity()
         # Retrieve the review to validate ownership
         review_to_delete = facade.get_review(review_id)
 
@@ -179,7 +183,7 @@ class ReviewResource(Resource):
             return {'error': str(e)}, 404
 
         # Check if the creator of the review is the current user
-        if review_to_delete.user_id != current_user['id']:
+        if review_to_delete.user_id != current_user_id:
             api.abort(403, error=str(e))
             return {'error': str(e)}, 403
 

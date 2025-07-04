@@ -50,7 +50,7 @@ place_model = api.model('Place', {
                              description='Latitude of the place'),
     'longitude': fields.Float(required=True,
                               description='Longitude of the place'),
-    'owner_id': fields.String(required=True,
+    'owner_id': fields.String(required=False,
                               description='ID of the owner'),
     'amenities': fields.List(fields.String,
                              required=True,
@@ -149,7 +149,7 @@ class PlaceResource(Resource):
     @api.marshal_with(
         place_response_model,
         code=_http.HTTPStatus.OK,
-        description='Review details retrieved successfully')
+        description='Place details retrieved successfully')
     @api.response(200, 'Place details retrieved successfully')
     @api.response(400, 'Invalid ID: not a UUID4')
     @api.response(404, 'Place not found')
@@ -178,7 +178,7 @@ class PlaceResource(Resource):
     @jwt_required()
     def put(self, place_id):
         """Update a place's information"""
-        current_user = get_jwt_identity()
+        current_user_id = get_jwt_identity()
         # Retrieve the place
         existing_place = facade.get_place(place_id)
         # Check if the place exists
@@ -187,13 +187,19 @@ class PlaceResource(Resource):
             return {'error': str(e)}, 404
 
         # Check if the owner is the current user
-        if existing_place.owner_id != current_user['id']:
+        if existing_place.owner_id != current_user_id:
             api.abort(403, error=str(e))
             return {'error': str(e)}, 403
 
         # Automatically parses and validates request JSON
         place_data = api.payload
 
+        if 'owner_id' in place_data:
+            if place_data['owner_id'] != current_user_id:
+                api.abort(403, error=str(e))
+                return {'error': str(e)}, 403
+            else:
+                place_data.pop('owner_id', None)
         try:
             updated_place = facade.update_place(place_id,
                                                 place_data)
