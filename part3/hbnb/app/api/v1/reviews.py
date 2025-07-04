@@ -181,7 +181,7 @@ class ReviewResource(Resource):
             review = facade.get_review(review_id)
             if review is None:
                 raise CustomError('Invalid review_id: review not found', 404)
-            elif current_user != review.user_id:
+            elif current_user != review.user.id:
                 raise CustomError('Unauthorized action: user is not the author of the review', 403)
             facade.delete_review(review_id)
         except CustomError as e:
