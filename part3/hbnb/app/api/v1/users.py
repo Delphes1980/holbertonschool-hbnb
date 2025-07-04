@@ -91,29 +91,8 @@ class UserList(AdminUserCreate):
         """Get a list of registered users"""
         return facade.get_all_users(), 200
 
-@api.route('/<user_id>')
-class UserResource(Resource):
-    @api.doc('Returns user corresponding to given ID')
-    @api.marshal_with(user_response_model,
-                      code=_http.HTTPStatus.OK,
-                      description='User details retrieved successfully')
-    @api.response(200, 'User details retrieved successfully',
-                  user_response_model)
-    @api.response(400, 'Invalid ID: not a UUID4 / Invalid input data',
-                  error_model)
-    @api.response(404, 'User not found', error_model)
-    def get(self, user_id):
-        """Get user details by ID"""
-        try:
-            user = facade.get_user(user_id)
-        except Exception as e:
-            api.abort(400, error=str(e))
-            return {'error', str(e)}, 400
-        if user is None:
-            api.abort(404, error='User not found')
-            return {'error': 'User not found'}, 404
-        return user, 200
 
+class AdminPrivilegesUserModify(Resource):
     @api.doc('Returns the updated user', security='Bearer')
     @api.marshal_with(user_response_model,
                       code=_http.HTTPStatus.OK,
@@ -122,8 +101,8 @@ class UserResource(Resource):
     @api.response(200, 'User successfully updated',
                   user_response_model)
     @api.response(400, 'Invalid input data', error_model)
-    @api.response(403, 'Unauthorized action', error_model)
     @api.response(401, 'Missing authorization header', error_model)
+    @api.response(403, 'Unauthorized action', error_model)
     @api.response(404, 'User not found', error_model)
     @jwt_required() # ensure the user is authenticated
     def put(self, user_id):
@@ -161,3 +140,26 @@ class UserResource(Resource):
             api.abort(404, error='User not found')
             return {'error': 'User not found'}, 404
         return updated_user, 200
+
+@api.route('/<user_id>')
+class UserResource(AdminPrivilegesUserModify):
+    @api.doc('Returns user corresponding to given ID')
+    @api.marshal_with(user_response_model,
+                      code=_http.HTTPStatus.OK,
+                      description='User details retrieved successfully')
+    @api.response(200, 'User details retrieved successfully',
+                  user_response_model)
+    @api.response(400, 'Invalid ID: not a UUID4 / Invalid input data',
+                  error_model)
+    @api.response(404, 'User not found', error_model)
+    def get(self, user_id):
+        """Get user details by ID"""
+        try:
+            user = facade.get_user(user_id)
+        except Exception as e:
+            api.abort(400, error=str(e))
+            return {'error', str(e)}, 400
+        if user is None:
+            api.abort(404, error='User not found')
+            return {'error': 'User not found'}, 404
+        return user, 200
