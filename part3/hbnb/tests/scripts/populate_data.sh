@@ -1,31 +1,36 @@
 #!/bin/bash
-# Script to create 5 users, 3 places, 10 amenities, and reviews via API, using real user IDs
+# Script to create 5 users (with passwords), 3 places, 10 amenities, and reviews via API.
 
 API_URL="http://127.0.0.1:5000/api/v1"
 USER_IDS=()
 PLACE_IDS=()
 
-# Create 5 users and store their IDs
+# --- Create 5 users (with password) and store their IDs ---
 echo "Creating users..."
 for i in $(seq 1 5)
 do
+  USER_EMAIL="user$i@example.com"
+  USER_PASSWORD="password$i" # A simple password for each user
+  
   RESPONSE=$(curl -s -X POST "$API_URL/users/" \
     -H "Content-Type: application/json" \
-    -d "{\"first_name\": \"User\", \"last_name\": \"Test\", \"email\": \"user$i@example.com\"}")
+    -d "{\"first_name\": \"User\", \"last_name\": \"Test\", \"email\": \"$USER_EMAIL\", \"password\": \"$USER_PASSWORD\"}")
+  
   echo "User $i response: $RESPONSE"
   USER_ID=$(echo "$RESPONSE" | grep -o '"id"[ ]*:[ ]*"[^\"]*"' | head -1 | cut -d '"' -f4)
+  
   if [ -n "$USER_ID" ]; then
     USER_IDS+=("$USER_ID")
-    echo "User $i ID: $USER_ID"
+    echo "User $i ID: $USER_ID, Email: $USER_EMAIL, Password: $USER_PASSWORD"
   else
-    echo "Failed to create user $i"
+    echo "Failed to create user $i. Response was: $RESPONSE"
   fi
   sleep 0.2
 done
 
 echo "Collected USER_IDS: ${USER_IDS[@]}"
 
-# Use the first user as owner for all places (or rotate if you want)
+# --- Use the first user as owner for all places (or rotate if you want) ---
 OWNER_ID=${USER_IDS[0]}
 
 echo "Creating places..."
@@ -40,18 +45,18 @@ do
     PLACE_IDS+=("$PLACE_ID")
     echo "Place $i ID: $PLACE_ID"
   else
-    echo "Failed to create place $i"
+    echo "Failed to create place $i. Response was: $RESPONSE"
   fi
   sleep 0.2
 done
 
 echo "Collected PLACE_IDS: ${PLACE_IDS[@]}"
 
-# List all places
+# --- List all places ---
 echo "\nListing all places:"
 curl -s "$API_URL/places/" | jq .
 
-# Create 10 amenities
+# --- Create 10 amenities ---
 echo "Creating amenities..."
 for i in $(seq 1 10)
 do
@@ -62,7 +67,7 @@ do
   sleep 0.2
 done
 
-# Create reviews: each user reviews each place once
+# --- Create reviews: each user reviews each place once ---
 echo "Creating reviews..."
 REVIEW_NUM=1
 for USER_ID in "${USER_IDS[@]}"
@@ -71,7 +76,7 @@ do
   do
     RESPONSE=$(curl -s -X POST "$API_URL/reviews/" \
       -H "Content-Type: application/json" \
-      -d "{\"text\": \"Review $REVIEW_NUM by user $USER_ID for place $PLACE_ID\", \"rating\": $(( (REVIEW_NUM % 5) + 1 )), \"place_id\": \"$PLACE_ID\", \"user_id\": \"$USER_ID\"}")
+      -d "{\"text\": \"Review $REVIEW_NUM by user $(echo $USER_ID | cut -c1-8) for place $(echo $PLACE_ID | cut -c1-8)\", \"rating\": $(( (REVIEW_NUM % 5) + 1 )), \"place_id\": \"$PLACE_ID\", \"user_id\": \"$USER_ID\"}")
     echo "Review $REVIEW_NUM response: $RESPONSE"
     ((REVIEW_NUM++))
     sleep 0.1
@@ -80,9 +85,8 @@ done
 
 echo "Done."
 
-
+echo "\n--- Récapitulatif des utilisateurs créés ---"
 for USER_ID in "${USER_IDS[@]}"
 do
   echo "User ID: $USER_ID"
 done
-

@@ -1,17 +1,29 @@
-from app.persistence.repository import InMemoryRepository
+from app.persistence.repository import SQLAlchemyRepository
+from app.persistence.UserRepository import UserRepository
+from app.persistence.PlaceRepository import PlaceRepository
 from app.models.place import Place
 from app.services.UserService import UserService
 from app.services.AmenityService import AmenityService
 from app.models.review import Review
 from app.models.baseEntity import type_validation
-from app.services.ressources import is_valid_uuid4
+from uuid import UUID
+
+
+def is_valid_uuid4(uuid_str):
+    """Determines if given str is a uuid4"""
+    try:
+        val = UUID(uuid_str, version=4)
+        return val.version == 4
+    except ValueError:
+        return False
+
 
 class HBnBFacade:
     def __init__(self):
-        self.user_repo = InMemoryRepository()
-        self.place_repo = InMemoryRepository()
-        self.review_repo = InMemoryRepository()
-        self.amenity_repo = InMemoryRepository()
+        self.user_repo = UserRepository()
+        self.place_repo = PlaceRepository()
+        self.review_repo = SQLAlchemyRepository(Review)
+        self.amenity_repo = SQLAlchemyRepository(AmenityService)
 
 # Services for User CRUD operations ####
 

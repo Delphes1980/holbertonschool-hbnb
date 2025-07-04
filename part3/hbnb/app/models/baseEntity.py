@@ -1,8 +1,22 @@
 import uuid
 from datetime import datetime, timezone
+from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy.ext.declarative import declarative_base
+from app import db
 
 
-class BaseEntity:
+Model = declarative_base()
+
+
+class BaseEntity(db.Model):
+    __abstract__ = True
+    id = db.Column(db.String(50), default=lambda: str(uuid.uuid4()), primary_key=True,
+                       nullable=False, unique=True)
+    created_at = db.Column(DateTime, nullable=False,
+                               default=datetime.now(timezone.utc))
+    updated_at = db.Column(DateTime, nullable=False,
+                               default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
+
     def __init__(self):
         self.id = str(uuid.uuid4())
         self.created_at = datetime.now(timezone.utc)

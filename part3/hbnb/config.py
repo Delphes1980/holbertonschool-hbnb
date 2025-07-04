@@ -6,6 +6,9 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
+    BCRYPT_LOG_ROUNDS = 12
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///development.db'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 config = {
     'development': DevelopmentConfig,
