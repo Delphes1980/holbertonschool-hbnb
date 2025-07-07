@@ -135,12 +135,13 @@ class UserService:
         user = cls.get_user(facade, user_id)
         if user is None:
             return None
-        user_by_email = cls.get_user_by_email(facade,
-            user_data.get('email'))
-        if user_by_email and user_by_email.id != user.id:
-            raise ValueError('Invalid email: email already used by '
-                             'another user')
+        if user_data.get('email') is not None:
+            user_by_email = cls.get_user_by_email(facade,
+                                            user_data.get('email'))
+            if user_by_email and user_by_email.id != user.id:
+                raise ValueError('Invalid email: email already used by'
+                                 ' another user')
         # validate_init_args(User, **user_data)
-        user.update(user_data)
+        facade.user_repo.update(user_id, user_data)
         updated_user = facade.user_repo.get(user_id)
         return updated_user
