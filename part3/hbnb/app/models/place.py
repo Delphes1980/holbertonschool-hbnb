@@ -2,18 +2,25 @@ from app.models.baseEntity import (BaseEntity, type_validation,
                                    strlen_validation)
 from app.models.user import User
 from app import db
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Text, Float
+from sqlalchemy.orm import mapped_column, Mapped
 from app.api.v1.apiRessources import CustomError
-
+from sqlalchemy.ext.hybrid import hybrid_property
+from typing import Optional
 
 class Place(BaseEntity):
     __tablename__ = 'places'
-    id = db.Column(db.Integer, primary_key=True, unique=True)
-    title = db.Column(db.String(128), nullable=False)
-    description = db.Column(db.Text, nullable=False)
-    price = db.Column(db.Float, nullable=False)
-    latitude = db.Column(db.Float, nullable=False)
-    longitude = db.Column(db.Float, nullable=False)
+    # id = db.Column(db.Integer, primary_key=True, unique=True)
+    _title: Mapped[str] = mapped_column("title", String(128),
+                                        nullable=False)
+    _description: Mapped[Optional[str]] = mapped_column("description", Text,
+                                              nullable=True)
+    _price: Mapped[float] = mapped_column("price", Float,
+                                          nullable=False)
+    _latitude: Mapped[float] = mapped_column("latitude", Float,
+                                             nullable=False)
+    _longitude: Mapped[float] = mapped_column("longitude", Float,
+                                              nullable=False)
 
     def __init__(self, title: str, description = None, *,
                  price: float, latitude: float,
@@ -26,51 +33,15 @@ class Place(BaseEntity):
         self.longitude = longitude
         self.owner = owner
         self.reviews = []  # List to store related reviews
-        self.__amenities = []  # List to store related amenities
+        self._amenities = []  # List to store related amenities
 
-    def add_review(self, review):
-        """Add a review to the place."""
-        if review is None:
-            raise ValueError('Expected review but received None')
-        from app.models.review import Review
-        type_validation(review, "Review", Review)
-        self.reviews.append(review)
-
-    def add_amenity(self, amenity):
-        """Add an amenity to the place."""
-        self.amenities.append(self.amenity_validation(amenity))
-
-    def amenity_validation(self, amenity):
-        if amenity is None:
-            raise ValueError('Invalid amenity: expected amenity but received None')
-        from app.models.amenity import Amenity
-        type_validation(amenity, "Amenity", Amenity)
-        if any(place_amenity == amenity 
-               for place_amenity in self.amenities):
-            raise CustomError(f'Amenity "{amenity.name}" already listed for this place', 400)
-        return amenity
-
-    @property
-    def amenities(self):
-        return self.__amenities
-    
-    @amenities.setter
-    def amenities(self, amenities):
-        if amenities is None:
-            self.__amenities = []
-            return None
-        type_validation(amenities, "amenities", list)
-        for amenity in amenities:
-            self.add_amenity(amenity)
-            # self.__amenities.append(self.amenity_validation(amenity))
-
-    @property
-    def title(self):
-        return self.__title
+    @hybrid_property
+    def title(self): # type: ignore
+        return self._title
 
     @title.setter
     def title(self, value):
-        self.__title = self.validate_title(value)
+        self._title = self.validate_title(value)
 
     def validate_title(self, title):
         """Verify if the title is a string < 100 characters."""
@@ -81,13 +52,13 @@ class Place(BaseEntity):
         strlen_validation(title, "Title", 4, 100)
         return title
 
-    @property
-    def description(self):
-        return self.__description
+    @hybrid_property
+    def description(self): # type: ignore
+        return self._description
 
-    @description.setter
+    @description.setter # type: ignore
     def description(self, value):
-        self.__description = self.validate_description(value)
+        self._description = self.validate_description(value) # type
 
     def validate_description(self, description):
         """Verify if the description is a string."""
@@ -98,13 +69,13 @@ class Place(BaseEntity):
         strlen_validation(description, "Description", 3, 50)
         return description
 
-    @property
-    def price(self):
-        return self.price_
+    @hybrid_property
+    def price(self): # type: ignore
+        return self._price
 
     @price.setter
     def price(self, value):
-        self.price_ = self.validate_price(value)
+        self._price = self.validate_price(value)
 
     def validate_price(self, price: float):
         """Verify is the price is an integer."""
@@ -116,13 +87,13 @@ class Place(BaseEntity):
                              "than 0)")
         return float(price)
 
-    @property
-    def latitude(self):
-        return self.__latitude
+    @hybrid_property
+    def latitude(self): # type: ignore
+        return self._latitude
 
     @latitude.setter
     def latitude(self, value):
-        self.__latitude = self.validate_latitude(value)
+        self._latitude = self.validate_latitude(value)
 
     def validate_latitude(self, latitude):
         """Verify is the latitude is a float between -90.0 & 90.0."""
@@ -133,13 +104,13 @@ class Place(BaseEntity):
             raise ValueError("Latitude must be between -90.0 and 90.0.")
         return float(latitude)
 
-    @property
-    def longitude(self):
-        return self.__longitude
+    @hybrid_property
+    def longitude(self): # type: ignore
+        return self._longitude
 
     @longitude.setter
     def longitude(self, value):
-        self.__longitude = self.validate_longitude(value)
+        self._longitude = self.validate_longitude(value)
 
     def validate_longitude(self, longitude):
         """Verify is the longitude is a float between -180.0 &
@@ -169,6 +140,42 @@ class Place(BaseEntity):
     #         raise PermissionError("Unauthorized access: the current user "
     #                           "is not the owner")
     #     return True
+
+    def add_review(self, review):
+        """Add a review to the place."""
+        if review is None:
+            raise ValueError('Expected review but received None')
+        from app.models.review import Review
+        type_validation(review, "Review", Review)
+        self.reviews.append(review)
+
+    def add_amenity(self, amenity):
+        """Add an amenity to the place."""
+        self.amenities.append(self.amenity_validation(amenity))
+
+    def amenity_validation(self, amenity):
+        if amenity is None:
+            raise ValueError('Invalid amenity: expected amenity but received None')
+        from app.models.amenity import Amenity
+        type_validation(amenity, "Amenity", Amenity)
+        if any(place_amenity == amenity 
+               for place_amenity in self.amenities):
+            raise CustomError(f'Amenity "{amenity.name}" already listed for this place', 400)
+        return amenity
+
+    @property
+    def amenities(self):
+        return self._amenities
+    
+    @amenities.setter
+    def amenities(self, value):
+        if value is None:
+            self._amenities = []
+            return None
+        type_validation(value, "amenities", list)
+        for amenity in value:
+            self.add_amenity(amenity)
+            # self.__amenities.append(self.amenity_validation(amenity))
 
     # def to_dict(self):
     #     """ Convert the Place object to a dictionary representation,
