@@ -1,13 +1,12 @@
 from flask import Flask
 from flask_restx import Api
 from flask_bcrypt import Bcrypt
-from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
+from flask_sqlalchemy import SQLAlchemy
 
-
-db = SQLAlchemy()
 bcrypt = Bcrypt()
 jwt = JWTManager()
+db = SQLAlchemy()
 
 authorizations = {
     'Bearer': {
@@ -45,33 +44,39 @@ def create_app(config_class="config.DevelopmentConfig"):
     api.add_namespace(reviews_ns, path='/api/v1/reviews')
     api.add_namespace(auth_ns, path='/api/v1/auth')
 
-    # with app.app_context():
-    #     db.create_all()
-    # from app.services import facade
-    # from app.models.user import User
-    # admin_email = app.config.get('ADMIN_EMAIL', None)
-    # admin_password = app.config.get('ADMIN_PASSWORD', None)
-    # if admin_email is not None and admin_password is not None:
-    #     admin_user = User(
-    #         first_name='Admin',
-    #         last_name='User',
-    #         email=admin_email,
-    #         password=admin_password,
-    #         is_admin=True
-    #     )
-    #     with app.app_context():
-    #         facade.user_repo.add(admin_user)
-    # regular_user_email = app.config.get('REGULAR_USER_EMAIL', None)
-    # regular_user_password = app.config.get('REGULAR_USER_PASSWORD', None)
-    # if regular_user_email is not None and regular_user_password is not None:
-    #     regular_user = User(
-    #         first_name='Regular',
-    #         last_name='User',
-    #         email=regular_user_email,
-    #         password=regular_user_password,
-    #         is_admin=False
-    #     )
-    #     with app.app_context():
-    #         facade.user_repo.add(regular_user)
+    with app.app_context():
+        db.create_all()
+        from app.models.user import User
+        # Only add admin and regular a user if no users exist:
+        if User.query.count() == 0:
+            admin_email = app.config.get('ADMIN_EMAIL', None)
+            admin_password = app.config.get('ADMIN_PASSWORD', None)
+            if admin_email is not None and admin_password is not None:
+                admin_user = User(
+                    first_name='Admin',
+                    last_name='User',
+                    email=admin_email,
+                    password=admin_password,
+                    is_admin=True
+                )
+                db.session.add(admin_user)
+                db.session.commit()
+            regular_user_email = app.config.get('REGULAR_USER_EMAIL', None)
+            regular_user_password = app.config.get('REGULAR_USER_PASSWORD', None)
+            if regular_user_email is not None and regular_user_password is not None:
+                regular_user = User(
+                    first_name='Regular',
+                    last_name='User',
+                    email=regular_user_email,
+                    password=regular_user_password,
+                    is_admin=False
+                )
+                db.session.add(regular_user)
+                db.session.commit()
+            from .models.amenity import Amenity
+            if Amenity.query.filter_by(name="WiFi").first() is None:
+                basic_amenity = Amenity(name="WiFi")
+                db.session.add(basic_amenity)
+                db.session.commit()
 
     return app
