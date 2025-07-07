@@ -1,22 +1,24 @@
-# from app.persistence.repository import InMemoryRepository
-from app.services.PlaceService import PlaceService
+from app.persistence.repository import InMemoryRepository
 from app.persistence.repository import SQLAlchemyRepository
-from app.persistence.UserRepository import UserRepository
-from app.persistence.PlaceRepository import PlaceRepository
-from app.models.place import Place
-from app.models.review import Review
+# from app.persistence.UserRepository import UserRepository
+# from app.persistence.PlaceRepository import PlaceRepository
+from app.models.user import User
+# from app.models.place import Place
+from app.models.amenity import Amenity
+# from app.models.review import Review
 from app.services.UserService import UserService
+from app.services.PlaceService import PlaceService
 from app.services.AmenityService import AmenityService
 from app.services.ReviewService import ReviewService
-from app.models.baseEntity import type_validation
+# from app.models.baseEntity import type_validation
 
 
 class HBnBFacade:
     def __init__(self):
-        self.user_repo = UserRepository()
-        self.place_repo = PlaceRepository()
-        self.review_repo = SQLAlchemyRepository(Review)
-        self.amenity_repo = SQLAlchemyRepository(AmenityService)
+        self.user_repo = SQLAlchemyRepository(User) # UserRepository() # InMemoryRepository()
+        self.place_repo = InMemoryRepository() # SQLAlchemyRepository(Place) # PlaceRepository()
+        self.review_repo = InMemoryRepository() # SQLAlchemyRepository(Review) # ReviewRepository()
+        self.amenity_repo = SQLAlchemyRepository(Amenity) # AmenityRepository() # InMemoryRepository()
 
 # Services for User CRUD operations ####
 
