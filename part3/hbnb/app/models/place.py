@@ -2,8 +2,8 @@ from app.models.baseEntity import (BaseEntity, type_validation,
                                    strlen_validation)
 from app.models.user import User
 from app import db
-from sqlalchemy import Column, Integer, String, Text, Float
-from sqlalchemy.orm import mapped_column, Mapped
+from sqlalchemy import Column, Integer, String, Text, Float, ForeignKey
+from sqlalchemy.orm import mapped_column, Mapped, relationship
 from app.api.v1.apiRessources import CustomError
 from sqlalchemy.ext.hybrid import hybrid_property
 from typing import Optional
@@ -21,6 +21,9 @@ class Place(BaseEntity):
                                              nullable=False)
     _longitude: Mapped[float] = mapped_column("longitude", Float,
                                               nullable=False)
+    _user_id: Mapped[str] = mapped_column("user_id", String, ForeignKey("users.id"), nullable=False)
+
+    owner = db.relationship("User", back_populates="places")
 
     def __init__(self, title: str, description = None, *,
                  price: float, latitude: float,
@@ -123,16 +126,16 @@ class Place(BaseEntity):
                              " 180.0")
         return float(longitude)
 
-    @property
-    def owner(self):
-        return self.__owner
+    # @hybrid_property
+    # def owner(self):
+    #     return self._owner
 
-    @owner.setter
-    def owner(self, value):
-        if value is None:
-            raise ValueError("Invalid owner: expected user but received None")
-        type_validation(value, "owner", User)
-        self.__owner = value
+    # @owner.setter
+    # def owner(self, value):
+    #     if value is None:
+    #         raise ValueError("Invalid owner: expected user but received None")
+    #     type_validation(value, "owner", User)
+    #     self._owner = value
 
     # def is_owner(self, user_id):
     #     """Verify is the user owns the place."""
