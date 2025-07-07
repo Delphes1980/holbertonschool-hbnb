@@ -3,48 +3,54 @@ from app.models.baseEntity import (BaseEntity, type_validation,
 from app.models.place import Place
 from app.models.user import User
 from app import bcrypt, db
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Text
+from sqlalchemy.orm import mapped_column, Mapped
 from app.api.v1.apiRessources import CustomError
+from sqlalchemy.ext.hybrid import hybrid_property
 
 class Review(BaseEntity):
     __tablename__ = 'reviews'
-    id = db.Column(db.Integer, primary_key=True)
-    text = db.Column(db.Text, nullable=False)
-    rating = db.Column(db.Integer, nullable=False)
+    # id = db.Column(db.Integer, primary_key=True)
+    _text: Mapped[str] = mapped_column("text", Text, nullable=False)
+    _rating: Mapped[int] = mapped_column("rating", Integer,
+                                         nullable=False)
 
     def __init__(self, text: str, rating: int, place: Place,
                  user: User):
         super().__init__()
         self.text = text
-        self.rating = self.rating_validation(rating)
-        self.place = self.set_place(place)
-        self.user = self.set_user(user)
+        # self.rating = self.rating_validation(rating)
+        # self.place = self.set_place(place)
+        # self.user = self.set_user(user)
+        self.rating = rating
+        self.place = place
+        self.user = user
         if any(review.user == user for review in place.reviews):
             raise CustomError('This user has already reviewed this place',
                               400)
         place.add_review(self)
 
-    # @property
-    # def text(self):
-    #     return self.__text
+    @hybrid_property
+    def text(self): # type: ignore
+        return self._text
 
-    # @text.setter
-    # def text(self, text):
-    #     if text is None:
-    #         raise ValueError("text is required: provide content for"
-    #                          " the review")
-    #     type_validation(text, "Text", str)
-    #     text = text.strip()
-    #     strlen_validation(text, "Text", 2, 500)
-    #     self.__text = text
+    @text.setter # type: ignore
+    def text(self, value):
+        if value is None:
+            raise ValueError("text is required: provide content for"
+                             " the review")
+        type_validation(value, "Text", str)
+        value = value.strip()
+        strlen_validation(value, "Text", 2, 500)
+        self._text = value
 
-    # @property
-    # def rating(self):
-    #     return self.__rating
+    @hybrid_property
+    def rating(self): #type: ignore
+        return self._rating
 
-    # @rating.setter
-    # def rating(self, rating):
-    #     self.__rating = self.rating_validation(rating)
+    @rating.setter
+    def rating(self, value):
+        self._rating = self.rating_validation(value)
 
     def rating_validation(self, rating):
         if rating is None:
@@ -56,13 +62,13 @@ class Review(BaseEntity):
                              " 5, both inclusive")
         return rating
 
-    # @property
-    # def user(self):
-    #     return self.__user
+    @property
+    def user(self):
+        return self._user
 
-    # @user.setter
-    # def user(self, user):
-    #     self.__user = self.set_user(user)
+    @user.setter
+    def user(self, value):
+        self._user = self.set_user(value)
 
     def set_user(self, user):
         if user is None:
@@ -73,13 +79,13 @@ class Review(BaseEntity):
             raise CustomError("User cannot review their own place", 400)
         return user
 
-    # @property
-    # def place(self):
-    #     return self.__place
+    @property
+    def place(self):
+        return self._place
 
-    # @place.setter
-    # def place(self, place):
-    #     self.__place = self.set_place(place)
+    @place.setter
+    def place(self, value):
+        self._place = self.set_place(value)
 
     def set_place(self, place):
         if place is None:
