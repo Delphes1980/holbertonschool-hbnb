@@ -16,7 +16,12 @@ class DevelopmentConfig(Config):
     ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'adminpassword')
     REGULAR_USER_EMAIL = 'user@example.com'
     REGULAR_USER_PASSWORD = 'password'
-    
+
+class TestingConfig(Config):
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
 config = {
     'development': DevelopmentConfig,
     'default': DevelopmentConfig
