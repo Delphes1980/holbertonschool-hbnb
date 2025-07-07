@@ -79,11 +79,10 @@ class PlaceService:
         place_data.pop('owner_id')
         place_data['owner'] = existing_user
         amenities_ids = place_data.get('amenities_ids')
+        amenities = []
         if amenities_ids is not None:
             place_data.pop('amenities_ids')
             type_validation(amenities_ids, 'amenities', (str | list))
-        amenities = []
-        if amenities_ids is not None:
             if isinstance(amenities_ids, list):
                 for amenity_id in amenities_ids:
                     type_validation(amenity_id, 'amenity_id', str)
@@ -94,13 +93,14 @@ class PlaceService:
                                          "'{amenity_id}' is not a "
                                          "valid UUID4")
                     current_amenity = facade.get_amenity(amenity_id)
-                    if not current_amenity:
+                    if current_amenity is None:
                         raise CustomError(f"Amenity with id "
                                          "'{amenity_id}' was not "
                                          "found", 404)
                     amenities.append(current_amenity)
-        # validate_init_args(Place, **place_data)
-        place.update(place_data)
-        place.amenities = amenities
+        validate_init_args(Place, **place_data)
+        place_data['amenities'] = amenities
+        facade.place_repo.update(place_id, place_data)
+        # place.amenities = amenities
         updated_place = facade.place_repo.get(place_id)
         return updated_place

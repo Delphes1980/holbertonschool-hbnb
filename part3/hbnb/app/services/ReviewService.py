@@ -88,9 +88,8 @@ class ReviewService:
         review = facade.get_review(review_id)
         if review is None:
             return None
-        # validate_init_args(Review, **review_data)
-        # self.review_repo.update(review_id, review_data)
-        review.update(review_data)
+        validate_init_args(Review, **review_data)
+        facade.review_repo.update(review_id, review_data)
         return facade.review_repo.get(review_id)
 
     @classmethod

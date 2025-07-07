@@ -3,7 +3,7 @@ from app.models.baseEntity import (BaseEntity, type_validation,
 from validate_email_address import validate_email
 from app import bcrypt, db
 import re
-from sqlalchemy.orm import mapped_column, Mapped
+from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from .baseEntity import BaseEntity
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -11,7 +11,10 @@ from sqlalchemy.ext.hybrid import hybrid_property
 # from datetime import datetime, timezone
 # import uuid
 # from flask_bcrypt import generate_password_hash, check_password_hash
-
+from typing import List, TYPE_CHECKING
+if TYPE_CHECKING:
+    from .place import Place
+    from .review import Review
 
 class User(BaseEntity):
     __tablename__ = 'users'
@@ -38,7 +41,8 @@ class User(BaseEntity):
     _is_admin: Mapped[bool] = mapped_column("is_admin",
                                             Boolean, default=False)
     # is_admin = db.Column(db.Boolean, default=False)
-    
+    places: Mapped[List["Place"]] = relationship("Place", back_populates="_owner", lazy=True)
+    reviews: Mapped[List["Review"]] = relationship("Review", back_populates="_user", lazy=True)
 
     def __init__(self, first_name: str, last_name: str,
                  email: str, password: str, is_admin: bool = False):
