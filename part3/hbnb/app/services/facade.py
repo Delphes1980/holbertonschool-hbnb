@@ -3,15 +3,18 @@ from app.services.PlaceService import PlaceService
 from app.services.UserService import UserService
 from app.services.AmenityService import AmenityService
 from app.services.ReviewService import ReviewService
-from app.models.baseEntity import type_validation
-from app.services.ressources import is_valid_uuid4
+from app.persistence.repository import SQLAlchemyRepository
+from app.models.amenity import Amenity
+from app.models.user import User
+# from app.models.place import Place
+# from app.models.review import Review
 
 class HBnBFacade:
     def __init__(self):
-        self.user_repo = InMemoryRepository()
-        self.place_repo = InMemoryRepository()
-        self.review_repo = InMemoryRepository()
-        self.amenity_repo = InMemoryRepository()
+        self.user_repo = SQLAlchemyRepository(User) #InMemoryRepository()
+        self.place_repo = InMemoryRepository() # SQLAlchemyRepository(Place)
+        self.review_repo = InMemoryRepository() # SQLAlchemyRepository(Review)
+        self.amenity_repo = SQLAlchemyRepository(Amenity)
 
 # Services for User CRUD operations ####
 
