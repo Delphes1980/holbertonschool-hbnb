@@ -55,6 +55,7 @@ class AmenityService:
             raise ValueError('Invalid name: name is already used for '
                              'another amenity')
         # validate_init_args(Amenity, **amenity_data)
-        amenity.update(amenity_data)
+        # amenity.update(amenity_data)
+        facade.amenity_repo.update(amenity_id, amenity_data)
         updated_amenity = facade.amenity_repo.get(amenity_id)
         return updated_amenity
