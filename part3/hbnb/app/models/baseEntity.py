@@ -1,17 +1,16 @@
 import uuid
 from datetime import datetime, timezone
 from sqlalchemy import Column, Integer, String, DateTime
-from sqlalchemy.ext.declarative import declarative_base
+# from sqlalchemy.ext.declarative import declarative_base
 from app import db
 
-
-Model = declarative_base()
+# Model = declarative_base()
 
 
 class BaseEntity(db.Model):
-    __abstract__ = True
-    id = db.Column(db.String(50), default=lambda: str(uuid.uuid4()), primary_key=True,
-                       nullable=False, unique=True)
+    __abstract__ = True # This ensures SQLAlchemy does not create a table for BaseModel
+    id = db.Column(db.String(36), default=lambda: str(uuid.uuid4()),
+                   primary_key=True, nullable=False, unique=True)
     created_at = db.Column(DateTime, nullable=False,
                                default=datetime.now(timezone.utc))
     updated_at = db.Column(DateTime, nullable=False,
@@ -32,6 +31,7 @@ class BaseEntity(db.Model):
         for key, value in data.items():
             if hasattr(self, key):
                 setattr(self, key, value)
+                # getattr(self, f"{key}_setter")(value)
         self.save()  # Update the updated_at timestamp
 
     # def to_dict(self):

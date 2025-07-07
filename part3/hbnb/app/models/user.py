@@ -1,38 +1,87 @@
 from app.models.baseEntity import (BaseEntity, type_validation,
                                    strlen_validation)
 from validate_email_address import validate_email
-from app import bcrypt
-import re
 from app import bcrypt, db
-from sqlalchemy import Column, Integer, String, DateTime
+import re
+from sqlalchemy.orm import mapped_column, Mapped
+from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from .baseEntity import BaseEntity
 from sqlalchemy.ext.hybrid import hybrid_property
-from app.persistence.repository import SQLAlchemyRepository
-from datetime import datetime, timezone
-import uuid
-from flask_bcrypt import generate_password_hash, check_password_hash
+# from app.persistence.repository import SQLAlchemyRepository
+# from datetime import datetime, timezone
+# import uuid
+# from flask_bcrypt import generate_password_hash, check_password_hash
 
 
 class User(BaseEntity):
     __tablename__ = 'users'
 
-    id = db.Column(db.String(50), default=lambda:str(uuid.uuid4()), primary_key=True, nullable=False, unique=True)
-    created_at = db.Column(DateTime, nullable=False, default=datetime.now(timezone.utc))
-    updated_at = db.Column(DateTime, nullable=False, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
-    first_name = db.Column(db.String(50), nullable=False)
-    last_name = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(120), nullable=False, unique=True)
-    is_admin = db.Column(db.Boolean, default=False)
-    password = db.Column(String(128), nullable=False)
+    # id = db.Column(db.String(50), default=lambda:str(uuid.uuid4()), primary_key=True, nullable=False, unique=True)
+    # created_at = db.Column(DateTime, nullable=False, default=datetime.now(timezone.utc))
+    # updated_at = db.Column(DateTime, nullable=False,
+    # default=datetime.now(timezone.utc),
+    # onupdate=datetime.now(timezone.utc))
+    _first_name: Mapped[str] = mapped_column("first_name",
+                                             String(50),
+                                             nullable=False)
+    # first_name = db.Column(db.String(50), nullable=False)
+    _last_name: Mapped[str] = mapped_column("last_name",
+                                            String(50), nullable=False)
+    # last_name = db.Column(db.String(50), nullable=False)
+    _email: Mapped[str] = mapped_column("email",
+                                        String(120), 
+                                        nullable=False, unique=True)
+    # email = db.Column(db.String(120), nullable=False, unique=True)
+    _password: Mapped[str] = mapped_column("password",
+                                           String(128), nullable=False)
+    # password = db.Column(String(128), nullable=False)
+    _is_admin: Mapped[bool] = mapped_column("is_admin",
+                                            Boolean, default=False)
+    # is_admin = db.Column(db.Boolean, default=False)
+    
 
     def __init__(self, first_name: str, last_name: str,
                  email: str, password: str, is_admin: bool = False):
         super().__init__()
-        self.first_name = self.name_validation(first_name, "first_name")
-        self.last_name = self.name_validation(last_name, "last_name")
-        self.email = self.email_validation(email)
-        self.is_admin = type_validation(is_admin, "is_admin", bool)
-        self.password = self.hash_password(password)
+        self.first_name = first_name
+        self.last_name = last_name
+        self.email = email
+        self.is_admin = is_admin
+        self.password = password
+        # self.first_name = self.name_validation(first_name, "first_name")
+        # self.last_name = self.name_validation(last_name, "last_name")
+        # self.email = self.email_validation(email)
+        # self.is_admin = type_validation(is_admin, "is_admin", bool)
+        # self.password = self.hash_password(password)
+
+    @hybrid_property
+    def password(self): # type: ignore
+        return self._password
+    
+    @password.setter
+    def password(self, value):
+        if value is None:
+            raise ValueError('Expected password but received None')
+        type_validation(value, 'password', str)
+        self._password = self.hash_password(value)
+
+    def hash_password(self, plain_password):
+        """Hashes the password before storing it"""
+        if plain_password is None:
+            raise ValueError('Expected password but received None')
+        # elif not isinstance(plain_password, str):
+        #     raise TypeError("Password must be a string")
+        type_validation(plain_password, "Password", str)
+        return bcrypt.generate_password_hash(plain_password).decode('utf-8')
+
+    def verify_password(self, plain_password):
+        """ Verifies if the provided password matches the hashed
+        password"""
+        if plain_password is None:
+            raise ValueError('Expected password but received None')
+        # if self.password is None:
+        #     return False
+        return bcrypt.check_password_hash(self.password, plain_password)
 
     def name_validation(self, names: str, names_name: str):
         if names is None:
@@ -59,69 +108,48 @@ class User(BaseEntity):
                              " example@exam.ple")
         return email
 
-    def hash_password(self, plain_password):
-        """Hashes the password before storing it"""
-        if plain_password is None:
-            raise ValueError('Expected password but received None')
-        elif not isinstance(plain_password, str):
-            raise TypeError("Password must be a string")
-        return bcrypt.generate_password_hash(plain_password).decode('utf-8')
+    @hybrid_property
+    def first_name(self): # type: ignore
+        return self._first_name
 
-    def verify_password(self, plain_password):
-        """ Verifies if the provided password matches the hashed
-        password"""
-        if plain_password is None:
-            raise ValueError('Expected password but received None')
-        # if not self.password:
-        #     return False
-        return bcrypt.check_password_hash(self.password, plain_password)
-    
+    @first_name.setter
+    def first_name(self, value):
+        self._first_name = self.name_validation(value,
+                                                 "first_name")
+
+    @hybrid_property
+    def last_name(self): # type: ignore
+        return self._last_name
+
+    @last_name.setter
+    def last_name(self, value):
+        self._last_name = self.name_validation(value, "last_name")
+
+    @hybrid_property
+    def email(self): # type: ignore
+        return self._email
+
+    @email.setter
+    def email(self, value: str):
+        self._email = self.email_validation(value)
+
+    @hybrid_property
+    def is_admin(self): # type: ignore
+        return self._is_admin
+
+    @is_admin.setter
+    def is_admin(self, value: bool):
+        if value is None:
+            raise ValueError('Expected is_admin boolean but received None')
+        type_validation(value, "is_admin", bool)
+        self._is_admin = value
+
 
     # def update_first_name(self, new_first_name):
     #     self.first_name = self.name_validation(new_first_name,
     #     "first_name")
 
-    # @property
-    # def password(self):
-    #     return self.password_hash
+   
     
-    # @password.setter
-    # def password(self, password):
-    #     if password is None:
-    #         raise ValueError('Expected password but received None')
-    #     type_validation(password, 'password', str)
-    #     self.password_hash = self.hash_password(password)
 
-    # @property
-    # def first_name(self):
-    #     return self.__first_name
-
-    # @first_name.setter
-    # def first_name(self, first_name):
-    #     self.__first_name = self.name_validation(first_name,
-                                                #  "first_name")
-
-    # @property
-    # def last_name(self):
-    #     return self.__last_name
-
-    # @last_name.setter
-    # def last_name(self, last_name):
-    #     self.__last_name = self.name_validation(last_name, "last_name")
-
-    # @property
-    # def email(self):
-    #     return self.__email
-
-    # @email.setter
-    # def email(self, email: str):
-    #     self.__email = self.email_validation(email)
-
-    # @property
-    # def is_admin(self):
-    #     return self.__is_admin
-
-    # @is_admin.setter
-    # def is_admin(self, is_admin: bool):
-    #     type_validation(is_admin, "is_admin", bool)
-    #     self.__is_admin = is_admin
+    
