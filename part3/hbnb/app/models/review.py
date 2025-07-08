@@ -33,7 +33,7 @@ class Review(BaseEntity):
         self.rating = rating
         self.place = place
         self.user = user
-        if any(review.user == user for review in self.place.reviews):
+        if any(((review.id != self.id) and (review.user == user)) for review in self.place.reviews):
             raise CustomError('This user has already reviewed this place',
                               400)
         place.add_review(self)
