@@ -1,11 +1,20 @@
 from app.models.baseEntity import (BaseEntity, type_validation,
                                    strlen_validation)
 from app import db
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Table, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import mapped_column, Mapped
-from typing import Any
+from sqlalchemy.orm import mapped_column, Mapped, DeclarativeBase, relationship
+from typing import Any, List, TYPE_CHECKING
+if TYPE_CHECKING:
+    from .place import Place
 
+
+place_amenity = Table("place_amenity", db.metadata,
+    Column("place_id", String(36), ForeignKey("places.id"),
+           primary_key=True),
+    Column("amenity_id", String(36), ForeignKey("amenities.id"),
+           primary_key=True)
+    )
 
 class Amenity(BaseEntity):
     __tablename__ = 'amenities'
@@ -13,6 +22,8 @@ class Amenity(BaseEntity):
     _name: Mapped[str] = mapped_column("name", 
                                        String(128), nullable=False, unique=True)
     # name = db.Column(db.String(128), nullable=False)
+    places: Mapped[List["Place"]] = relationship("Place",
+        secondary=place_amenity, back_populates="_amenities", lazy=True)
 
     def __init__(self, name):
         super().__init__()

@@ -66,17 +66,17 @@ class ReviewList(Resource):
     @jwt_required()
     def post(self):
         """Register a new review"""
-        current_user_id = get_jwt_identity()
         # Automatically parses and validates request JSON
         review_data = api.payload
         try:
             compare_data_and_model(review_data, review_model)
-            current_user = get_jwt_identity()
+            current_user_id = get_jwt_identity()
             given_user_id = review_data.get('user_id')
             if given_user_id is None:
                 # Set user_id to the authenticated user's ID
-                review_data['user_id'] = current_user
-            elif current_user != facade.get_user(given_user_id).id:
+                review_data['user_id'] = current_user_id
+            # elif current_user != facade.get_user(given_user_id).id:
+            elif current_user_id != given_user_id:
                 raise CustomError('Unauthorized action: authenticated user does not match provided review author. User is not allowed to create a review for another user', 403)
             # Retrieve the place_id
             given_place_id = review_data.get('place_id')
@@ -87,13 +87,13 @@ class ReviewList(Resource):
             if place is None:
                 raise CustomError('Invalid place_id: given place_id doesn\'t correspond to an registered place', 400)
             # Check if the current user tries to review their own place
-            if place.owner.id == current_user:
+            if place.owner.id == current_user_id:
                 raise CustomError('User can not review their own place', 403)
             # Check if the review already exists
             existing_review = facade.get_review_by_place_and_user(
-                given_place_id, current_user)
+                given_place_id, current_user_id)
             if existing_review is not None:
-                raise CustomError('User has already reviewed ths place', 403)
+                raise CustomError('User has already reviewed this place', 403)
             new_review = facade.create_review(review_data)
         except CustomError as e:
             api.abort(e.status_code, error=str(e))
@@ -158,12 +158,12 @@ class ReviewResource(Resource):
         current_user_id = get_jwt_identity()
         review_data = api.payload
         try:
-            compare_data_and_model(review_data, review_model)
-            current_user = get_jwt_identity()
+            compare_data_and_model(review_data, update_review_model)
+            current_user_id = get_jwt_identity()
             given_user_id = review_data.get('user_id')
             if given_user_id is None:
-                review_data['user_id'] = current_user
-            elif current_user != given_user_id:
+                review_data['user_id'] = current_user_id
+            elif current_user_id != given_user_id:
                 raise CustomError('Unauthorized action: given user_id doesn\' match authenticated user', 403)
             # Retrieve the review to validate ownership
             review = facade.get_review(review_id)
@@ -171,7 +171,7 @@ class ReviewResource(Resource):
             if review is None:
                 raise CustomError('Invalid review_id: review not found', 404)
             # Check if the authenticated user is the creator of the review
-            if current_user != review.user_id:
+            if current_user_id != review.user_id:
                 raise CustomError('Unauthorized action: user is not the author of the review', 403)
             given_place_id = review_data.get('place_id')
             if given_place_id != review.place_id:

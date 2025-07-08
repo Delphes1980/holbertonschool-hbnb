@@ -1,12 +1,17 @@
 from app.models.baseEntity import (BaseEntity, type_validation,
                                    strlen_validation)
-from app.models.user import User
 from app import db
 from sqlalchemy import Column, Integer, String, Text, Float, ForeignKey
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from app.api.v1.apiRessources import CustomError
 from sqlalchemy.ext.hybrid import hybrid_property
-from typing import Optional
+from typing import List, Optional, TYPE_CHECKING
+from .user import User
+from .amenity import place_amenity
+if TYPE_CHECKING:
+    from .review import Review
+    from .amenity import Amenity
+
 
 class Place(BaseEntity):
     __tablename__ = 'places'
@@ -21,10 +26,12 @@ class Place(BaseEntity):
                                              nullable=False)
     _longitude: Mapped[float] = mapped_column("longitude", Float,
                                               nullable=False)
-    _user_id: Mapped[str] = mapped_column("user_id", String, ForeignKey("users.id"), nullable=False)
-
-    owner = db.relationship("User", back_populates="places")
-
+    owner_id: Mapped[str] = mapped_column("owner_id",
+                                           ForeignKey('users.id'))
+    _owner: Mapped["User"] = relationship("User", back_populates="places", lazy=True)
+    _reviews: Mapped[List["Review"]] = relationship("Review", back_populates="_place", lazy=True, cascade="all, delete-orphan")
+    _amenities: Mapped[List["Amenity"]] = relationship("Amenity", secondary=place_amenity, back_populates="places")
+    
     def __init__(self, title: str, description = None, *,
                  price: float, latitude: float,
                  longitude: float, owner: User):
@@ -35,7 +42,7 @@ class Place(BaseEntity):
         self.latitude = latitude
         self.longitude = longitude
         self.owner = owner
-        self.reviews = []  # List to store related reviews
+        self._reviews = []  # List to store related reviews
         self._amenities = []  # List to store related amenities
 
     @hybrid_property
@@ -126,17 +133,23 @@ class Place(BaseEntity):
                              " 180.0")
         return float(longitude)
 
-    # @hybrid_property
-    # def owner(self):
-    #     return self._owner
+    @hybrid_property
+    def owner(self): # type: ignore
+        return self._owner
 
-    # @owner.setter
-    # def owner(self, value):
-    #     if value is None:
-    #         raise ValueError("Invalid owner: expected user but received None")
-    #     type_validation(value, "owner", User)
-    #     self._owner = value
+    @owner.setter # type: ignore
+    def owner(self, value): # type: ignore
+        if value is None:
+            raise ValueError("Invalid owner: expected user but received None")
+        type_validation(value, "owner", User)
+        self._owner = value
+        self.owner_id = value.id
 
+    # allow querying for the attribute
+    @owner.expression
+    def owner(cls):
+        return cls._owner
+    
     # def is_owner(self, user_id):
     #     """Verify is the user owns the place."""
     #     if self.owner != user_id:
@@ -152,6 +165,19 @@ class Place(BaseEntity):
         type_validation(review, "Review", Review)
         self.reviews.append(review)
 
+    @hybrid_property
+    def reviews(self): #type: ignore
+        return self._reviews
+    
+    @reviews.setter #type: ignore
+    def reviews(self, value):
+        if value is None:
+            self._reviews = []
+            return None
+        type_validation(value, "reviews", list)
+        for review in value:
+            self.add_review(review)
+
     def add_amenity(self, amenity):
         """Add an amenity to the place."""
         self.amenities.append(self.amenity_validation(amenity))
@@ -166,11 +192,11 @@ class Place(BaseEntity):
             raise CustomError(f'Amenity "{amenity.name}" already listed for this place', 400)
         return amenity
 
-    @property
-    def amenities(self):
+    @hybrid_property
+    def amenities(self): # type: ignore
         return self._amenities
     
-    @amenities.setter
+    @amenities.setter # type: ignore
     def amenities(self, value):
         if value is None:
             self._amenities = []

@@ -1,11 +1,11 @@
-from app.persistence.repository import InMemoryRepository
+# from app.persistence.repository import InMemoryRepository
 from app.persistence.repository import SQLAlchemyRepository
 # from app.persistence.UserRepository import UserRepository
 from app.persistence.PlaceRepository import PlaceRepository
 from app.models.user import User
 from app.models.place import Place
 from app.models.amenity import Amenity
-# from app.models.review import Review
+from app.models.review import Review
 from app.services.UserService import UserService
 from app.services.PlaceService import PlaceService
 from app.services.AmenityService import AmenityService
@@ -16,8 +16,8 @@ from app.services.ReviewService import ReviewService
 class HBnBFacade:
     def __init__(self):
         self.user_repo = SQLAlchemyRepository(User) # UserRepository() # InMemoryRepository()
-        self.place_repo = SQLAlchemyRepository(Place) # SQLAlchemyRepository(Place) # PlaceRepository()
-        self.review_repo = InMemoryRepository() # SQLAlchemyRepository(Review) # ReviewRepository()
+        self.place_repo = SQLAlchemyRepository(Place) #InMemoryRepository() # PlaceRepository()
+        self.review_repo = SQLAlchemyRepository(Review) # ReviewRepository() # InMemoryRepository()
         self.amenity_repo = SQLAlchemyRepository(Amenity) # AmenityRepository() # InMemoryRepository()
 
 # Services for User CRUD operations ####

@@ -3,8 +3,8 @@ from app.models.baseEntity import (BaseEntity, type_validation,
 from app.models.place import Place
 from app.models.user import User
 from app import bcrypt, db
-from sqlalchemy import Column, Integer, String, Text
-from sqlalchemy.orm import mapped_column, Mapped
+from sqlalchemy import Column, Integer, String, Text, ForeignKey
+from sqlalchemy.orm import mapped_column, Mapped, relationship
 from app.api.v1.apiRessources import CustomError
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -14,6 +14,14 @@ class Review(BaseEntity):
     _text: Mapped[str] = mapped_column("text", Text, nullable=False)
     _rating: Mapped[int] = mapped_column("rating", Integer,
                                          nullable=False)
+    place_id: Mapped[str] = mapped_column("place_id", String(36),
+                                           ForeignKey("places.id"),
+                                           nullable=False)
+    _place: Mapped["Place"] = relationship("Place", back_populates="_reviews", lazy=True)
+    user_id: Mapped[str] = mapped_column("user_id", String(36),
+                                         ForeignKey("users.id"),
+                                         nullable=False)
+    _user: Mapped[User] = relationship("User", back_populates="reviews", lazy=True)
 
     def __init__(self, text: str, rating: int, place: Place,
                  user: User):
@@ -25,7 +33,7 @@ class Review(BaseEntity):
         self.rating = rating
         self.place = place
         self.user = user
-        if any(review.user == user for review in place.reviews):
+        if any(review.user == user for review in self.place.reviews):
             raise CustomError('This user has already reviewed this place',
                               400)
         place.add_review(self)
@@ -62,30 +70,43 @@ class Review(BaseEntity):
                              " 5, both inclusive")
         return rating
 
-    @property
-    def user(self):
+    @hybrid_property
+    def user(self): # type: ignore
         return self._user
 
-    @user.setter
-    def user(self, value):
+    @user.setter # type: ignore
+    def user(self, value): #type: ignore
         self._user = self.set_user(value)
+        self.user_id = value.id
+
+    @user.expression
+    def user(cls):
+        return cls._user
 
     def set_user(self, user):
         if user is None:
             raise ValueError("user is required: provide user who"
                              " writes the review")
         type_validation(user, "User", User)
-        if user == self.place.owner:
-            raise CustomError("User cannot review their own place", 400)
+        if self.place is not None:
+            if user == self.place.owner:
+                raise CustomError("User cannot review their own place", 400)
+        else:
+            raise CustomError("Place is required, review should be written for a place", 400)
         return user
 
-    @property
-    def place(self):
+    @hybrid_property
+    def place(self): # type: ignore
         return self._place
 
-    @place.setter
-    def place(self, value):
+    @place.setter 
+    def place(self, value): # type: ignore
         self._place = self.set_place(value)
+        self.place_id = value.id
+
+    @place.expression
+    def place(cls):
+        return cls._place
 
     def set_place(self, place):
         if place is None:

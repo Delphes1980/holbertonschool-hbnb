@@ -73,10 +73,39 @@ def create_app(config_class="config.DevelopmentConfig"):
                 )
                 db.session.add(regular_user)
                 db.session.commit()
+                
             from .models.amenity import Amenity
             if Amenity.query.filter_by(name="WiFi").first() is None:
                 basic_amenity = Amenity(name="WiFi")
                 db.session.add(basic_amenity)
                 db.session.commit()
+
+            if Amenity.query.filter_by(name="Pool").first() is None:
+                basic_amenity = Amenity(name="Pool")
+                db.session.add(basic_amenity)
+                db.session.commit()
+
+            from .models.place import Place
+            if regular_user:
+                if Place.query.filter_by(title="Maison").first() is None:
+                    place1 = Place(
+                    title="Maison",
+                    price=20,
+                    latitude=20.3,
+                    longitude=21.35,
+                    owner=regular_user
+                    )
+                    db.session.add(place1)
+                    db.session.commit()
+            if Place.query.filter_by(title="Appartement").first() is None:
+                place2 = Place(
+                    title="Appartement",
+                    price=30,
+                    latitude=15.69,
+                    longitude=14.9,
+                    owner=regular_user
+                    )
+                db.session.add(place2)
+                db.session.commit()                    
 
     return app
