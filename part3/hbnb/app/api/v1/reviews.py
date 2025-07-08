@@ -93,7 +93,7 @@ class ReviewList(Resource):
             existing_review = facade.get_review_by_place_and_user(
                 given_place_id, current_user_id)
             if existing_review is not None:
-                raise CustomError('User has already reviewed ths place', 403)
+                raise CustomError('User has already reviewed this place', 403)
             new_review = facade.create_review(review_data)
         except CustomError as e:
             api.abort(e.status_code, error=str(e))
