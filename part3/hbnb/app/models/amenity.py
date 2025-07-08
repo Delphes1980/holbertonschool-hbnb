@@ -23,7 +23,7 @@ class Amenity(BaseEntity):
                                        String(128), nullable=False, unique=True)
     # name = db.Column(db.String(128), nullable=False)
     places: Mapped[List["Place"]] = relationship("Place",
-        secondary=place_amenity, back_populates="_amenities")
+        secondary=place_amenity, back_populates="_amenities", lazy=True)
 
     def __init__(self, name):
         super().__init__()

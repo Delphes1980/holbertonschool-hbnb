@@ -29,7 +29,7 @@ class Place(BaseEntity):
     owner_id: Mapped[str] = mapped_column("owner_id",
                                            ForeignKey('users.id'))
     _owner: Mapped["User"] = relationship("User", back_populates="places", lazy=True)
-    _reviews: Mapped[List["Review"]] = relationship("Review", back_populates="_place", lazy=True)
+    _reviews: Mapped[List["Review"]] = relationship("Review", back_populates="_place", lazy=True, cascade="all, delete-orphan")
     _amenities: Mapped[List["Amenity"]] = relationship("Amenity", secondary=place_amenity, back_populates="places")
     
     def __init__(self, title: str, description = None, *,

@@ -41,7 +41,7 @@ class User(BaseEntity):
     _is_admin: Mapped[bool] = mapped_column("is_admin",
                                             Boolean, default=False)
     # is_admin = db.Column(db.Boolean, default=False)
-    places: Mapped[List["Place"]] = relationship("Place", back_populates="_owner", lazy=True)
+    places: Mapped[List["Place"]] = relationship("Place", back_populates="_owner", lazy=True, cascade="all, delete-orphan")
     reviews: Mapped[List["Review"]] = relationship("Review", back_populates="_user", lazy=True)
 
     def __init__(self, first_name: str, last_name: str,
