@@ -49,13 +49,13 @@ class AdminAmenityCreate(Resource):
     @jwt_required()
     def post(self):
         """Register a new amenity"""
-        is_admin = get_jwt().get('is_admin')
+        is_admin = get_jwt().get('is_admin', False)
         amenity_data = api.payload
         try:
-            if is_admin is None:
-                raise CustomError('is_admin claim was not found in the jwt', 401)
-            elif not is_admin:
-                raise CustomError('Admin privileges required', 403)
+            # if is_admin is None:
+            #     raise CustomError('is_admin claim was not found in the jwt', 401)
+            if not is_admin:
+                raise CustomError('Unauthorized action: admin privileges required', 403)
             compare_data_and_model(amenity_data, amenity_model)
             new_amenity = facade.create_amenity(amenity_data)
         except CustomError as e:
