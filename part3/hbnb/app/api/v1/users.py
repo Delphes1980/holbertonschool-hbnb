@@ -29,40 +29,39 @@ user_response_model = api.model('UserResponse', {
                            description='Email of the user', attribute='email')
 })
 
-update_user_model = api.model('UpdateUser', {
-    'first_name': fields.String(required=False, description='first name of'
-                                'the user'),
-    'last_name': fields.String(required=False, description='Last name of the'
-                               'user')
-})
-
-
+# update_user_model = api.model('UpdateUser', {
+#     'first_name': fields.String(required=False, description='first name of'
+#                                 'the user'),
+#     'last_name': fields.String(required=False, description='Last name of the'
+#                                'user')
+# })
+# user_update_model = api.model('UserUpdate', {
+#     'first_name': fields.String(required=True,
+#                                 description='First name of the user', attribute='first_name'),
+#     'last_name': fields.String(required=True,
+#                                description='Last name of the user'),
+#     'email': fields.String(required=True,
+#                            description='Email of the user', attribute='email')
+# })
+# update_user_model = api.model('UpdateUser', {
+#     'first_name': fields.String(required=False, description='first name of'
+#                                 'the user'),
+#     'last_name': fields.String(required=False, description='Last name of the'
+#                                'user')
+# })
 user_update_model = api.model('UserUpdate', {
-    'first_name': fields.String(required=True,
-                                description='First name of the user', attribute='first_name'),
-    'last_name': fields.String(required=True,
-                               description='Last name of the user'),
-    'email': fields.String(required=True,
-                           description='Email of the user', attribute='email')
-})
-
-update_user_model = api.model('UpdateUser', {
-    'first_name': fields.String(required=False, description='first name of'
-                                'the user'),
-    'last_name': fields.String(required=False, description='Last name of the'
-                               'user')
-})
-
-
-user_update_model = api.model('UserUpdate', {
-    'first_name': fields.String(required=True,
-                                description='First name of the user'),
-    'last_name': fields.String(required=True,
-                               description='Last name of the user'),
+    'first_name': fields.String(required=False,
+                                description='First name of the user',
+                                attribute='first_name'),
+    'last_name': fields.String(required=False,
+                               description='Last name of the user',
+                               attribute='last_name'),
     'email': fields.String(required=False,
-                           description='Email of the user'),
+                           description='Email of the user',
+                           attribute='email'),
     'password': fields.String(required=False,
-                              description='Password of the user')
+                              description='Password of the user',
+                              attribute='password')
 })
 
 error_model = api.model('Error', {
@@ -139,9 +138,9 @@ class AdminPrivilegesUserModify(Resource):
             if user is None:
                 raise CustomError('Invalid user_id: no user found corresponding to that user_id', 404)
             current_user = get_jwt_identity()
-            is_admin = get_jwt().get('is_admin')
-            if is_admin is None:
-                raise CustomError('is_admin claim was not found in the jwt', 401)
+            is_admin = get_jwt().get('is_admin', False)
+            # if is_admin is None:
+            #     raise CustomError('is_admin claim was not found in the jwt', 401)
             if not is_admin and current_user != user.id: # check the user_id in the URL 
                                     # matches the authenticated user
                 raise CustomError('Unauthorized action: you can not modify the user account of somebody else', 403)
