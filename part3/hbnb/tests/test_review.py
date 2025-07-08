@@ -86,14 +86,14 @@ class TestReview(unittest.TestCase):
         with self.assertRaises(CustomError) as e:
             Review(text='Perfect place, my place', rating=5,
                    place=self.place, user=self.owner)
-        self.assertIn('You cannot review your own place',
+        self.assertIn('User cannot review their own place',
                       str(e.exception))
         self.assertEqual(400, e.exception.status_code)
         
         with self.assertRaises(CustomError) as e:
             Review(text='Someone else\'s place', rating=3,
                    place=self.place, user=self.user)
-        self.assertIn('You have already reviewed this place',
+        self.assertIn('This user has already reviewed this place',
                       str(e.exception))
         self.assertEqual(400, e.exception.status_code)
 

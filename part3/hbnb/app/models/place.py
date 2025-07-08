@@ -202,6 +202,7 @@ class Place(BaseEntity):
             self._amenities = []
             return None
         type_validation(value, "amenities", list)
+        self._amenities = []
         for amenity in value:
             self.add_amenity(amenity)
             # self.__amenities.append(self.amenity_validation(amenity))

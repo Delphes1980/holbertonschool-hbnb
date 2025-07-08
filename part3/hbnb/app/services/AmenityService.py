@@ -12,9 +12,14 @@ class AmenityService:
         type_validation(name, 'name', str)
         if name is None:
             raise ValueError('Invalid name: name is required')
-        existing_amenity = cls.get_amenity_by_name(facade, name)
-        if existing_amenity:
-            raise ValueError('Invalid name: name already registered')
+        name = name.strip()
+        all_existing_amenities = cls.get_all_amenities(facade)
+        for existing_amenity in all_existing_amenities:
+            if existing_amenity.name.casefold() == name.casefold():
+                raise ValueError('Invalid name: name already registered')
+        # existing_amenity = cls.get_amenity_by_name(facade, name)
+        # if existing_amenity is not None:
+        #     raise ValueError('Invalid name: name already registered')
         validate_init_args(Amenity, **amenity_data)
         new_amenity = Amenity(**amenity_data)
         facade.amenity_repo.add(new_amenity)
@@ -36,7 +41,8 @@ class AmenityService:
 
     @classmethod
     def get_amenity_by_name(cls, facade, name):
-        if name is None:
+        if name is None or (isinstance(name, str) and
+                            len(name.strip()) == 0):
             raise ValueError('Invalid name: name is required')
         type_validation(name, 'name', str)
         return facade.amenity_repo.get_by_attribute('name', name)
