@@ -141,7 +141,9 @@ class UserService:
             if user_by_email and user_by_email.id != user.id:
                 raise ValueError('Invalid email: email already used by'
                                  ' another user')
-        validate_init_args(User, **user_data)
+        # We do not need to provide all input arguments of User, only
+        # those we want to change:
+        # validate_init_args(User, **user_data)
         facade.user_repo.update(user_id, user_data)
         updated_user = facade.user_repo.get(user_id)
         return updated_user
