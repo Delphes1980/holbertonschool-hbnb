@@ -71,6 +71,7 @@ class SQLAlchemyRepository(Repository):
             # for key, value in data.items():
             #     setattr(obj, key, value)
             obj.update(data)
+            # db.session.merge(obj)
             db.session.commit()
 
     def delete(self, obj_id):
