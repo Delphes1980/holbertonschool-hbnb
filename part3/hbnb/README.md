@@ -27,4 +27,51 @@ Examples of how the classes and methods can be used.
 
 ## ER diagram
 
-[![](https://mermaid.ink/img/pako:eNqVVNFumzAU_RXLT5sEGZAECG9Z06lSsqralJeFKfLwJbFqbGRMkzTJv89ASGCrNpUHo3t97jnH9rWPOJEUcIRBzRjZKJLFAplvWYBCp5NtyyN64iQBFKEtKXqTg4GZ_AYvDHZmlgN5gQugqeiWr6cZCKYPBhhjQ_Rpa9Ax7sCviLO07dMJdQtSWQqKmOgVtPxXBwoSYLWHyuCqGn5GUZRKoe84KYpHkgE6NgyFVkxsPgz9j4hR9DS_ZlHKVKHXwmBvOVP9ZwoywjhadgpzI7GTihq_D9PvD_ez1u0vKTlixZrQzCxBnGNR-1_V478cvmVPM807NigUiWK5ZlIY3cflYjH9vLhvlVMuiUa5Ygl0E5wYlpL2c1JsOslWXe4EqLXx8GVu-KstHTBa0ZtVNBu_an7vXgfsdRMxoZEyjsSmX1AWbyt3MXndOS2o3tCbv0sHrS7_9zqszrs-4PbA2g5d9aL_0l49Ps2tv2x2gaQh7EIvGrc1JZXKDFJz8CkpuUZ96SqyC_YKkevlGlt4oxjFkVYlWDgDZZrWhLh2GGNODrLUMa6uGPDnGFtNXm_BtHqdVkDLvU2JerYTyaWqbRjenIgfUmYttZLlZoujlPDCRGVOiYbLe3KFgKCg7sxN1jia1Aw4OuI9jryRNwhHjuf54zAYOa7rW_iAI9eZDILQc8JgEoZOMPTds4Vfa1FnMHH9seuPnMAPh944CCwMlGmpvjavWf2onX8DBBSULQ?type=png)](https://mermaid.live/edit#pako:eNqVVNFumzAU_RXLT5sEGZAECG9Z06lSsqralJeFKfLwJbFqbGRMkzTJv89ASGCrNpUHo3t97jnH9rWPOJEUcIRBzRjZKJLFAplvWYBCp5NtyyN64iQBFKEtKXqTg4GZ_AYvDHZmlgN5gQugqeiWr6cZCKYPBhhjQ_Rpa9Ax7sCviLO07dMJdQtSWQqKmOgVtPxXBwoSYLWHyuCqGn5GUZRKoe84KYpHkgE6NgyFVkxsPgz9j4hR9DS_ZlHKVKHXwmBvOVP9ZwoywjhadgpzI7GTihq_D9PvD_ez1u0vKTlixZrQzCxBnGNR-1_V478cvmVPM807NigUiWK5ZlIY3cflYjH9vLhvlVMuiUa5Ygl0E5wYlpL2c1JsOslWXe4EqLXx8GVu-KstHTBa0ZtVNBu_an7vXgfsdRMxoZEyjsSmX1AWbyt3MXndOS2o3tCbv0sHrS7_9zqszrs-4PbA2g5d9aL_0l49Ps2tv2x2gaQh7EIvGrc1JZXKDFJz8CkpuUZ96SqyC_YKkevlGlt4oxjFkVYlWDgDZZrWhLh2GGNODrLUMa6uGPDnGFtNXm_BtHqdVkDLvU2JerYTyaWqbRjenIgfUmYttZLlZoujlPDCRGVOiYbLe3KFgKCg7sxN1jia1Aw4OuI9jryRNwhHjuf54zAYOa7rW_iAI9eZDILQc8JgEoZOMPTds4Vfa1FnMHH9seuPnMAPh944CCwMlGmpvjavWf2onX8DBBSULQ)
+[![](https://mermaid.ink/img/pako:eNqVVF2P2jAQ_CuWn1opSUmOr-SNHledBD2hVryUVMiNN2CdY0eOc8AB_72OQyBpK1XkwdGuZ2fG9tpHnEgKOMKgpoxsFMligcy3LECh08l15REtOEkARWhLis6k55nJb_DGYGdmOZA3uADqinb5epKBYPpggDE2RJ-2Bh3jFvyKOEvXPZ1QuyCVpaCIiU5Bw391oCABZj1UBlfV8DOKolQK_chJUbyQDNCxZii0-vAw_IgYRYvZNYVSpgq9FgZ4y5nSP1OQEcbRslWYG_6dVNSYfZ58f36aNlZ_SckRK9aEZsa_OMfCml_Z8V57mmneskGhSBTLNZPC6L4s5_PJ5_lTo5xySTTKFUugneDEsJS0m5Ni00o26nInQK2Nhy8zw1_tp8doRW9WUe_6qv7dvQ7Y6zpiQiNlHIlNt6As_q3cxuS2bRqQ3dCbv0v7rC7_ex1W520PuDmwpj1Xnei_tFePi5nzl802kNSEbehF47ampFKZQmoOPiUl16grXUVuwd4h8oNcYwdvFKM40qoEB2egTNOaEFuHMebkIEsd4-p-AX-NsVPn9RZMq9u0AlruXUrUq5tILpW1YXhzIn5ImTXUSpabLY5SwgsTlTklGi6PyRUCgoJ6NNdY4ygYWgocHfEeR74_9IJeLxz6g2oM-30HH3Dk-j3vYRj4_VE4HPnhOOiPzg5-t7K-FwzG4Xgw8MN-L_RH4cjBQJmW6mv9mNk37fwbUT2TUg?type=png)](https://mermaid.live/edit#pako:eNqVVF2P2jAQ_CuWn1opSUmOr-SNHledBD2hVryUVMiNN2CdY0eOc8AB_72OQyBpK1XkwdGuZ2fG9tpHnEgKOMKgpoxsFMligcy3LECh08l15REtOEkARWhLis6k55nJb_DGYGdmOZA3uADqinb5epKBYPpggDE2RJ-2Bh3jFvyKOEvXPZ1QuyCVpaCIiU5Bw391oCABZj1UBlfV8DOKolQK_chJUbyQDNCxZii0-vAw_IgYRYvZNYVSpgq9FgZ4y5nSP1OQEcbRslWYG_6dVNSYfZ58f36aNlZ_SckRK9aEZsa_OMfCml_Z8V57mmneskGhSBTLNZPC6L4s5_PJ5_lTo5xySTTKFUugneDEsJS0m5Ni00o26nInQK2Nhy8zw1_tp8doRW9WUe_6qv7dvQ7Y6zpiQiNlHIlNt6As_q3cxuS2bRqQ3dCbv0v7rC7_ex1W520PuDmwpj1Xnei_tFePi5nzl802kNSEbehF47ampFKZQmoOPiUl16grXUVuwd4h8oNcYwdvFKM40qoEB2egTNOaEFuHMebkIEsd4-p-AX-NsVPn9RZMq9u0AlruXUrUq5tILpW1YXhzIn5ImTXUSpabLY5SwgsTlTklGi6PyRUCgoJ6NNdY4ygYWgocHfEeR74_9IJeLxz6g2oM-30HH3Dk-j3vYRj4_VE4HPnhOOiPzg5-t7K-FwzG4Xgw8MN-L_RH4cjBQJmW6mv9mNk37fwbUT2TUg)
+
+```mermaid
+---
+config:
+  layout: elk
+  theme: redux-dark-color
+---
+erDiagram
+    User ||--o{ Place : has
+    User ||..o{ Review : leaves
+    Place ||--o{ Place_Amenity : "has/have"
+    Place_Amenity }o--|| Amenity : "found in"
+    Place ||--o{ Review : receives
+User[User]:::fontClassName {
+    str(36) id PK
+    str first_name
+    str last_name
+    str email UK
+    str password "HASHED"
+    bool is_admin
+}
+Place[Place]:::fontClassName {
+    str(36) id PK
+    str title
+    str description "NULLABLE"
+    float price
+    float latitude
+    float longitude
+    str(36) owner_id FK "User.id"
+}
+Review[Review]:::fontClassName {
+    str(36) id PK
+    str text
+    int rating
+    str(36) user_id FK "User.id"
+    str(36) place_id FK "Place.id"
+}
+Amenity[Amenity]:::fontClassName {
+    str(36) id PK
+    str name UK
+}
+Place_Amenity[Place_Amenity]:::fontClassName {
+    str(36) place_id PK,FK "Place.id"
+    str(36) amenity_id PK,FK "Amenity.id"
+}
+classDef default fontClassName font-size:12pt
+````
