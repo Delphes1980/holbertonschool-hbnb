@@ -18,10 +18,10 @@ class ReviewService:
             raise ValueError('Review data does not contain place_id key')
         if not is_valid_uuid4(place_id):
             raise ValueError('Invalid place_id: given place_id is not valid UUID4')
-        existing_user = facade.user_repo.get(user_id)
+        existing_user = facade.get_user(user_id)
         if existing_user is None:
             raise ValueError('No User corresponding to given ID')
-        existing_place = facade.place_repo.get(place_id)
+        existing_place = facade.get_place(place_id)
         if existing_place is None:
             raise ValueError('No Place corresponding to given place '
                              'ID')
@@ -63,18 +63,19 @@ class ReviewService:
         type_validation(place_id, 'place_id', str)
         if not is_valid_uuid4(place_id):
             raise ValueError('Invalid ID: given place_id is not valid UUID4')
-        existing_user = facade.get_user(user_id)
-        if existing_user is None:
-            raise CustomError('Invalid user_id: no user corresponding to that user_id', 400)
-        type_validation(user_id, 'user_id', str)
-        if not is_valid_uuid4(user_id):
-            raise ValueError('Invalid ID: given place_id is not valid UUID4')
         existing_place = facade.get_place(place_id)
         if existing_place is None:
             raise CustomError('Invalid place_id: no place corresponding to that place_id', 400)
+        type_validation(user_id, 'user_id', str)
+        if not is_valid_uuid4(user_id):
+            raise ValueError('Invalid ID: given user_id is not valid UUID4')
+        existing_user = facade.get_user(user_id)
+        if existing_user is None:
+            raise CustomError('Invalid user_id: no user corresponding to that user_id', 400)
         reviews = facade.get_reviews_by_place(place_id)
         if reviews is None:
             return None
+        type_validation(reviews, "reviews", list)
         for review in reviews:
             if review.user.id == user_id:
                 return review
@@ -87,10 +88,11 @@ class ReviewService:
             raise ValueError('Invalid ID: given review_id is not valid UUID4')
         review = facade.get_review(review_id)
         if review is None:
-            return None
+            raise CustomError("Invalid review_id: review not found", 404)
         validate_init_args(Review, **review_data)
         facade.review_repo.update(review_id, review_data)
-        return facade.review_repo.get(review_id)
+        updated_review = facade.review_repo.get(review_id)
+        return updated_review
 
     @classmethod
     def delete_review(cls, facade, review_id):
@@ -99,7 +101,7 @@ class ReviewService:
             raise ValueError('Invalid ID: given review_id is not valid UUID4')
         review = facade.get_review(review_id)
         if review is None:
-            raise CustomError('Review not found', 404)
+            raise CustomError('Invalid review_id: review not found', 404)
         for review_in_place in review.place.reviews:
             if review_in_place == review:
                 review.place.reviews.remove(review)

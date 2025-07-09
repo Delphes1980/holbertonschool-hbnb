@@ -5,6 +5,8 @@ class Config:
     DEBUG = False
     ERROR_INCLUDE_MESSAGE = False
     BCRYPT_LOG_ROUNDS = 12
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///development.db'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 class DevelopmentConfig(Config):
     DEBUG = True
@@ -17,6 +19,9 @@ class DevelopmentConfig(Config):
     REGULAR_USER_EMAIL = 'user@example.com'
     REGULAR_USER_PASSWORD = 'password'
 
+    DELETED_USER_EMAIL = 'deleted@example.com'
+    DELETED_USER_PASSWORD = 'password'
+
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
@@ -25,10 +30,12 @@ class TestingConfig(Config):
     ADMIN_PASSWORD = 'adminpassword'
     REGULAR_USER_EMAIL = 'user@example.com'
     REGULAR_USER_PASSWORD = 'password'
-    
-    
+
+    DELETED_USER_EMAIL = 'deleted@example.com'
+    DELETED_USER_PASSWORD = 'password'
 
 config = {
+    'testing': TestingConfig,
     'development': DevelopmentConfig,
     'default': DevelopmentConfig
 }

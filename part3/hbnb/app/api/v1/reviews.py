@@ -14,8 +14,8 @@ review_model = api.model('Review', {
                           'review'),
     'rating': fields.Integer(required=True, description='Rating of the'
                              ' place (1-5)'),
-    'user_id': fields.String(required=False, description='ID of the '
-                             'user'),
+    # 'user_id': fields.String(required=False, description='ID of the '
+    #                          'user'),
     'place_id': fields.String(required=True, description='ID of the '
                               'place')
 })
@@ -115,9 +115,98 @@ class ReviewList(Resource):
         """Retrieve a list of all reviews"""
         return facade.get_all_reviews(), 200
 
+class AdminPrivilegesReviewModify(Resource):
+    # Endpoint for updating an existing review by ID
+    @api.doc('Returns the updated review', security='Bearer')
+    @api.marshal_with(review_response_model, code=_http.HTTPStatus.OK,
+                      description='Review updated successfully')
+    @api.expect(update_review_model, validate=False)
+    @api.response(200, 'Review updated successfully',
+                  review_response_model)
+    @api.response(400, 'Invalid input data', error_model)
+    @api.response(403, 'Unauthorized action', error_model)
+    @api.response(404, 'Review not found', error_model)
+    @jwt_required()
+    def put(self, review_id):
+        """Update a review's information"""
+        review_data = api.payload
+        try:
+            compare_data_and_model(review_data, update_review_model)
+            # Retrieve the review
+            review = facade.get_review(review_id)
+            # Check if the review exists
+            if review is None:
+                raise CustomError('Invalid review_id: review not found', 404)
+            current_user_id = get_jwt_identity()
+            # check if user tries to change a review given to their place
+            if current_user_id == review.place.owner.id:
+                raise CustomError('Unauthorized action: user can not leave a review on their own place', 403)
+            is_admin = get_jwt().get('is_admin', False)
+            # Check if the author of the review is the authenticated user
+            if not is_admin and current_user_id != review.user.id:
+                raise CustomError('Unauthorized action: user is not the author of the review', 403)
+            given_user_id = review_data.get('user_id')
+            if given_user_id is None:
+                review_data['user_id'] = current_user_id
+                # given_user_id = current_user_id
+            elif not is_admin and (current_user_id != given_user_id):
+                raise CustomError('Unauthorized action: given user_id doesn\' match authenticated user', 403)
+            elif is_admin and (given_user_id != review.user.id):
+                raise CustomError('Unauthorized action: not even an admin can change the author of a review', 403)
+            given_place_id = review_data.get('place_id')
+            if given_place_id is None:
+                review_data['place_id'] = review.place.id
+            elif given_place_id != review.place.id:
+                raise CustomError('Unauthorized action: user can not change the place for which the original review was given', 403)
+            review_data.pop('user_id')
+            review_data['user'] = review.user
+            review_data.pop('place_id')
+            review_data['place'] = review.place
+            updated_review = facade.update_review(review_id,
+                                                  review_data)
+        except CustomError as e:
+            api.abort(e.status_code, error=str(e))
+            return {'error': str(e)}, e.status_code
+        except Exception as e:
+            api.abort(400, error=str(e))
+            return {'error': str(e)}, 400
+        if updated_review is None:
+            api.abort(404, error='Updated review not found')
+            return {'error': 'Updated review not found'}, 404
+        return updated_review, 200
+
+class AdminPrivilegesReviewDelete(Resource):
+    # Endpoint for deleting a review by ID
+    @api.doc('Deletes review', security='Bearer')
+    @api.response(200, 'Review deleted successfully', msg_model)
+    @api.response(401, 'Missing authorization header', error_model)
+    @api.response(403, 'Unauthorized action', error_model)
+    @api.response(404, 'Review not found', error_model)
+    @jwt_required()
+    def delete(self, review_id):
+        """Delete a review"""
+        try:
+            current_user_id = get_jwt_identity()
+            is_admin = get_jwt().get('is_admin', False)
+            # Retrieve the review to validate ownership
+            review = facade.get_review(review_id)
+            # Check if the review already exists
+            if review is None:
+                raise CustomError('Invalid review_id: review not found', 404)
+            # Check if the creator of the review is the current user
+            elif not is_admin and current_user_id != review.user.id:
+                raise CustomError('Unauthorized action: user is not the author of the review', 403)
+            facade.delete_review(review_id)
+        except CustomError as e:
+            api.abort(e.status_code, error=str(e))
+            return {'error': str(e)}, e.status_code
+        except Exception as e:
+            api.abort(404, error=str(e))
+            return {'error': str(e)}, 404
+        return {"msg": f"Review {review_id} has been succesfully deleted"}, 200
 
 @api.route('/<review_id>')
-class ReviewResource(Resource):
+class ReviewResource(AdminPrivilegesReviewModify, AdminPrivilegesReviewDelete):
     # Endpoint for retrieving a single review by ID
     @api.doc('Returns review corresponding to given ID')
     @api.marshal_with(review_response_model,
@@ -142,81 +231,6 @@ class ReviewResource(Resource):
             return {'error': 'Review not found'}, 404
         return review, 200
 
-    # Endpoint for updating an existing review by ID
-    @api.doc('Returns the updated review', security='Bearer')
-    @api.marshal_with(review_response_model, code=_http.HTTPStatus.OK,
-                      description='Review updated successfully')
-    @api.expect(update_review_model, validate=False)
-    @api.response(200, 'Review updated successfully',
-                  review_response_model)
-    @api.response(400, 'Invalid input data', error_model)
-    @api.response(403, 'Unauthorized action', error_model)
-    @api.response(404, 'Review not found', error_model)
-    @jwt_required()
-    def put(self, review_id):
-        """Update a review's information"""
-        current_user_id = get_jwt_identity()
-        review_data = api.payload
-        try:
-            compare_data_and_model(review_data, update_review_model)
-            current_user_id = get_jwt_identity()
-            given_user_id = review_data.get('user_id')
-            if given_user_id is None:
-                review_data['user_id'] = current_user_id
-            elif current_user_id != given_user_id:
-                raise CustomError('Unauthorized action: given user_id doesn\' match authenticated user', 403)
-            # Retrieve the review to validate ownership
-            review = facade.get_review(review_id)
-            # Check if the review exists
-            if review is None:
-                raise CustomError('Invalid review_id: review not found', 404)
-            # Check if the authenticated user is the creator of the review
-            if current_user_id != review.user_id:
-                raise CustomError('Unauthorized action: user is not the author of the review', 403)
-            given_place_id = review_data.get('place_id')
-            if given_place_id != review.place_id:
-                raise CustomError('Unauthorized action: user can not change the place for which the original review was given', 403)
-            updated_review = facade.update_review(review_id,
-                                                  review_data)
-        except CustomError as e:
-            api.abort(e.status_code, error=str(e))
-            return {'error': str(e)}, e.status_code
-        except Exception as e:
-            api.abort(400, error=str(e))
-            return {'error': str(e)}, 400
-        if updated_review is None:
-            api.abort(404, error='Review not found')
-            return {'error': 'Review not found'}, 404
-        return updated_review, 200
-
-    # Endpoint for deleting a review by ID
-
-    @api.doc('Deletes review', security='Bearer')
-    @api.response(200, 'Review deleted successfully', msg_model)
-    @api.response(401, 'Missing authorization header', error_model)
-    @api.response(403, 'Unauthorized action', error_model)
-    @api.response(404, 'Review not found', error_model)
-    @jwt_required()
-    def delete(self, review_id):
-        """Delete a review"""
-        try:
-            current_user = get_jwt_identity()
-            # Retrieve the review to validate ownership
-            review = facade.get_review(review_id)
-            # Check if the review already exists
-            if review is None:
-                raise CustomError('Invalid review_id: review not found', 404)
-            # Check if the creator of the review is the current user
-            elif current_user != review.user.id:
-                raise CustomError('Unauthorized action: user is not the author of the review', 403)
-            facade.delete_review(review_id)
-        except CustomError as e:
-            api.abort(e.status_code, error=str(e))
-            return {'error': str(e)}, e.status_code
-        except Exception as e:
-            api.abort(404, error=str(e))
-            return {'error': str(e)}, 404
-        return {"msg": f"Review {review_id} has been succesfully deleted"}, 200
 
 
 @api.route('/places/<place_id>/reviews')

@@ -3,7 +3,8 @@ from app.services import facade
 from app.api.v1.apiRessources import (compare_data_and_model,
                                       CustomError)
 from app.models.baseEntity import type_validation
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from app.services.ressources import is_valid_uuid4
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 
 api = Namespace('places', description='Place operations')
@@ -53,8 +54,8 @@ place_model = api.model('Place', {
                              description='Latitude of the place'),
     'longitude': fields.Float(required=True,
                               description='Longitude of the place'),
-    'owner_id': fields.String(required=False,
-                              description='ID of the owner'),
+    # 'owner_id': fields.String(required=False,
+                            #   description='ID of the owner'),
     'amenities_ids': fields.List(fields.String,
                              required=False,
                              description="List of amenities ID's")
@@ -99,6 +100,10 @@ place_response_model = api.model('PlaceResponse', {
 
 error_model = api.model('Error', {
     'error': fields.String(description='Error message')
+})
+
+msg_model = api.model('Message', {
+    'message': fields.String(description='Message')
 })
 
 @api.route('/')
@@ -152,8 +157,90 @@ class PlaceList(Resource):
         return facade.get_all_places(), 200
 
 
+class AdminPrivilegesPlaceModify(Resource):
+    # Endpoint for updating an existing place by ID
+    @api.doc('Returns the updated place', security='Bearer')
+    @api.marshal_with(place_response_model,
+                      code=_http.HTTPStatus.OK,
+                      description='Place updated successfully')
+    @api.expect(place_model, validate=False)
+    @api.response(200, 'Place updated successfully',
+                  place_response_model)
+    @api.response(400, 'Invalid input data', error_model)
+    @api.response(401, 'Missing authorization header', error_model)
+    @api.response(403, 'Unauthorized action', error_model)
+    @api.response(404, 'Place not found', error_model)
+    @jwt_required()
+    def put(self, place_id):
+        """Update a place's information"""
+        # Automatically parses and validates request JSON
+        place_data = api.payload
+        try:
+            compare_data_and_model(place_data, place_model)
+            # Retrieve the place
+            place = facade.get_place(place_id)
+            # Check if the place exists
+            if place is None:
+                raise CustomError('Invalid place_id: place not found',
+                                  404)
+            current_user_id = get_jwt_identity()
+            is_admin = get_jwt().get("is_admin", False)
+            # Check if the owner is the current user
+            if not is_admin and current_user_id != place.owner.id:
+                raise CustomError('Unauthorized action: user is not owner of place', 403)
+            given_owner_id = place_data.get('owner_id')
+            if given_owner_id is None:
+                place_data['owner_id'] = place.owner.id
+            elif not is_admin and (given_owner_id != current_user_id):
+                raise CustomError('Unauthorized action: given owner_id doesn\' match authenticated user', 403)
+            elif is_admin and given_owner_id != place.owner.id:
+                raise CustomError('Unauthorized action: not even an admin can change the owner of a place', 403)
+            updated_place = facade.update_place(place_id,
+                                                place_data)
+        except CustomError as e:
+            api.abort(e.status_code, error=str(e))
+            return {'error': str(e)}, e.status_code
+        except Exception as e:
+            api.abort(400, error=str(e))
+            return {'error': str(e)}, 400
+        if updated_place is None:
+            api.abort(404, error='Place not found')
+            return {'error': 'Place not found'}, 404
+        return updated_place, 200
+
+
+class AdminPrivilegesPlaceDelete(Resource):
+    # Endpoint for deleting a place by ID
+    @api.doc('Deletes place', security='Bearer')
+    @api.response(200, 'Place deleted successfully', msg_model)
+    @api.response(401, 'Missing authorization header', error_model)
+    @api.response(403, 'Unauthorized action', error_model)
+    @api.response(404, 'Place not found', error_model)
+    @jwt_required()
+    def delete(self, place_id):
+        """Delete a place"""
+        try:
+            current_user_id = get_jwt_identity()
+            is_admin = get_jwt().get('is_admin', False)
+            # Retrieve the place to validate ownership
+            place = facade.get_place(place_id)
+            # Check if the place exists
+            if place is None:
+                raise CustomError('Invalid place_id: place not found', 404)
+            # Check if the owner of the place is the current user
+            elif not is_admin and current_user_id != place.owner.id:
+                raise CustomError('Unauthorized action: user is not the owner of the place', 403)
+            facade.delete_place(place_id)
+        except CustomError as e:
+            api.abort(e.status_code, error=str(e))
+            return {'error': str(e)}, e.status_code
+        except Exception as e:
+            api.abort(404, error=str(e))
+            return {'error': str(e)}, 404
+        return {"msg": f"Place {place_id} has been succesfully deleted"}, 200
+
 @api.route('/<place_id>')
-class PlaceResource(Resource):
+class PlaceResource(AdminPrivilegesPlaceModify, AdminPrivilegesPlaceDelete):
     # Endpoint for retrieving a single place by ID
     @api.doc('Returns place corresponding to given ID')
     @api.marshal_with(
@@ -179,53 +266,7 @@ class PlaceResource(Resource):
             return {'error': 'Place not found'}, 404
         return place, 200
 
-    # Endpoint for updating an existing place by ID
-    @api.doc('Returns the updated place', security='Bearer')
-    @api.marshal_with(place_response_model,
-                      code=_http.HTTPStatus.OK,
-                      description='Place updated successfully')
-    @api.expect(place_model, validate=False)
-    @api.response(200, 'Place updated successfully',
-                  place_response_model)
-    @api.response(400, 'Invalid input data', error_model)
-    @api.response(401, 'Missing authorization header', error_model)
-    @api.response(403, 'Unauthorized action', error_model)
-    @api.response(404, 'Place not found', error_model)
-    @jwt_required()
-    def put(self, place_id):
-        """Update a place's information"""
-        # Automatically parses and validates request JSON
-        place_data = api.payload
-
-        try:
-            compare_data_and_model(place_data, place_model)
-            current_user = get_jwt_identity()
-            given_owner_id = place_data.get('owner_id')
-            if given_owner_id is None:
-                place_data['owner_id'] = current_user
-            elif current_user != facade.get_user(given_owner_id).id:
-                raise CustomError('Unauthorized action: given owner_id doesn\' match authenticated user', 403)
-            # Retrieve the place
-            place = facade.get_place(place_id)
-            # Check if the place exists
-            if place is None:
-                raise CustomError('Invalid place_id: place not found',
-                                  404)
-            # Check if the owner is the current user
-            if current_user != place.owner.id:
-                raise CustomError('Unauthorized action: user is not owner of place', 403)
-            updated_place = facade.update_place(place_id,
-                                                place_data)
-        except CustomError as e:
-            api.abort(e.status_code, error=str(e))
-            return {'error': str(e)}, e.status_code
-        except Exception as e:
-            api.abort(400, error=str(e))
-            return {'error': str(e)}, 400
-        if updated_place is None:
-            api.abort(404, error='Place not found')
-            return {'error': 'Place not found'}, 404
-        return updated_place, 200
+    
 
 
 @api.route('/<place_id>/reviews')

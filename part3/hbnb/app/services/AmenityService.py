@@ -1,6 +1,6 @@
 from app.models.amenity import Amenity
 from app.services.ressources import is_valid_uuid4
-from app.api.v1.apiRessources import validate_init_args    
+from app.api.v1.apiRessources import validate_init_args, CustomError
 from app.models.baseEntity import type_validation
 
 class AmenityService:
@@ -12,9 +12,14 @@ class AmenityService:
         type_validation(name, 'name', str)
         if name is None:
             raise ValueError('Invalid name: name is required')
-        existing_amenity = cls.get_amenity_by_name(facade, name)
-        if existing_amenity:
-            raise ValueError('Invalid name: name already registered')
+        name = name.strip()
+        all_existing_amenities = cls.get_all_amenities(facade)
+        for existing_amenity in all_existing_amenities:
+            if existing_amenity.name.casefold() == name.casefold():
+                raise ValueError('Invalid name: name already registered')
+        # existing_amenity = cls.get_amenity_by_name(facade, name)
+        # if existing_amenity is not None:
+        #     raise ValueError('Invalid name: name already registered')
         validate_init_args(Amenity, **amenity_data)
         new_amenity = Amenity(**amenity_data)
         facade.amenity_repo.add(new_amenity)
@@ -36,7 +41,8 @@ class AmenityService:
 
     @classmethod
     def get_amenity_by_name(cls, facade, name):
-        if name is None:
+        if name is None or (isinstance(name, str) and
+                            len(name.strip()) == 0):
             raise ValueError('Invalid name: name is required')
         type_validation(name, 'name', str)
         return facade.amenity_repo.get_by_attribute('name', name)
@@ -59,3 +65,16 @@ class AmenityService:
         facade.amenity_repo.update(amenity_id, amenity_data)
         updated_amenity = facade.amenity_repo.get(amenity_id)
         return updated_amenity
+
+    @classmethod
+    def delete_amenity(cls, facade, amenity_id):
+        type_validation(amenity_id, 'amenity_id', str)
+        if not is_valid_uuid4(amenity_id):
+            raise ValueError('Invalid ID: given amenity_id is not valid UUID4')
+        amenity = facade.get_amenity(amenity_id)
+        if amenity is None:
+            raise CustomError('Invalid amenity_id: amenity not found', 404)
+        # it shouldn't be necessary to delete manually the amenities
+        # associated, SQLAlchemy should take care of that
+        facade.amenity_repo.delete(amenity_id)
+        # del amenity

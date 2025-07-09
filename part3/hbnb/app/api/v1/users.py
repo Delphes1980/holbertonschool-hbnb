@@ -29,44 +29,47 @@ user_response_model = api.model('UserResponse', {
                            description='Email of the user', attribute='email')
 })
 
-update_user_model = api.model('UpdateUser', {
-    'first_name': fields.String(required=False, description='first name of'
-                                'the user'),
-    'last_name': fields.String(required=False, description='Last name of the'
-                               'user')
-})
-
-
+# update_user_model = api.model('UpdateUser', {
+#     'first_name': fields.String(required=False, description='first name of'
+#                                 'the user'),
+#     'last_name': fields.String(required=False, description='Last name of the'
+#                                'user')
+# })
+# user_update_model = api.model('UserUpdate', {
+#     'first_name': fields.String(required=True,
+#                                 description='First name of the user', attribute='first_name'),
+#     'last_name': fields.String(required=True,
+#                                description='Last name of the user'),
+#     'email': fields.String(required=True,
+#                            description='Email of the user', attribute='email')
+# })
+# update_user_model = api.model('UpdateUser', {
+#     'first_name': fields.String(required=False, description='first name of'
+#                                 'the user'),
+#     'last_name': fields.String(required=False, description='Last name of the'
+#                                'user')
+# })
 user_update_model = api.model('UserUpdate', {
-    'first_name': fields.String(required=True,
-                                description='First name of the user', attribute='first_name'),
-    'last_name': fields.String(required=True,
-                               description='Last name of the user'),
-    'email': fields.String(required=True,
-                           description='Email of the user', attribute='email')
-})
-
-update_user_model = api.model('UpdateUser', {
-    'first_name': fields.String(required=False, description='first name of'
-                                'the user'),
-    'last_name': fields.String(required=False, description='Last name of the'
-                               'user')
-})
-
-
-user_update_model = api.model('UserUpdate', {
-    'first_name': fields.String(required=True,
-                                description='First name of the user'),
-    'last_name': fields.String(required=True,
-                               description='Last name of the user'),
+    'first_name': fields.String(required=False,
+                                description='First name of the user',
+                                attribute='first_name'),
+    'last_name': fields.String(required=False,
+                               description='Last name of the user',
+                               attribute='last_name'),
     'email': fields.String(required=False,
-                           description='Email of the user'),
+                           description='Email of the user',
+                           attribute='email'),
     'password': fields.String(required=False,
-                              description='Password of the user')
+                              description='Password of the user',
+                              attribute='password')
 })
 
 error_model = api.model('Error', {
     'error': fields.String(description='Error message')
+})
+
+msg_model = api.model('Message', {
+    'message': fields.String(description='Message')
 })
 
 
@@ -139,9 +142,9 @@ class AdminPrivilegesUserModify(Resource):
             if user is None:
                 raise CustomError('Invalid user_id: no user found corresponding to that user_id', 404)
             current_user = get_jwt_identity()
-            is_admin = get_jwt().get('is_admin')
-            if is_admin is None:
-                raise CustomError('is_admin claim was not found in the jwt', 401)
+            is_admin = get_jwt().get('is_admin', False)
+            # if is_admin is None:
+            #     raise CustomError('is_admin claim was not found in the jwt', 401)
             if not is_admin and current_user != user.id: # check the user_id in the URL 
                                     # matches the authenticated user
                 raise CustomError('Unauthorized action: you can not modify the user account of somebody else', 403)
@@ -166,8 +169,38 @@ class AdminPrivilegesUserModify(Resource):
             return {'error': 'User not found'}, 404
         return updated_user, 200
 
+class AdminPrivilegesUserDelete(Resource):
+    # Endpoint for deleting a user by ID
+    @api.doc('Deletes user', security='Bearer')
+    @api.response(200, 'User deleted successfully', msg_model)
+    @api.response(401, 'Missing authorization header', error_model)
+    @api.response(403, 'Unauthorized action', error_model)
+    @api.response(404, 'User not found', error_model)
+    @jwt_required()
+    def delete(self, user_id):
+        """Delete a user"""
+        try:
+            current_user_id = get_jwt_identity()
+            is_admin = get_jwt().get('is_admin', False)
+            # Retrieve the user to validate its existence
+            user = facade.get_user(user_id)
+            # Check if the user exists
+            if user is None:
+                raise CustomError('Invalid user_id: user not found', 404)
+            # Check if the owner of the place is the current user
+            elif not is_admin and current_user_id != user.id:
+                raise CustomError('Unauthorized action: user can not delete other users', 403)
+            facade.delete_user(user_id)
+        except CustomError as e:
+            api.abort(e.status_code, error=str(e))
+            return {'error': str(e)}, e.status_code
+        except Exception as e:
+            api.abort(404, error=str(e))
+            return {'error': str(e)}, 404
+        return {"msg": f"User {user_id} has been succesfully deleted"}, 200
+
 @api.route('/<user_id>')
-class UserResource(AdminPrivilegesUserModify):
+class UserResource(AdminPrivilegesUserModify, AdminPrivilegesUserDelete):
     @api.doc('Returns user corresponding to given ID')
     @api.marshal_with(user_response_model,
                       code=_http.HTTPStatus.OK,
