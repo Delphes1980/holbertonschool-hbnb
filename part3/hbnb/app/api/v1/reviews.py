@@ -14,8 +14,8 @@ review_model = api.model('Review', {
                           'review'),
     'rating': fields.Integer(required=True, description='Rating of the'
                              ' place (1-5)'),
-    'user_id': fields.String(required=False, description='ID of the '
-                             'user'),
+    # 'user_id': fields.String(required=False, description='ID of the '
+    #                          'user'),
     'place_id': fields.String(required=True, description='ID of the '
                               'place')
 })
@@ -175,8 +175,38 @@ class AdminPrivilegesReviewModify(Resource):
             return {'error': 'Updated review not found'}, 404
         return updated_review, 200
 
+class AdminPrivilegesReviewDelete(Resource):
+    # Endpoint for deleting a review by ID
+    @api.doc('Deletes review', security='Bearer')
+    @api.response(200, 'Review deleted successfully', msg_model)
+    @api.response(401, 'Missing authorization header', error_model)
+    @api.response(403, 'Unauthorized action', error_model)
+    @api.response(404, 'Review not found', error_model)
+    @jwt_required()
+    def delete(self, review_id):
+        """Delete a review"""
+        try:
+            current_user_id = get_jwt_identity()
+            is_admin = get_jwt().get('is_admin', False)
+            # Retrieve the review to validate ownership
+            review = facade.get_review(review_id)
+            # Check if the review already exists
+            if review is None:
+                raise CustomError('Invalid review_id: review not found', 404)
+            # Check if the creator of the review is the current user
+            elif not is_admin and current_user_id != review.user.id:
+                raise CustomError('Unauthorized action: user is not the author of the review', 403)
+            facade.delete_review(review_id)
+        except CustomError as e:
+            api.abort(e.status_code, error=str(e))
+            return {'error': str(e)}, e.status_code
+        except Exception as e:
+            api.abort(404, error=str(e))
+            return {'error': str(e)}, 404
+        return {"msg": f"Review {review_id} has been succesfully deleted"}, 200
+
 @api.route('/<review_id>')
-class ReviewResource(AdminPrivilegesReviewModify):
+class ReviewResource(AdminPrivilegesReviewModify, AdminPrivilegesReviewDelete):
     # Endpoint for retrieving a single review by ID
     @api.doc('Returns review corresponding to given ID')
     @api.marshal_with(review_response_model,
@@ -201,34 +231,6 @@ class ReviewResource(AdminPrivilegesReviewModify):
             return {'error': 'Review not found'}, 404
         return review, 200
 
-    # Endpoint for deleting a review by ID
-
-    @api.doc('Deletes review', security='Bearer')
-    @api.response(200, 'Review deleted successfully', msg_model)
-    @api.response(401, 'Missing authorization header', error_model)
-    @api.response(403, 'Unauthorized action', error_model)
-    @api.response(404, 'Review not found', error_model)
-    @jwt_required()
-    def delete(self, review_id):
-        """Delete a review"""
-        try:
-            current_user = get_jwt_identity()
-            # Retrieve the review to validate ownership
-            review = facade.get_review(review_id)
-            # Check if the review already exists
-            if review is None:
-                raise CustomError('Invalid review_id: review not found', 404)
-            # Check if the creator of the review is the current user
-            elif current_user != review.user.id:
-                raise CustomError('Unauthorized action: user is not the author of the review', 403)
-            facade.delete_review(review_id)
-        except CustomError as e:
-            api.abort(e.status_code, error=str(e))
-            return {'error': str(e)}, e.status_code
-        except Exception as e:
-            api.abort(404, error=str(e))
-            return {'error': str(e)}, 404
-        return {"msg": f"Review {review_id} has been succesfully deleted"}, 200
 
 
 @api.route('/places/<place_id>/reviews')
