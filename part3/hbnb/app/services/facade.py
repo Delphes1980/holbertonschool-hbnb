@@ -42,6 +42,10 @@ class HBnBFacade:
         """Update an existing user's data."""
         return UserService.update_user(self, user_id, user_data)
 
+    def delete_user(self, user_id):
+        """ Delete a user """
+        return UserService.delete_user(self, user_id)
+
 # Services for Amenity CRUD operations ########
 
     def create_amenity(self, amenity_data):
@@ -64,6 +68,10 @@ class HBnBFacade:
         return AmenityService.update_amenity(self, amenity_id,
                                              amenity_data)
 
+    def delete_amenity(self, amenity_id):
+        """ Delete an amenity """
+        return AmenityService.delete_amenity(self, amenity_id)
+
 # Services for Place CRUD operations ####
 
     def create_place(self, place_data):
@@ -81,6 +89,10 @@ class HBnBFacade:
     def update_place(self, place_id, place_data):
         """ Update a place with the provided data """
         return PlaceService.update_place(self, place_id, place_data)
+
+    def delete_place(self, place_id):
+        """ Delete a place """
+        return PlaceService.delete_place(self, place_id)
 
 # Services for Review CRUD operations ########
 

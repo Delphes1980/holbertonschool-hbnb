@@ -101,7 +101,7 @@ class ReviewService:
             raise ValueError('Invalid ID: given review_id is not valid UUID4')
         review = facade.get_review(review_id)
         if review is None:
-            raise CustomError('Review not found', 404)
+            raise CustomError('Invalid review_id: review not found', 404)
         for review_in_place in review.place.reviews:
             if review_in_place == review:
                 review.place.reviews.remove(review)

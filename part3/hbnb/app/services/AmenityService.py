@@ -1,6 +1,6 @@
 from app.models.amenity import Amenity
 from app.services.ressources import is_valid_uuid4
-from app.api.v1.apiRessources import validate_init_args    
+from app.api.v1.apiRessources import validate_init_args, CustomError
 from app.models.baseEntity import type_validation
 
 class AmenityService:
@@ -65,3 +65,16 @@ class AmenityService:
         facade.amenity_repo.update(amenity_id, amenity_data)
         updated_amenity = facade.amenity_repo.get(amenity_id)
         return updated_amenity
+
+    @classmethod
+    def delete_amenity(cls, facade, amenity_id):
+        type_validation(amenity_id, 'amenity_id', str)
+        if not is_valid_uuid4(amenity_id):
+            raise ValueError('Invalid ID: given amenity_id is not valid UUID4')
+        amenity = facade.get_amenity(amenity_id)
+        if amenity is None:
+            raise CustomError('Invalid amenity_id: amenity not found', 404)
+        # it shouldn't be necessary to delete manually the amenities
+        # associated, SQLAlchemy should take care of that
+        facade.amenity_repo.delete(amenity_id)
+        # del amenity

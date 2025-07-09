@@ -24,6 +24,10 @@ error_model = api.model('Error', {
     'error': fields.String(description='Error message')
 })
 
+msg_model = api.model('Message', {
+    'message': fields.String(description='Message')
+})
+
 # Define the response model for returning amenity data
 # amenity_response_model = api.inherit('AmenityResponse', amenity_model, {
 #     'id': fields.String(
@@ -119,9 +123,36 @@ class AdminAmenityModify(Resource):
             return {'error': 'Amenity not found'}, 404
         return updated_amenity, 200
 
+class AdminPrivilegesAmenityDelete(Resource):
+    # Endpoint for deleting an amenity by ID
+    @api.doc('Deletes amenity', security='Bearer')
+    @api.response(200, 'Amenity deleted successfully', msg_model)
+    @api.response(401, 'Missing authorization header', error_model)
+    @api.response(403, 'Unauthorized action', error_model)
+    @api.response(404, 'Amenity not found', error_model)
+    @jwt_required()
+    def delete(self, amenity_id):
+        """Delete a amenity"""
+        try:
+            is_admin = get_jwt().get('is_admin', False)
+            if not is_admin:
+                raise CustomError("Unauthorized action: admin privileges required", 403)
+            # Retrieve the amenity to validate its existence
+            amenity = facade.get_amenity(amenity_id)
+            # Check if the amenity exists
+            if amenity is None:
+                raise CustomError('Invalid amenity_id: amenity not found', 404)
+            facade.delete_amenity(amenity_id)
+        except CustomError as e:
+            api.abort(e.status_code, error=str(e))
+            return {'error': str(e)}, e.status_code
+        except Exception as e:
+            api.abort(404, error=str(e))
+            return {'error': str(e)}, 404
+        return {"msg": f"Amenity {amenity_id} has been succesfully deleted"}, 200
 
 @api.route('/<amenity_id>')
-class AmenityResource(AdminAmenityModify):
+class AmenityResource(AdminAmenityModify, AdminPrivilegesAmenityDelete):
     # ENdpoint for retrieving a single amenity by ID
     @api.doc('Returns amenity corresponding to given ID')
     @api.marshal_with(

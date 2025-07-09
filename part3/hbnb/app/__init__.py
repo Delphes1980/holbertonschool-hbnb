@@ -49,6 +49,18 @@ def create_app(config_class="config.DevelopmentConfig"):
         from app.models.user import User
         # Only add admin and regular a user if no users exist:
         if User.query.count() == 0:
+            deleted_user_email = app.config.get('DELETED_USER_EMAIL', None)
+            deleted_user_password = app.config.get('DELETED_USER_PASSWORD')
+            if deleted_user_email is not None and deleted_user_password is not None:
+                deleted_user = User(
+                    first_name="Deleted",
+                    last_name="User",
+                    email=deleted_user_email,
+                    password=deleted_user_password,
+                    is_admin=False
+                )
+                db.session.add(deleted_user)
+                db.session.commit()
             admin_email = app.config.get('ADMIN_EMAIL', None)
             admin_password = app.config.get('ADMIN_PASSWORD', None)
             if admin_email is not None and admin_password is not None:
@@ -86,10 +98,12 @@ def create_app(config_class="config.DevelopmentConfig"):
                 db.session.commit()
 
             from .models.place import Place
-            if regular_user:
-                if Place.query.filter_by(title="Maison").first() is None:
+            if regular_user_email is not None:
+                regular_user = User.query.filter_by(email=regular_user_email).one()
+                if regular_user is not None and Place.query.filter_by(title="Maison").first() is None:
                     place1 = Place(
                     title="Maison",
+                    description="Very homey house",
                     price=20,
                     latitude=20.3,
                     longitude=21.35,
@@ -97,15 +111,14 @@ def create_app(config_class="config.DevelopmentConfig"):
                     )
                     db.session.add(place1)
                     db.session.commit()
-            if Place.query.filter_by(title="Appartement").first() is None:
-                place2 = Place(
-                    title="Appartement",
-                    price=30,
-                    latitude=15.69,
-                    longitude=14.9,
-                    owner=regular_user
-                    )
-                db.session.add(place2)
-                db.session.commit()                    
-
+                if Place.query.filter_by(title="Appartement").first() is None:
+                    place2 = Place(
+                        title="Appartement",
+                        price=30,
+                        latitude=15.69,
+                        longitude=14.9,
+                        owner=regular_user
+                        )
+                    db.session.add(place2)
+                    db.session.commit()                    
     return app

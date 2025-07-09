@@ -147,3 +147,25 @@ class UserService:
         facade.user_repo.update(user_id, user_data)
         updated_user = facade.user_repo.get(user_id)
         return updated_user
+    
+    @classmethod
+    def delete_user(cls, facade, user_id):
+        type_validation(user_id, 'user_id', str)
+        if not is_valid_uuid4(user_id):
+            raise ValueError('Invalid ID: given user_id is not valid UUID4')
+        user = facade.get_user(user_id)
+        if user is None:
+            raise CustomError('Invalid user_id: user not found', 404)
+        from run import app
+        deleted_user_email = app.config.get("DELETED_USER_EMAIL", None)
+        deleted_user = None
+        if deleted_user_email is not None:
+            deleted_user = facade.get_user_by_email(deleted_user_email)
+        if deleted_user is None:
+            raise CustomError("User stand-in was not found, user and every related entity may be deleted in its absence", 404)
+        for review in user.reviews:
+            review.user = deleted_user
+        # it shouldn't be necessary to delete manually the places
+        # associated, SQLAlchemy should take care
+        facade.user_repo.delete(user_id)
+        # del user

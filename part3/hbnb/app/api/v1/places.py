@@ -3,6 +3,7 @@ from app.services import facade
 from app.api.v1.apiRessources import (compare_data_and_model,
                                       CustomError)
 from app.models.baseEntity import type_validation
+from app.services.ressources import is_valid_uuid4
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 
@@ -53,8 +54,8 @@ place_model = api.model('Place', {
                              description='Latitude of the place'),
     'longitude': fields.Float(required=True,
                               description='Longitude of the place'),
-    'owner_id': fields.String(required=False,
-                              description='ID of the owner'),
+    # 'owner_id': fields.String(required=False,
+                            #   description='ID of the owner'),
     'amenities_ids': fields.List(fields.String,
                              required=False,
                              description="List of amenities ID's")
@@ -99,6 +100,10 @@ place_response_model = api.model('PlaceResponse', {
 
 error_model = api.model('Error', {
     'error': fields.String(description='Error message')
+})
+
+msg_model = api.model('Message', {
+    'message': fields.String(description='Message')
 })
 
 @api.route('/')
@@ -203,8 +208,39 @@ class AdminPrivilegesPlaceModify(Resource):
             return {'error': 'Place not found'}, 404
         return updated_place, 200
 
+
+class AdminPrivilegesPlaceDelete(Resource):
+    # Endpoint for deleting a place by ID
+    @api.doc('Deletes place', security='Bearer')
+    @api.response(200, 'Place deleted successfully', msg_model)
+    @api.response(401, 'Missing authorization header', error_model)
+    @api.response(403, 'Unauthorized action', error_model)
+    @api.response(404, 'Place not found', error_model)
+    @jwt_required()
+    def delete(self, place_id):
+        """Delete a place"""
+        try:
+            current_user_id = get_jwt_identity()
+            is_admin = get_jwt().get('is_admin', False)
+            # Retrieve the place to validate ownership
+            place = facade.get_place(place_id)
+            # Check if the place exists
+            if place is None:
+                raise CustomError('Invalid place_id: place not found', 404)
+            # Check if the owner of the place is the current user
+            elif not is_admin and current_user_id != place.owner.id:
+                raise CustomError('Unauthorized action: user is not the owner of the place', 403)
+            facade.delete_place(place_id)
+        except CustomError as e:
+            api.abort(e.status_code, error=str(e))
+            return {'error': str(e)}, e.status_code
+        except Exception as e:
+            api.abort(404, error=str(e))
+            return {'error': str(e)}, 404
+        return {"msg": f"Place {place_id} has been succesfully deleted"}, 200
+
 @api.route('/<place_id>')
-class PlaceResource(AdminPrivilegesPlaceModify):
+class PlaceResource(AdminPrivilegesPlaceModify, AdminPrivilegesPlaceDelete):
     # Endpoint for retrieving a single place by ID
     @api.doc('Returns place corresponding to given ID')
     @api.marshal_with(
