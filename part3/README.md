@@ -3,10 +3,10 @@
 ## ER diagram
 
 The ER diagram for the HBnB Evolution application:
-![ER Diagram](hbnb/images/ER_diagram_Mermaid_Chart-2025-07-09-143508.png)
+![ER Diagram](hbnb/images/ER_diagram_MermaidChart-2025-07-09-175919.png)
 
 An ER diagram for HBnB Evolution with a yet-to-implement entity "Reservation"
-![ER Diagram](hbnb/images/ER_diagram_HBnB_MermaidChart-2025-07-09-153802.png)
+![ER Diagram](hbnb/images/ER_diagram_extra_MermaidChart-2025-07-09-180153.png)
 
 <!-- ```mermaid
 erDiagram
