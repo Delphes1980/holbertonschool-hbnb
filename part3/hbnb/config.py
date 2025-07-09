@@ -18,6 +18,7 @@ class DevelopmentConfig(Config):
     ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'adminpassword')
     REGULAR_USER_EMAIL = 'user@example.com'
     REGULAR_USER_PASSWORD = 'password'
+
     DELETED_USER_EMAIL = 'deleted@example.com'
     DELETED_USER_PASSWORD = 'password'
 
@@ -29,6 +30,7 @@ class TestingConfig(Config):
     ADMIN_PASSWORD = 'adminpassword'
     REGULAR_USER_EMAIL = 'user@example.com'
     REGULAR_USER_PASSWORD = 'password'
+
     DELETED_USER_EMAIL = 'deleted@example.com'
     DELETED_USER_PASSWORD = 'password'
 

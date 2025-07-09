@@ -47,6 +47,7 @@ def create_app(config_class="config.DevelopmentConfig"):
     with app.app_context():
         db.create_all()
         from app.models.user import User
+        regular_user = None
         # Only add admin and regular a user if no users exist:
         if User.query.count() == 0:
             deleted_user_email = app.config.get('DELETED_USER_EMAIL', None)
