@@ -1,10 +1,10 @@
 -- A script that create all the tables of the database at the launch of the app
 
-DROP TABLE users;
-DROP TABLE places;
-DROP TABLE reviews;
-DROP TABLE amenities;
-DROP TABLE place_amenity;
+DROP TABLE IF EXISTS place_amenity;
+DROP TABLE IF EXISTS reviews;
+DROP TABLE IF EXISTS places;
+DROP TABLE IF EXISTS amenities;
+DROP TABLE IF EXISTS users;
 
 CREATE TABLE IF NOT EXISTS users(
 	id CHAR(36) PRIMARY KEY NOT NULL,
