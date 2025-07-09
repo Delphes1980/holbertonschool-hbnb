@@ -27,7 +27,7 @@ Examples of how the classes and methods can be used.
 
 ## ER diagram
 
-![ER Diagram](images/er_diagram.png)
+![ER Diagram](images/ER diagram for HBnB Evolution _ Mermaid Chart-2025-07-09-143508.png)
 
 <!-- ```mermaid
 erDiagram
