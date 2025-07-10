@@ -20,6 +20,7 @@ authorizations = {
     }
 }
 
+
 def create_app(config_class="config.DevelopmentConfig"):
     app = Flask(__name__)
     app.config.from_object(config_class)
@@ -37,7 +38,7 @@ def create_app(config_class="config.DevelopmentConfig"):
     api = Api(app, version='1.0', title='HBnB API',
               description='HBnB Application API', doc='/api/v1/',
               authorizations=authorizations)
-    
+
     api.add_namespace(users_ns, path='/api/v1/users')
     api.add_namespace(amenities_ns, path='/api/v1/amenities')
     api.add_namespace(places_ns, path='/api/v1/places')
@@ -75,7 +76,8 @@ def create_app(config_class="config.DevelopmentConfig"):
                 db.session.add(admin_user)
                 db.session.commit()
             regular_user_email = app.config.get('REGULAR_USER_EMAIL', None)
-            regular_user_password = app.config.get('REGULAR_USER_PASSWORD', None)
+            regular_user_password = app.config.get('REGULAR_USER_PASSWORD',
+                                                   None)
             if regular_user_email is not None and regular_user_password is not None:
                 regular_user = User(
                     first_name='Regular',
@@ -86,7 +88,7 @@ def create_app(config_class="config.DevelopmentConfig"):
                 )
                 db.session.add(regular_user)
                 db.session.commit()
-                
+
             from .models.amenity import Amenity
             if Amenity.query.filter_by(name="WiFi").first() is None:
                 basic_amenity = Amenity(name="WiFi")
@@ -101,7 +103,8 @@ def create_app(config_class="config.DevelopmentConfig"):
             from .models.place import Place
             if regular_user_email is not None:
                 regular_user = User.query.filter_by(email=regular_user_email).one()
-                if regular_user is not None and Place.query.filter_by(title="Maison").first() is None:
+                if regular_user is not None and Place.query.filter_by(
+                        title="Maison").first() is None:
                     place1 = Place(
                     title="Maison",
                     description="Very homey house",
@@ -121,5 +124,5 @@ def create_app(config_class="config.DevelopmentConfig"):
                         owner=regular_user
                         )
                     db.session.add(place2)
-                    db.session.commit()                    
+                    db.session.commit()          
     return app

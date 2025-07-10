@@ -2,6 +2,7 @@ from app.models.user import User
 from app import db
 from app.persistence.repository import SQLAlchemyRepository
 
+
 class UserRepository(SQLAlchemyRepository):
     def __init__(self):
         super().__init__(User)
@@ -14,7 +15,7 @@ class UserRepository(SQLAlchemyRepository):
 
     def get_all_users(self):
         return self.model.query(User).all()
-    
+
     def create_user(self, user_data):
         new_user = User(user_data)
         self.model.add(new_user)
@@ -26,7 +27,7 @@ class UserRepository(SQLAlchemyRepository):
             self.model.update(user_update, user_data)
             return user_update
         return None
-    
+
     def delete_user(self, user_id):
         user_to_delete = self.model.query(User).filter_by(user_id).first()
         if user_to_delete:

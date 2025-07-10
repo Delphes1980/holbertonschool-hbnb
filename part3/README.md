@@ -112,7 +112,16 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-#### 4. Application utilisation
+#### 4. Initialize the database
+On your terminal, tape the following command:
+```
+flask shell
+>>> from app import db
+>>> db.create_all()
+>>> exit()
+```
+
+#### 5. Application utilisation
 From the hbnb directory (within part3), run:
 ```
 python run.py
