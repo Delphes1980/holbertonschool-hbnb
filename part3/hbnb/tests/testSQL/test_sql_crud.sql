@@ -2,8 +2,12 @@
 
 .print ' -- ########## USERS ########## -- '
 
+-- ### Read users before creation of new records ###
+.print '# Read all users before additional creation of records #'
+SELECT first_name, last_name, email, is_admin, updated_at FROM users;
+
 -- ### Create users ###
-INSERT OR IGNORE INTO users(id, created_at, updated_at, email, first_name, last_name, password, is_admin)
+INSERT INTO users(id, created_at, updated_at, email, first_name, last_name, password, is_admin)
 VALUES (
 	'0c095bc9-8ac4-4d50-b16b-e3da1e8ea3fb',
 	CURRENT_TIMESTAMP,
@@ -15,7 +19,8 @@ VALUES (
 	False
 );
 
-INSERT OR IGNORE INTO users(id, created_at, updated_at, email, first_name, last_name, password, is_admin)
+
+INSERT INTO users(id, created_at, updated_at, email, first_name, last_name, password, is_admin)
 VALUES (
 	'e4f87197-440f-47ae-8a27-1e1f23184be0',
 	CURRENT_TIMESTAMP,
@@ -27,7 +32,7 @@ VALUES (
 	False
 );
 
-INSERT OR IGNORE INTO users(id, created_at, updated_at, email, first_name, last_name, password, is_admin)
+INSERT INTO users(id, created_at, updated_at, email, first_name, last_name, password, is_admin)
 VALUES (
 	'3b670ec5-1ff8-4431-8de7-2b646b05bd3b',
 	CURRENT_TIMESTAMP,
@@ -39,36 +44,50 @@ VALUES (
 	True
 );
 
+.print '# Expecting ERROR: Try to create user with an email already in use #'
+INSERT INTO users(id, email, first_name, last_name, password)
+VALUES (
+	'9a51d348-ebcb-4fba-a16f-0399b411ca79',
+	'bon@tranche.com',
+	'Bad',
+	'Email',
+	'$2y$10$hkpyfaMvL0iVp4Dl/FjhVuUusulCQhRCoZp3L6JnV8V8SaMiV3Dju'
+);
 
--- ### Read users ###
-.print '# Read all users #'
-SELECT first_name, last_name, email, is_admin FROM users;
-
-.print '# Read only the first_name #'
+.print '# Read only the first_name of all admins #'
 SELECT first_name from users WHERE is_admin = True;
 
+.print '# Read only the email of all non-admins #'
+SELECT email from users WHERE is_admin = False;
+
 -- ### Update users ###
-.print '# Update of the last_name (reading before the update) #'
-SELECT last_name FROM users;
+.print '# Update last_name of user with email bob@crash.com (reading before the update) #'
+SELECT last_name, updated_at FROM users;
 UPDATE users SET last_name = "'dead' dylan"
 WHERE email = 'bob@crash.com';
 .print '# Update of the last_name (reading after the update) #'
-SELECT last_name FROM users;
+SELECT last_name, updated_at FROM users;
 
-.print '# Update of the email (reading before the update) #'
+.print '# Update of the email of user bon@tranche.com to bon@sandwich.com (reading before the update) #'
 SELECT email FROM users;
 UPDATE users SET email = 'bon@sandwich.com'
 WHERE email = 'bon@tranche.com';
 .print '# Update of the email (reading after the update) #'
 SELECT email FROM users;
 
+.print '# Expecting ERROR: Update of the email of user test2@example.com to test@example.com #'
+SELECT email FROM users;
+UPDATE users SET email = 'test@example.com'
+WHERE email = 'test2@example.com';
+.print '# Reading after failed update #'
+SELECT email FROM users;
+
 -- ### Delete users ###
-.print '# Delete one user (reading before the deletion) #'
+.print '# Delete user first_name="jean" (reading before the deletion) #'
 SELECT first_name FROM users;
 DELETE FROM users WHERE first_name = 'jean';
-.print '# Delete one user (reading after the deletion) #'
+.print '# Reading after the deletion #'
 SELECT first_name FROM users;
-
 
 .print ' -- ########## PLACES ########## -- '
 

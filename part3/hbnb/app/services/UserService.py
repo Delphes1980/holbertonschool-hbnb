@@ -56,9 +56,12 @@ class UserService:
         type_validation(email, 'email', str)
         if email is None:
             raise ValueError('Invalid email: email is required')
+
+        # Check for existing user with the same email
         existing_user = cls.get_user_by_email(facade, email)
         if existing_user:
             raise CustomError('Invalid email: email already registered', 400)
+
         validate_init_args(User, **user_data)
         user = User(**user_data)
         facade.user_repo.add(user)
@@ -134,6 +137,8 @@ class UserService:
         user = cls.get_user(facade, user_id)
         if user is None:
             return None
+
+        # Check if email is unique, if email is being updated
         if user_data.get('email') is not None:
             user_by_email = cls.get_user_by_email(
                 facade, user_data.get('email'))
@@ -149,6 +154,7 @@ class UserService:
 
     @classmethod
     def delete_user(cls, facade, user_id):
+        """ Deletes a user"""
         type_validation(user_id, 'user_id', str)
         if not is_valid_uuid4(user_id):
             raise ValueError('Invalid ID: given user_id is not valid UUID4')
