@@ -1,6 +1,7 @@
 # HBnB Evolution
 
 ## Installation
+#### 0. Install python 3.10+ and sqlite 3.37
 #### 1. Clone the repository
 git clone https://github.com/Delphes1980/holbertonschool-hbnb.git desired_folder_name
 ```
