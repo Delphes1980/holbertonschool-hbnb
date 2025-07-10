@@ -15,10 +15,10 @@ from app.services.ReviewService import ReviewService
 
 class HBnBFacade:
     def __init__(self):
-        self.user_repo = SQLAlchemyRepository(User) # UserRepository() # InMemoryRepository()
-        self.place_repo = SQLAlchemyRepository(Place) #InMemoryRepository() # PlaceRepository()
-        self.review_repo = SQLAlchemyRepository(Review) # ReviewRepository() # InMemoryRepository()
-        self.amenity_repo = SQLAlchemyRepository(Amenity) # AmenityRepository() # InMemoryRepository()
+        self.user_repo = SQLAlchemyRepository(User)
+        self.place_repo = SQLAlchemyRepository(Place)
+        self.review_repo = SQLAlchemyRepository(Review)
+        self.amenity_repo = SQLAlchemyRepository(Amenity)
 
 # Services for User CRUD operations ####
 
@@ -109,8 +109,8 @@ class HBnBFacade:
         return ReviewService.get_reviews_by_place(self, place_id)
 
     def get_review_by_place_and_user(self, place_id, user_id):
-        return ReviewService.get_review_by_place_and_user(self,
-            place_id, user_id)
+        return ReviewService.get_review_by_place_and_user(
+            self, place_id, user_id)
 
     def update_review(self, review_id, review_data):
         return ReviewService.update_review(self, review_id,

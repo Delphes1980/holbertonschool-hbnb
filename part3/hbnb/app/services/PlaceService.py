@@ -94,14 +94,12 @@ class PlaceService:
                 if len(amenity_id.strip()) == 0:
                     continue
                 if not is_valid_uuid4(amenity_id):
-                    raise ValueError(f"Given amenity_id "
-                                        "'{amenity_id}' is not a "
-                                        "valid UUID4")
+                    raise ValueError(f"Given amenity_id '{amenity_id}' is not"
+                                     "a valid UUID4")
                 current_amenity = facade.get_amenity(amenity_id)
                 if current_amenity is None:
-                    raise CustomError(f"Amenity with id "
-                                        "'{amenity_id}' was not "
-                                        "found", 404)
+                    raise CustomError(
+                        f"Amenity with id '{amenity_id}' was not found", 404)
                 amenities.append(current_amenity)
         validate_init_args(Place, **place_data)
         place_data['amenities'] = amenities

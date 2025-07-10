@@ -22,33 +22,15 @@ user_response_model = api.model('UserResponse', {
     'id': fields.String(required=True,
                         description='ID of the user'),
     'first_name': fields.String(required=True,
-                                description='First name of the user', attribute='first_name'),
+                                description='First name of the user',
+                                attribute='first_name'),
     'last_name': fields.String(required=True,
-                               description='Last name of the user', attribute='last_name'),
+                               description='Last name of the user',
+                               attribute='last_name'),
     'email': fields.String(required=True,
                            description='Email of the user', attribute='email')
 })
 
-# update_user_model = api.model('UpdateUser', {
-#     'first_name': fields.String(required=False, description='first name of'
-#                                 'the user'),
-#     'last_name': fields.String(required=False, description='Last name of the'
-#                                'user')
-# })
-# user_update_model = api.model('UserUpdate', {
-#     'first_name': fields.String(required=True,
-#                                 description='First name of the user', attribute='first_name'),
-#     'last_name': fields.String(required=True,
-#                                description='Last name of the user'),
-#     'email': fields.String(required=True,
-#                            description='Email of the user', attribute='email')
-# })
-# update_user_model = api.model('UpdateUser', {
-#     'first_name': fields.String(required=False, description='first name of'
-#                                 'the user'),
-#     'last_name': fields.String(required=False, description='Last name of the'
-#                                'user')
-# })
 user_update_model = api.model('UserUpdate', {
     'first_name': fields.String(required=False,
                                 description='First name of the user',
@@ -102,17 +84,20 @@ class AdminUserCreate(Resource):
             api.abort(400, error=str(e))
             return {'error': str(e)}, 400
         if new_user is None:
-            api.abort(500, error='Something happened and the user was not created')
-            return {'error': 'Something happened and the user was not created'}, 400
+            api.abort(500,
+                      error='Something happened and the user was not created')
+            return {
+                'error': 'Something happened and the user was not created'},
+        400
         return new_user, 201
-    
+
+
 @api.route('/')
 class UserList(AdminUserCreate):
     @api.doc('Returns list of registered users')
     @api.marshal_list_with(user_response_model,
-                      code=_http.HTTPStatus.OK,
-                      description='List of users retrieved '
-                                  'successfully')
+                           code=_http.HTTPStatus.OK,
+                           description='List of users retrieved successfully')
     @api.response(200, 'List of users retrieved successfully',
                   user_response_model)
     def get(self):
@@ -132,7 +117,7 @@ class AdminPrivilegesUserModify(Resource):
     @api.response(401, 'Missing authorization header', error_model)
     @api.response(403, 'Unauthorized action', error_model)
     @api.response(404, 'User not found', error_model)
-    @jwt_required() # ensure the user is authenticated
+    @jwt_required()  # ensure the user is authenticated
     def put(self, user_id):
         """Update the user data of a registered user by ID"""
         user_data = api.payload
@@ -140,23 +125,27 @@ class AdminPrivilegesUserModify(Resource):
             compare_data_and_model(user_data, user_update_model)
             user = facade.get_user(user_id)
             if user is None:
-                raise CustomError('Invalid user_id: no user found corresponding to that user_id', 404)
+                raise CustomError(
+                    'Invalid user_id: no user found corresponding to that'
+                    ' user_id', 404)
             current_user = get_jwt_identity()
             is_admin = get_jwt().get('is_admin', False)
             # if is_admin is None:
-            #     raise CustomError('is_admin claim was not found in the jwt', 401)
-            if not is_admin and current_user != user.id: # check the user_id in the URL 
-                                    # matches the authenticated user
-                raise CustomError('Unauthorized action: you can not modify the user account of somebody else', 403)
+            #     raise CustomError('is_admin claim was not found in the
+            # jwt', 401)
+            # check the user_id in the URL matches the authenticated user
+            if not is_admin and current_user != user.id:
+                raise CustomError(
+                    'Unauthorized action: you can not modify the user account'
+                    ' of somebody else', 403)
             given_email = user_data.get('email')
             given_password = user_data.get("password")
             if not is_admin and (
-                (given_email is not None and
-                 user.email != given_email) or 
-                 (given_password is not None and
-                  not user.verify_password(given_password))
-                ):
-                raise CustomError('You cannot modify email or password action', 400)
+                (given_email is not None and user.email != given_email) or
+                (given_password is not None and not user.verify_password
+                 (given_password))):
+                raise CustomError(
+                    'You cannot modify email or password action', 400)
             updated_user = facade.update_user(user_id, user_data)
         except CustomError as e:
             api.abort(e.status_code, error=str(e))
@@ -168,6 +157,7 @@ class AdminPrivilegesUserModify(Resource):
             api.abort(404, error='User not found')
             return {'error': 'User not found'}, 404
         return updated_user, 200
+
 
 class AdminPrivilegesUserDelete(Resource):
     # Endpoint for deleting a user by ID
@@ -189,7 +179,9 @@ class AdminPrivilegesUserDelete(Resource):
                 raise CustomError('Invalid user_id: user not found', 404)
             # Check if the owner of the place is the current user
             elif not is_admin and current_user_id != user.id:
-                raise CustomError('Unauthorized action: user can not delete other users', 403)
+                raise CustomError(
+                    'Unauthorized action: user can not delete other users',
+                    403)
             facade.delete_user(user_id)
         except CustomError as e:
             api.abort(e.status_code, error=str(e))
@@ -198,6 +190,7 @@ class AdminPrivilegesUserDelete(Resource):
             api.abort(404, error=str(e))
             return {'error': str(e)}, 404
         return {"msg": f"User {user_id} has been succesfully deleted"}, 200
+
 
 @api.route('/<user_id>')
 class UserResource(AdminPrivilegesUserModify, AdminPrivilegesUserDelete):

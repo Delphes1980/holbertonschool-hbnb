@@ -82,6 +82,7 @@ def compare_data_and_model(data: dict, model):
         raise ValueError(f"Unexpected fields: {', '.join(extra)} are "
                          "present")
 
+
 class CustomError(Exception):
     def __init__(self, message, status_code):
         super().__init__(message)

@@ -8,13 +8,15 @@ from app import db
 
 
 class BaseEntity(db.Model):
-    __abstract__ = True # This ensures SQLAlchemy does not create a table for BaseModel
+    # This ensures SQLAlchemy does not create a table for BaseModel
+    __abstract__ = True
     id = db.Column(db.String(36), default=lambda: str(uuid.uuid4()),
                    primary_key=True, nullable=False, unique=True)
     created_at = db.Column(DateTime, nullable=False,
-                               default=datetime.now(timezone.utc))
+                           default=datetime.now(timezone.utc))
     updated_at = db.Column(DateTime, nullable=False,
-                               default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
+                           default=datetime.now(timezone.utc),
+                           onupdate=datetime.now(timezone.utc))
 
     def __init__(self):
         self.id = str(uuid.uuid4())

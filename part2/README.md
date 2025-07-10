@@ -46,6 +46,7 @@ hbnb/
 │   │   ├── place.py
 │   │   ├── review.py
 │   │   ├── amenity.py
+|   |   |__ baseEntity.py
 │   ├── services/                 # Business logic layer / facade
 │   │   ├── __init__.py
 │   │   ├── facade.py

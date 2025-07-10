@@ -16,34 +16,28 @@ if TYPE_CHECKING:
     from .place import Place
     from .review import Review
 
+
 class User(BaseEntity):
     __tablename__ = 'users'
-
-    # id = db.Column(db.String(50), default=lambda:str(uuid.uuid4()), primary_key=True, nullable=False, unique=True)
-    # created_at = db.Column(DateTime, nullable=False, default=datetime.now(timezone.utc))
-    # updated_at = db.Column(DateTime, nullable=False,
-    # default=datetime.now(timezone.utc),
-    # onupdate=datetime.now(timezone.utc))
-    _first_name: Mapped[str] = mapped_column("first_name",
-                                             String(50),
+    _first_name: Mapped[str] = mapped_column("first_name", String(50),
                                              nullable=False)
-    # first_name = db.Column(db.String(50), nullable=False)
-    _last_name: Mapped[str] = mapped_column("last_name",
-                                            String(50), nullable=False)
-    # last_name = db.Column(db.String(50), nullable=False)
-    _email: Mapped[str] = mapped_column("email",
-                                        String(120), 
-                                        nullable=False, unique=True)
-    # email = db.Column(db.String(120), nullable=False, unique=True)
-    _password: Mapped[str] = mapped_column("password",
-                                           String(128), nullable=False)
-    # password = db.Column(String(128), nullable=False)
-    _is_admin: Mapped[bool] = mapped_column("is_admin",
-                                            Boolean, default=False)
-    # is_admin = db.Column(db.Boolean, default=False)
-    places: Mapped[List["Place"]] = relationship("Place", back_populates="_owner", lazy=True, cascade="all, delete-orphan")
-    reviews: Mapped[List["Review"]] = relationship("Review", back_populates="_user", lazy=True,
-                                    # cascade="all, delete-orphan"
+    _last_name: Mapped[str] = mapped_column("last_name", String(50),
+                                            nullable=False)
+    _email: Mapped[str] = mapped_column("email", String(120), nullable=False,
+                                        unique=True)
+    _password: Mapped[str] = mapped_column("password", String(128),
+                                           nullable=False)
+    _is_admin: Mapped[bool] = mapped_column("is_admin", Boolean,
+                                            default=False)
+    places: Mapped[List["Place"]] = relationship("Place",
+                                                 back_populates="_owner",
+                                                 lazy=True, cascade="all,"
+                                                 "delete-orphan")
+    reviews: Mapped[List["Review"]] = relationship("Review",
+                                                   back_populates="_user",
+                                                   lazy=True,
+                                                   # cascade="all,
+                                                   # delete-orphan"
                                     )
 
     def __init__(self, first_name: str, last_name: str,
@@ -61,9 +55,9 @@ class User(BaseEntity):
         # self.password = self.hash_password(password)
 
     @hybrid_property
-    def password(self): # type: ignore
+    def password(self):  # type: ignore
         return self._password
-    
+
     @password.setter
     def password(self, value):
         if value is None:
@@ -99,10 +93,10 @@ class User(BaseEntity):
         for name in names_list:
             if not re.match(r"^[^\W\d_]+([.'-][^\W\d_]+)*[.]?$", name,
                             re.UNICODE):
-                raise ValueError(f"Invalid {names_name}: {names_name} "
-                                 "must contain only letters, "
-                                 "apostrophes, dashes, or dots (no "
-                                 "digits or other special characters)")
+                raise ValueError(
+                    f"Invalid {names_name}: {names_name} must contain only"
+                    "letters, apostrophes, dashes, or dots (no digits or other"
+                    " special characters)")
         return " ".join(names_list)
 
     def email_validation(self, email: str):
@@ -110,21 +104,20 @@ class User(BaseEntity):
             raise ValueError('Expected email but received None')
         type_validation(email, "email", str)
         if not validate_email(email):
-            raise ValueError("Invalid email: email must have format"
-                             " example@exam.ple")
+            raise ValueError(
+                "Invalid email: email must have format example@exam.ple")
         return email
 
     @hybrid_property
-    def first_name(self): # type: ignore
+    def first_name(self):  # type: ignore
         return self._first_name
 
     @first_name.setter
     def first_name(self, value):
-        self._first_name = self.name_validation(value,
-                                                 "first_name")
+        self._first_name = self.name_validation(value, "first_name")
 
     @hybrid_property
-    def last_name(self): # type: ignore
+    def last_name(self):  # type: ignore
         return self._last_name
 
     @last_name.setter
@@ -132,7 +125,7 @@ class User(BaseEntity):
         self._last_name = self.name_validation(value, "last_name")
 
     @hybrid_property
-    def email(self): # type: ignore
+    def email(self):  # type: ignore
         return self._email
 
     @email.setter
@@ -140,7 +133,7 @@ class User(BaseEntity):
         self._email = self.email_validation(value)
 
     @hybrid_property
-    def is_admin(self): # type: ignore
+    def is_admin(self):  # type: ignore
         return self._is_admin
 
     @is_admin.setter
@@ -150,12 +143,6 @@ class User(BaseEntity):
         type_validation(value, "is_admin", bool)
         self._is_admin = value
 
-
     # def update_first_name(self, new_first_name):
     #     self.first_name = self.name_validation(new_first_name,
     #     "first_name")
-
-   
-    
-
-    

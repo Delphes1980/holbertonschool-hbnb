@@ -49,17 +49,19 @@ class AdminAmenityCreate(Resource):
     @api.expect(amenity_model, validate=False)
     @api.response(201, 'Amenity successfully created',
                   amenity_response_model)
-    @api.response(400, 'Name already assigned / Invalid input data', error_model)
+    @api.response(400, 'Name already assigned / Invalid input data',
+                  error_model)
     @jwt_required()
     def post(self):
         """Register a new amenity"""
         is_admin = get_jwt().get('is_admin', False)
         amenity_data = api.payload
         try:
-            # if is_admin is None:
-            #     raise CustomError('is_admin claim was not found in the jwt', 401)
+            # If is_admin is None:
+            # raise CustomError('is_admin claim was not found in the jwt', 401)
             if not is_admin:
-                raise CustomError('Unauthorized action: admin privileges required', 403)
+                raise CustomError('Unauthorized action: admin privileges'
+                                  ' required', 403)
             compare_data_and_model(amenity_data, amenity_model)
             new_amenity = facade.create_amenity(amenity_data)
         except CustomError as e:
@@ -70,6 +72,7 @@ class AdminAmenityCreate(Resource):
             return {'error': str(e)}, 400
         return new_amenity, 201
 
+
 @api.route('/')
 class AmenityList(AdminAmenityCreate):
     # Endpoint for retrieving all amenities
@@ -78,7 +81,8 @@ class AmenityList(AdminAmenityCreate):
         amenity_response_model,
         code=_http.HTTPStatus.OK,
         description='List of amenities retrieved successfully')
-    @api.response(200, 'List of amenities retrieved successfully', amenity_response_model)
+    @api.response(200, 'List of amenities retrieved successfully',
+                  amenity_response_model)
     def get(self):
         """Retrieve a list of all amenities"""
         return facade.get_all_amenities(), 200
@@ -104,7 +108,8 @@ class AdminAmenityModify(Resource):
         amenity_data = api.payload
         try:
             if is_admin is None:
-                raise CustomError('is_admin claim was not found in the jwt', 401)
+                raise CustomError('is_admin claim was not found in the jwt',
+                                  401)
             elif not is_admin:
                 raise CustomError('Admin privileges required', 403)
             compare_data_and_model(amenity_data, amenity_model)
@@ -123,6 +128,7 @@ class AdminAmenityModify(Resource):
             return {'error': 'Amenity not found'}, 404
         return updated_amenity, 200
 
+
 class AdminPrivilegesAmenityDelete(Resource):
     # Endpoint for deleting an amenity by ID
     @api.doc('Deletes amenity', security='Bearer')
@@ -136,12 +142,14 @@ class AdminPrivilegesAmenityDelete(Resource):
         try:
             is_admin = get_jwt().get('is_admin', False)
             if not is_admin:
-                raise CustomError("Unauthorized action: admin privileges required", 403)
+                raise CustomError("Unauthorized action: admin privileges"
+                                  "required", 403)
             # Retrieve the amenity to validate its existence
             amenity = facade.get_amenity(amenity_id)
             # Check if the amenity exists
             if amenity is None:
-                raise CustomError('Invalid amenity_id: amenity not found', 404)
+                raise CustomError('Invalid amenity_id: amenity not found',
+                                  404)
             facade.delete_amenity(amenity_id)
         except CustomError as e:
             api.abort(e.status_code, error=str(e))
@@ -149,18 +157,22 @@ class AdminPrivilegesAmenityDelete(Resource):
         except Exception as e:
             api.abort(404, error=str(e))
             return {'error': str(e)}, 404
-        return {"msg": f"Amenity {amenity_id} has been succesfully deleted"}, 200
+        return {
+            "msg": f"Amenity {amenity_id} has been succesfully deleted"}, 200
+
 
 @api.route('/<amenity_id>')
 class AmenityResource(AdminAmenityModify, AdminPrivilegesAmenityDelete):
-    # ENdpoint for retrieving a single amenity by ID
+    # Endpoint for retrieving a single amenity by ID
     @api.doc('Returns amenity corresponding to given ID')
     @api.marshal_with(
         amenity_response_model,
         code=_http.HTTPStatus.OK,
         description='Amenity details retrieved successfully')
-    @api.response(200, 'Amenity details retrieved successfully', amenity_response_model)
-    @api.response(400, 'Invalid ID: not a UUID4 / Invalid input data', error_model)
+    @api.response(200, 'Amenity details retrieved successfully',
+                  amenity_response_model)
+    @api.response(400, 'Invalid ID: not a UUID4 / Invalid input data',
+                  error_model)
     @api.response(403, 'Unauthorized action', error_model)
     @api.response(404, 'Amenity not found', error_model)
     def get(self, amenity_id):

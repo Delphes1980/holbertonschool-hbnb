@@ -3,8 +3,8 @@ from app.services.ressources import is_valid_uuid4
 from app.api.v1.apiRessources import validate_init_args, CustomError
 from app.models.baseEntity import type_validation
 
-class AmenityService:
 
+class AmenityService:
     @classmethod
     def create_amenity(cls, facade, amenity_data):
         """Create a new amenity with the provided data."""

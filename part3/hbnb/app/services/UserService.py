@@ -32,7 +32,6 @@ from validate_email_address import validate_email
 from app.models.baseEntity import type_validation
 
 
-
 class UserService:
     """
     Service class for user-related business logic.
@@ -136,18 +135,18 @@ class UserService:
         if user is None:
             return None
         if user_data.get('email') is not None:
-            user_by_email = cls.get_user_by_email(facade,
-                                            user_data.get('email'))
+            user_by_email = cls.get_user_by_email(
+                facade, user_data.get('email'))
             if user_by_email and user_by_email.id != user.id:
-                raise ValueError('Invalid email: email already used by'
-                                 ' another user')
+                raise ValueError(
+                    'Invalid email: email already used by another user')
         # We do not need to provide all input arguments of User, only
         # those we want to change:
         # validate_init_args(User, **user_data)
         facade.user_repo.update(user_id, user_data)
         updated_user = facade.user_repo.get(user_id)
         return updated_user
-    
+
     @classmethod
     def delete_user(cls, facade, user_id):
         type_validation(user_id, 'user_id', str)
@@ -162,7 +161,9 @@ class UserService:
         if deleted_user_email is not None:
             deleted_user = facade.get_user_by_email(deleted_user_email)
         if deleted_user is None:
-            raise CustomError("User stand-in was not found, user and every related entity may be deleted in its absence", 404)
+            raise CustomError(
+                "User stand-in was not found, user and every related entity"
+                "may be deleted in its absence", 404)
         for review in user.reviews:
             review.user = deleted_user
         # it shouldn't be necessary to delete manually the places

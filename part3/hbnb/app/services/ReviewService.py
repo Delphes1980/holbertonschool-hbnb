@@ -12,12 +12,14 @@ class ReviewService:
             raise ValueError('Review data does not contain user_id key')
         type_validation(user_id, 'user_id', str)
         if not is_valid_uuid4(user_id):
-            raise ValueError('Invalid user_id: given user_id is not valid UUID4')
+            raise ValueError(
+                'Invalid user_id: given user_id is not valid UUID4')
         place_id = review_data.get('place_id')
         if place_id is None:
             raise ValueError('Review data does not contain place_id key')
         if not is_valid_uuid4(place_id):
-            raise ValueError('Invalid place_id: given place_id is not valid UUID4')
+            raise ValueError(
+                'Invalid place_id: given place_id is not valid UUID4')
         existing_user = facade.get_user(user_id)
         if existing_user is None:
             raise ValueError('No User corresponding to given ID')
@@ -65,13 +67,16 @@ class ReviewService:
             raise ValueError('Invalid ID: given place_id is not valid UUID4')
         existing_place = facade.get_place(place_id)
         if existing_place is None:
-            raise CustomError('Invalid place_id: no place corresponding to that place_id', 400)
+            raise CustomError(
+                'Invalid place_id: no place corresponding to that place_id',
+                400)
         type_validation(user_id, 'user_id', str)
         if not is_valid_uuid4(user_id):
             raise ValueError('Invalid ID: given user_id is not valid UUID4')
         existing_user = facade.get_user(user_id)
         if existing_user is None:
-            raise CustomError('Invalid user_id: no user corresponding to that user_id', 400)
+            raise CustomError(
+                'Invalid user_id: no user corresponding to that user_id', 400)
         reviews = facade.get_reviews_by_place(place_id)
         if reviews is None:
             return None
