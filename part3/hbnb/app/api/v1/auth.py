@@ -14,14 +14,17 @@ login_model = api.model('Login', {
                               description='User password')
 })
 
+# Model for token response
 token_model = api.model('Token', {
     'access_token': fields.String(description='JWT access token')
 })
 
+# Model for error response
 error_model = api.model('Error', {
     'error': fields.String(description='Error message')
 })
 
+# Model for protected access response
 protected_access_model = api.model('ProtectedAccess', {
     'message': fields.String(required=True,
                              description='Protected ressource has been\
@@ -59,20 +62,3 @@ class Login(Resource):
 
         # Step 4: Return the JWT token to the client
         return {'access_token': access_token}, 200
-
-# # Test endpoint for protected resources
-# @api.route('/protected')
-# class ProtectedResource(Resource):
-#     @api.doc('Confirms access to protected ressource',
-#              security='Bearer')
-#     @api.response(200, 'Ressource accessed successfully',
-#                   protected_access_model)
-#     @jwt_required()
-#     def get(self):
-#         """A protected endpoint that requires a valid JWT token"""
-#         # Retrieve the user's claims from the token
-#         current_user = get_jwt()
-#         return {'message': f'Hello, user {current_user["id"]} who is '
-#                 f'{" " if current_user["is_admin"] else "not"} '
-#                 'admin'}, 200
-#         # return {'message': f'Hello, user {current_user["id"]}'}, 200

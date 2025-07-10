@@ -18,11 +18,10 @@ place_amenity = Table(
 
 
 class Amenity(BaseEntity):
+    """ Represents an 'Amenity' entity in the database"""
     __tablename__ = 'amenities'
-    # id = db.Column(db.Integer, primary_key=True, nullable=False)
     _name: Mapped[str] = mapped_column("name", String(128), nullable=False,
                                        unique=True)
-    # name = db.Column(db.String(128), nullable=False)
     places: Mapped[List["Place"]] = relationship("Place",
                                                  secondary=place_amenity,
                                                  back_populates="_amenities",
@@ -50,10 +49,3 @@ class Amenity(BaseEntity):
         name = " ".join(name.split())
         strlen_validation(name, "name", 1, 50)
         return name
-
-    # def to_dict(self):
-    #     """ Convert the Amenity object to a dictionary representation,
-    #     including BaseEntity fields """
-    #     base_dict = super().to_dict()
-    #     base_dict.update({"name": self.name})
-    #     return base_dict

@@ -34,7 +34,7 @@ def validate_init_args(some_class, **kwargs):
     sig = inspect.signature(some_class.__init__)
     params = sig.parameters
 
-    # Remove 'self'
+    # Remove 'self' from the parameters to validate
     init_params = {name: param for name, param in params.items()
                    if name != 'self'}
 
@@ -70,13 +70,17 @@ def compare_data_and_model(data: dict, model):
         ValueError: If any required field is missing from, or any
             unexpected field is present in, the input data.
     """
+    # Extract all fields
     all_model_fields = set(model.__schema__.get('properties', {}).keys())
+    # Extract all fields marked as 'required'
     required_model_fields = set(model.__schema__.get('required', []))
 
+    # Identify missing required fields
     missing = required_model_fields - set(data)
     if missing:
         raise ValueError(f"Missing required fields: {', '.join(missing)}")
 
+    # Identify extra fields in the input data
     extra = set(data) - all_model_fields
     if extra:
         raise ValueError(f"Unexpected fields: {', '.join(extra)} are "
@@ -84,6 +88,12 @@ def compare_data_and_model(data: dict, model):
 
 
 class CustomError(Exception):
+    """ Custom exception class to handle specific APIs errors with HTTP
+    status code"""
     def __init__(self, message, status_code):
+        """ Initialize a CustomError instance
+        Args:
+            message (str): the error message
+            satus_code (int): the HTTP status code"""
         super().__init__(message)
         self.status_code = status_code

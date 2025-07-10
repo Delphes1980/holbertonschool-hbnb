@@ -7,10 +7,6 @@ from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from .baseEntity import BaseEntity
 from sqlalchemy.ext.hybrid import hybrid_property
-# from app.persistence.repository import SQLAlchemyRepository
-# from datetime import datetime, timezone
-# import uuid
-# from flask_bcrypt import generate_password_hash, check_password_hash
 from typing import List, TYPE_CHECKING
 if TYPE_CHECKING:
     from .place import Place
@@ -48,11 +44,6 @@ class User(BaseEntity):
         self.email = email
         self.is_admin = is_admin
         self.password = password
-        # self.first_name = self.name_validation(first_name, "first_name")
-        # self.last_name = self.name_validation(last_name, "last_name")
-        # self.email = self.email_validation(email)
-        # self.is_admin = type_validation(is_admin, "is_admin", bool)
-        # self.password = self.hash_password(password)
 
     @hybrid_property
     def password(self):  # type: ignore
@@ -69,8 +60,6 @@ class User(BaseEntity):
         """Hashes the password before storing it"""
         if plain_password is None:
             raise ValueError('Expected password but received None')
-        # elif not isinstance(plain_password, str):
-        #     raise TypeError("Password must be a string")
         type_validation(plain_password, "Password", str)
         return bcrypt.generate_password_hash(plain_password).decode('utf-8')
 
@@ -79,8 +68,6 @@ class User(BaseEntity):
         password"""
         if plain_password is None:
             raise ValueError('Expected password but received None')
-        # if self.password is None:
-        #     return False
         return bcrypt.check_password_hash(self.password, plain_password)
 
     def name_validation(self, names: str, names_name: str):
@@ -142,7 +129,3 @@ class User(BaseEntity):
             raise ValueError('Expected is_admin boolean but received None')
         type_validation(value, "is_admin", bool)
         self._is_admin = value
-
-    # def update_first_name(self, new_first_name):
-    #     self.first_name = self.name_validation(new_first_name,
-    #     "first_name")

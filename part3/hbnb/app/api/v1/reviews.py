@@ -37,16 +37,19 @@ review_response_model = api.model('ReviewResponse', {
                              description='Rating of the place (1-5)')
 })
 
+# Define the update review response model
 update_review_model = api.model('UpdateReview', {
     'text': fields.String(required=False, description='New text of the'
                           ' review'),
     'rating': fields.Integer(required=False, description='New rating '
                              'of the place (1-5)')})
 
+# Define error response model
 error_model = api.model('Error', {
     'error': fields.String(description='Error message')
 })
 
+# Define success response model
 msg_model = api.model('Message', {
     'message': fields.String(description='Message')
 })
@@ -70,13 +73,14 @@ class ReviewList(Resource):
         # Automatically parses and validates request JSON
         review_data = api.payload
         try:
+            # Validate input data
             compare_data_and_model(review_data, review_model)
+            # Get current user ID
             current_user_id = get_jwt_identity()
             given_user_id = review_data.get('user_id')
             if given_user_id is None:
                 # Set user_id to the authenticated user's ID
                 review_data['user_id'] = current_user_id
-            # elif current_user != facade.get_user(given_user_id).id:
             elif current_user_id != given_user_id:
                 raise CustomError(
                     'Unauthorized action: authenticated user does not match'
@@ -99,6 +103,8 @@ class ReviewList(Resource):
                 given_place_id, current_user_id)
             if existing_review is not None:
                 raise CustomError('User has already reviewed this place', 403)
+
+            # Create new review
             new_review = facade.create_review(review_data)
         except CustomError as e:
             api.abort(e.status_code, error=str(e))
@@ -122,6 +128,8 @@ class ReviewList(Resource):
 
 
 class AdminPrivilegesReviewModify(Resource):
+    """ Handles updating an existing review 
+    Requires the author of the review or the admin privileges"""
     # Endpoint for updating an existing review by ID
     @api.doc('Returns the updated review', security='Bearer')
     @api.marshal_with(review_response_model, code=_http.HTTPStatus.OK,
@@ -137,32 +145,40 @@ class AdminPrivilegesReviewModify(Resource):
         """Update a review's information"""
         review_data = api.payload
         try:
+            # Validate the input data
             compare_data_and_model(review_data, update_review_model)
             # Retrieve the review
             review = facade.get_review(review_id)
+
             # Check if the review exists
             if review is None:
                 raise CustomError('Invalid review_id: review not found', 404)
+            # Get the current user ID
             current_user_id = get_jwt_identity()
-            # check if user tries to change a review given to their place
+            # Check if user tries to change a review given to their place
             if current_user_id == review.place.owner.id:
                 raise CustomError('Unauthorized action: user can not leave a'
                                   ' review on their own place', 403)
+
+            # Get the admin status
             is_admin = get_jwt().get('is_admin', False)
             # Check if the author of the review is the authenticated user
             if not is_admin and current_user_id != review.user.id:
                 raise CustomError('Unauthorized action: user is not the author'
                                   ' of the review', 403)
+
+            # The current_user_id should match the user_id
             given_user_id = review_data.get('user_id')
             if given_user_id is None:
                 review_data['user_id'] = current_user_id
-                # given_user_id = current_user_id
             elif not is_admin and (current_user_id != given_user_id):
                 raise CustomError("Unauthorized action: given user_id doesn't"
                                   " match authenticated user", 403)
             elif is_admin and (given_user_id != review.user.id):
                 raise CustomError('Unauthorized action: not even an admin can'
                                   ' change the author of a review', 403)
+
+            # Prevent changing place_id
             given_place_id = review_data.get('place_id')
             if given_place_id is None:
                 review_data['place_id'] = review.place.id
@@ -170,10 +186,13 @@ class AdminPrivilegesReviewModify(Resource):
                 raise CustomError(
                     'Unauthorized action: user can not change the place for'
                     ' which the original review was given', 403)
+
             review_data.pop('user_id')
             review_data['user'] = review.user
             review_data.pop('place_id')
             review_data['place'] = review.place
+
+            # Update review
             updated_review = facade.update_review(review_id,
                                                   review_data)
         except CustomError as e:
@@ -199,10 +218,13 @@ class AdminPrivilegesReviewDelete(Resource):
     def delete(self, review_id):
         """Delete a review"""
         try:
+            # Get current user ID
             current_user_id = get_jwt_identity()
+            # Get admin status
             is_admin = get_jwt().get('is_admin', False)
             # Retrieve the review to validate ownership
             review = facade.get_review(review_id)
+
             # Check if the review already exists
             if review is None:
                 raise CustomError('Invalid review_id: review not found', 404)
@@ -210,6 +232,8 @@ class AdminPrivilegesReviewDelete(Resource):
             elif not is_admin and current_user_id != review.user.id:
                 raise CustomError('Unauthorized action: user is not the author'
                                   ' of the review', 403)
+
+            # Delete review
             facade.delete_review(review_id)
         except CustomError as e:
             api.abort(e.status_code, error=str(e))
@@ -234,6 +258,7 @@ class ReviewResource(AdminPrivilegesReviewModify, AdminPrivilegesReviewDelete):
     def get(self, review_id):
         """Get review details by ID"""
         try:
+            # Retrieve review
             review = facade.get_review(review_id)
         except CustomError as e:
             api.abort(e.status_code, error=str(e))
@@ -263,6 +288,7 @@ class PlaceReviewList(Resource):
     def get(self, place_id):
         """Get all reviews for a specific place"""
         try:
+            # Retrieve all reviews for a place
             reviews_by_place = facade.get_reviews_by_place(place_id)
         except CustomError as e:
             api.abort(e.status_code, error=str(e))
@@ -270,6 +296,7 @@ class PlaceReviewList(Resource):
         except Exception as e:
             api.abort(400, error=str(e))
             return {'error': str(e)}, 400
+
         # Check if the list is empty
         if reviews_by_place is None:
             api.abort(404, error='Place not found')

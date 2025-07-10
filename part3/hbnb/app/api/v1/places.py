@@ -88,18 +88,12 @@ place_response_model = api.model('PlaceResponse', {
                            description='List of reviews')
 })
 
-# place_response_model = api.inherit('PlaceResponse', place_model, {
-#     'id': fields.String(description='Unique identifier for the place'),
-#     'created_at': fields.DateTime(dt_format='iso8601', description=
-# 'Timestamp of creation (ISO 8601)'),
-#     'updated_at': fields.DateTime(dt_format='iso8601', description=
-# 'Timestamp of the last update (ISO 8601)')
-# })
-
+# Define the error response model
 error_model = api.model('Error', {
     'error': fields.String(description='Error message')
 })
 
+# Define the success response model
 msg_model = api.model('Message', {
     'message': fields.String(description='Message')
 })
@@ -124,13 +118,20 @@ class PlaceList(Resource):
         # Automatically parses and validates request JSON
         place_data = api.payload
         try:
+            # Validate input data
             compare_data_and_model(place_data, place_model)
             given_owner_id = place_data.get('owner_id')
+
+            # If owner_id is provided, assign current_user as owner
             if given_owner_id is None:
                 place_data['owner_id'] = current_user
+            # If owner_is is provided, ensure that current_user is the
+            # provided owner
             elif current_user != facade.get_user(given_owner_id).id:
                 raise CustomError('Unauthorized action: user does not match'
                                   ' the provided place owner', 403)
+
+            # Create a new place
             new_place = facade.create_place(place_data)
         except CustomError as e:
             api.abort(e.status_code, error=str(e))
@@ -151,9 +152,6 @@ class PlaceList(Resource):
     def get(self):
         """Retrieve a list of all places"""
         # Call the facade to get all places
-        # places = facade.get_all_places()
-        # Convert each place to a dictionary & return the list
-        # return [place.to_dict() for place in places], 200
         return facade.get_all_places(), 200
 
 
@@ -176,6 +174,7 @@ class AdminPrivilegesPlaceModify(Resource):
         # Automatically parses and validates request JSON
         place_data = api.payload
         try:
+            # Validate input data
             compare_data_and_model(place_data, place_model)
             # Retrieve the place
             place = facade.get_place(place_id)
@@ -183,21 +182,31 @@ class AdminPrivilegesPlaceModify(Resource):
             if place is None:
                 raise CustomError('Invalid place_id: place not found',
                                   404)
+
+            # Get current user ID
             current_user_id = get_jwt_identity()
+            # Get admin status
             is_admin = get_jwt().get("is_admin", False)
+
             # Check if the owner is the current user
             if not is_admin and current_user_id != place.owner.id:
                 raise CustomError('Unauthorized action: user is not owner of'
                                   ' place', 403)
             given_owner_id = place_data.get('owner_id')
+
+            # If owner_id is not provided, current owner is retained
             if given_owner_id is None:
                 place_data['owner_id'] = place.owner.id
+            # If owner_id is provided, non-admin user must match the
+            # authenticated user
             elif not is_admin and (given_owner_id != current_user_id):
                 raise CustomError("Unauthorized action: given owner_id doesn't"
                                   " match authenticated user", 403)
+            # Admin cannot change the owner of a place
             elif is_admin and given_owner_id != place.owner.id:
                 raise CustomError('Unauthorized action: not even an admin can'
                                   ' change the owner of a place', 403)
+            # Update place
             updated_place = facade.update_place(place_id,
                                                 place_data)
         except CustomError as e:
@@ -223,17 +232,21 @@ class AdminPrivilegesPlaceDelete(Resource):
     def delete(self, place_id):
         """Delete a place"""
         try:
+            # Get current user ID
             current_user_id = get_jwt_identity()
+            # Get admin status
             is_admin = get_jwt().get('is_admin', False)
             # Retrieve the place to validate ownership
             place = facade.get_place(place_id)
             # Check if the place exists
             if place is None:
                 raise CustomError('Invalid place_id: place not found', 404)
-            # Check if the owner of the place is the current user
+            # Check if the user is the owner or admin
             elif not is_admin and current_user_id != place.owner.id:
                 raise CustomError('Unauthorized action: user is not the owner'
                                   ' of the place', 403)
+
+            # Delete place
             facade.delete_place(place_id)
         except CustomError as e:
             api.abort(e.status_code, error=str(e))
@@ -274,8 +287,7 @@ class PlaceResource(AdminPrivilegesPlaceModify, AdminPrivilegesPlaceDelete):
 
 @api.route('/<place_id>/reviews')
 class PlaceReviewsList(Resource):
-    # Endpoint for retrieving all reviews associated with a specific
-    # place
+    # Endpoint for retrieving all reviews associated with a specific place
     @api.doc('Returns list of reviews given to the concerned place')
     @api.marshal_list_with(review_response_model,
                            code=_http.HTTPStatus.OK,
@@ -288,6 +300,7 @@ class PlaceReviewsList(Resource):
     def get(self, place_id):
         """Get list of reviews for a place given its ID"""
         try:
+            # Retrieve reviews
             reviews_by_place = facade.get_reviews_by_place(place_id)
         except CustomError as e:
             api.abort(e.status_code, error=str(e))
@@ -295,6 +308,8 @@ class PlaceReviewsList(Resource):
         except Exception as e:
             api.abort(400, error=str(e))
             return {'error': str(e)}, 400
+
+        # Check if the place exists
         if reviews_by_place is None:
             api.abort(404, error='Place not found')
             return {'error': 'Place not found'}, 404
