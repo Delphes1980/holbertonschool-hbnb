@@ -93,9 +93,9 @@ hbnb/
 
 ### Installation
 #### 1. Clone the repository
-git clone (https://github.com/Delphes1980/holbertonschool-hbnb/tree/main/)
+git clone https://github.com/Delphes1980/holbertonschool-hbnb.git desired_folder_name
 ```
-cd part3/hbnb/
+cd desired_folder_name/part3/hbnb/
 ```
 
 #### 2. Create and activate a virtual environment
