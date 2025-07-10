@@ -5,9 +5,7 @@ from app.models.baseEntity import (BaseEntity, type_validation,
 class Amenity(BaseEntity):
     def __init__(self, name):
         super().__init__()
-        if not name:
-            raise ValueError("Name of the Amenity is required")
-        self.name = self.set_name(name)
+        self.name = name
 
     @property
     def name(self):
@@ -15,13 +13,13 @@ class Amenity(BaseEntity):
 
     @name.setter
     def name(self, value):
-        self.__name = self.set_name(value)
+        self.__name = self.name_validation(value)
 
-    def set_name(self, name):
+    def name_validation(self, name: str):
         """Verify if the name is a string < 50 characters."""
-        type_validation(name, "Name of the Amenity", str)
-        name = name.strip()
-        strlen_validation(name, "Name of the Amenity", 1, 50)
+        type_validation(name, "name", str)
+        name = " ".join(name.split())
+        strlen_validation(name, "name", 1, 50)
         return name
 
     # def to_dict(self):

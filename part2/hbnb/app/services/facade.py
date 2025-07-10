@@ -1,19 +1,9 @@
 from app.persistence.repository import InMemoryRepository
-from app.models.amenity import Amenity
 from app.models.place import Place
-from app.models.user import User
+from app.services.UserService import UserService
+from app.services.AmenityService import AmenityService
 from app.models.review import Review
 from app.models.baseEntity import type_validation
-from uuid import UUID
-
-
-def is_valid_uuid4(uuid_str):
-    """Determines if given str is a uuid4"""
-    try:
-        val = UUID(uuid_str, version=4)
-        return val.version == 4
-    except ValueError:
-        return False
 
 
 class HBnBFacade:
@@ -23,7 +13,51 @@ class HBnBFacade:
         self.review_repo = InMemoryRepository()
         self.amenity_repo = InMemoryRepository()
 
-# Services for Place CRUD operations #
+# Services for User CRUD operations ####
+
+    def create_user(self, user_data):
+        """Create a new user with the provided data."""
+        return UserService.create_user(self, user_data)
+
+    def get_user(self, user_id):
+        """Retrieve a user by their ID."""
+        return UserService.get_user(self, user_id)
+
+    def get_all_users(self):
+        """Retrieve all users from the repository."""
+        return self.user_repo.get_all()
+
+    def get_user_by_email(self, email):
+        """Retrieve a user by their email address."""
+        return UserService.get_user_by_email(self, email)
+
+    def update_user(self, user_id, user_data):
+        """Update an existing user's data."""
+        return UserService.update_user(self, user_id, user_data)
+
+# Services for Amenity CRUD operations ########
+
+    def create_amenity(self, amenity_data):
+        """Create a new amenity with the provided data."""
+        return AmenityService.create_amenity(self, amenity_data)
+
+    def get_amenity(self, amenity_id):
+        """ Retrieve an amenity by its ID """
+        return AmenityService.get_amenity(self, amenity_id)
+
+    def get_all_amenities(self):
+        """ Retrieve all amenities """
+        return self.amenity_repo.get_all()
+
+    def get_amenity_by_name(self, name):
+        return AmenityService.get_amenity_by_name(self, name)
+
+    def update_amenity(self, amenity_id, amenity_data):
+        """ Update an amenity with the provided data """
+        return AmenityService.update_amenity(self, amenity_id,
+                                             amenity_data)
+
+# Services for Place CRUD operations ########
 
     def create_place(self, place_data):
         """ Create a new place with the provided data """
@@ -45,15 +79,16 @@ class HBnBFacade:
         if amenities:
             for amenity_id in amenities:
                 if not is_valid_uuid4(amenity_id):
-                    raise ValueError(f"Given amenity_id={amenity_id} is not"
-                                     "a valid UUID4")
+                    raise ValueError(f"Given amenity_id={amenity_id} "
+                                     "is not a valid UUID4")
                 place.add_amenity(self.get_amenity(amenity_id))
-        # Delete amenities from place_data if they aren't needed for the
-        # Place model
+        # Delete amenities from place_data if they aren't needed for
+        # the Place model
         # place_data.pop('amenities', None)
-        # # Validate the place data
+        # Validate the place data
         # new_place = Place(**place_data)
-        # Store the new place in the repository
+        # Store the new place in the
+        # repository
         self.place_repo.add(place)
         return place
 
@@ -89,59 +124,15 @@ class HBnBFacade:
             amenities = []
             for amenity_id in amenities_ids:
                 if not is_valid_uuid4(amenity_id):
-                    raise ValueError(f"Given amenity_id={amenity_id} is not"
-                                     "a valid UUID4")
+                    raise ValueError(f"Given amenity_id={amenity_id} "
+                                     "is not a valid UUID4")
                 amenities.append(self.get_amenity(amenity_id))
             place_data['amenities'] = amenities
         place.update(place_data)
         # updated_place = self.place_repo.get(place_id)
         return place
 
-# Services for User CRUD operations #
-
-    def create_user(self, user_data):
-        """ Create a new user with the provided data """
-        user = User(**user_data)
-        self.user_repo.add(user)
-        return user
-
-    def get_user(self, user_id):
-        """ Retrieve a user by their ID """
-        return self.user_repo.get(user_id)
-
-    def get_user_by_email(self, email):
-        """ Retrieve a user byt their email address """
-        return self.user_repo.get_by_attribute('email', email)
-
-# Services for Amenity CRUD operations #
-
-    def create_amenity(self, amenity_data):
-        """ Create a new amenity with the provided data """
-        new_amenity = Amenity(**amenity_data)
-        self.amenity_repo.add(new_amenity)
-        return new_amenity
-
-    def get_amenity(self, amenity_id):
-        """ Retrieve an amenity by its ID """
-        if not is_valid_uuid4(amenity_id):
-            raise ValueError('Given amenity_id is not valid UUID4')
-        return self.amenity_repo.get(amenity_id)
-
-    def get_all_amenities(self):
-        """ Retrieve all amenities """
-        return self.amenity_repo.get_all()
-
-    def update_amenity(self, amenity_id, amenity_data):
-        """ Update an amenity with the provided data """
-        amenity = self.get_amenity(amenity_id)
-        if not amenity:
-            return None
-        amenity.update(amenity_data)
-        # updated_amenity = self.amenity_repo.get(amenity_id)
-        # return updated_amenity
-        return amenity
-
-# Services for Review CRUD operations #
+# Services for Review CRUD operations ########
 
     def create_review(self, review_data):
         # Placeholder for logic to create a review, including

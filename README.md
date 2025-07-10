@@ -2,9 +2,9 @@
 This repository has as objective to recreate ann Airbnb-like application.
 
 It will be composed of four parts:
-- [current stage of development] Technical documentation (UML)
+- Technical documentation (UML)
 - Business Logic and API
-- Authentification and Database
+- [current stage of development] Authentification and Database
 - Simple Web Client
 
 ## Technical documentation
@@ -23,6 +23,26 @@ The goal is to create a functional and scalable foundation for the application. 
 
 - Business Logic Layer: Developing the core models and logic that drive the application's functionality. This includes defining relationships, handling data validation, and managing interactions between different components.
 - Presentation Layer: Defining the services and API endpoints using Flask and Flask-RESTx. We'll structure the endpoints logically, ensuring clear paths and parameters for each operation.
+
+## Authentication and Database Integration
+This part of the HBnB project marks a significant step towards a robust and production-ready application. This phase is dedicated to securing the API through user authentication and authorization, and transitioning from in-memory storage to a persistent database solution.
+
+Key Objectives:
+- JWT-based Authentication: Implementing JSON Web Token (JWT) authentication using Flask-JWT-Extended to secure API endpoints, ensuring that only authenticated users can access protected resources and manage their sessions effectively.
+
+- Role-Based Access Control (RBAC): Introducing granular authorization based on user roles (e.g., distinguishing between regular users and administrators) to restrict access to specific functionalities or data.
+
+- Database Integration with SQLAlchemy: Replacing the temporary in-memory data storage with a persistent database.
+
+- SQLite will be utilized for development environments, offering a lightweight and file-based solution.
+
+- The application will be prepared for seamless configuration with MySQL for robust production deployments.
+
+- Database Schema Design: Designing a comprehensive relational database schema using SQLAlchemy's ORM to accurately map existing entities (Users, Places, Reviews, Amenities) and define their relationships.
+
+- Persistent CRUD Operations: Refactoring all Create, Read, Update, and Delete (CRUD) operations to interact directly with the database, ensuring data consistency, validation, and reliable storage.
+
+This part of the project will significantly enhance the application's security, scalability, and data integrity, making it ready for real-world scenarios.
 
 ### Authors
 - [Delphine Coutouly-Laborda](https://github.com/Delphes1980)

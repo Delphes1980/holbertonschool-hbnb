@@ -61,13 +61,16 @@ class TestUserAPI(unittest.TestCase):
         self.assertEqual(data['error'], 'Email already registered')
 
     def test_post_user_valid(self):
-        response = requests.post(BASE_URL + '/', json=self.user_data)
-        self.assertIn(response.status_code, [201, 400])
-        if response.status_code == 201:
-            self.assertIn('id', response.json())
-            TestUserAPI.user_id = response.json()['id']
-        else:
-            self.assertIn('error', response.json())
+        unique_email = f"testuser_{uuid.uuid4()}@example.com"
+        user_data = {
+            "first_name": self.user_data["first_name"],
+            "last_name": self.user_data["last_name"],
+            "email": unique_email
+        }
+        response = requests.post(BASE_URL + '/', json=user_data)
+        self.assertEqual(response.status_code, 201)
+        self.assertIn('id', response.json())
+        TestUserAPI.user_id = response.json()['id']
 
     def test_post_user_invalid(self):
         # Empty fields
@@ -78,7 +81,7 @@ class TestUserAPI(unittest.TestCase):
         # Missing fields
         response = requests.post(BASE_URL + '/', json={"first_name": "OnlyFirst"})
         self.assertEqual(response.status_code, 400)
-        self.assertIn('errors', response.json())
+        self.assertIn('error', response.json())
         # Extra fields
         bad_data = {"first_name": "Test", "last_name": "User", "email": "testextra@example.com", "extra": "field"}
         response = requests.post(BASE_URL + '/', json=bad_data)
