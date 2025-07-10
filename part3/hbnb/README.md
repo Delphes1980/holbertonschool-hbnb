@@ -3,7 +3,10 @@
 ## Installation
 #### 0. Install python 3.10.12 and sqlite 3.37.2
 #### 1. Clone the repository
+```
 git clone https://github.com/Delphes1980/holbertonschool-hbnb.git desired_folder_name
+```
+then
 ```
 cd desired_folder_name/part3/hbnb/
 ```
