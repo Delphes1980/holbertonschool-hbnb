@@ -130,7 +130,7 @@ class PlaceList(Resource):
                 place_data['owner_id'] = current_user
             elif current_user != facade.get_user(given_owner_id).id:
                 raise CustomError('Unauthorized action: user does not match'
-                                  'the provided place owner', 403)
+                                  ' the provided place owner', 403)
             new_place = facade.create_place(place_data)
         except CustomError as e:
             api.abort(e.status_code, error=str(e))
@@ -188,16 +188,16 @@ class AdminPrivilegesPlaceModify(Resource):
             # Check if the owner is the current user
             if not is_admin and current_user_id != place.owner.id:
                 raise CustomError('Unauthorized action: user is not owner of'
-                                  'place', 403)
+                                  ' place', 403)
             given_owner_id = place_data.get('owner_id')
             if given_owner_id is None:
                 place_data['owner_id'] = place.owner.id
             elif not is_admin and (given_owner_id != current_user_id):
                 raise CustomError("Unauthorized action: given owner_id doesn't"
-                                  "match authenticated user", 403)
+                                  " match authenticated user", 403)
             elif is_admin and given_owner_id != place.owner.id:
                 raise CustomError('Unauthorized action: not even an admin can'
-                                  'change the owner of a place', 403)
+                                  ' change the owner of a place', 403)
             updated_place = facade.update_place(place_id,
                                                 place_data)
         except CustomError as e:
@@ -233,7 +233,7 @@ class AdminPrivilegesPlaceDelete(Resource):
             # Check if the owner of the place is the current user
             elif not is_admin and current_user_id != place.owner.id:
                 raise CustomError('Unauthorized action: user is not the owner'
-                                  'of the place', 403)
+                                  ' of the place', 403)
             facade.delete_place(place_id)
         except CustomError as e:
             api.abort(e.status_code, error=str(e))
@@ -280,7 +280,7 @@ class PlaceReviewsList(Resource):
     @api.marshal_list_with(review_response_model,
                            code=_http.HTTPStatus.OK,
                            description='List of reviews given to the'
-                           'place retrieved successfully')
+                           ' place retrieved successfully')
     @api.response(200, 'List of reviews retrieved successfully',
                   review_response_model)
     @api.response(400, "Invalid ID", error_model)

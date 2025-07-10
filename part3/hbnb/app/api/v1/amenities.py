@@ -61,7 +61,7 @@ class AdminAmenityCreate(Resource):
             # raise CustomError('is_admin claim was not found in the jwt', 401)
             if not is_admin:
                 raise CustomError('Unauthorized action: admin privileges'
-                                  'required', 403)
+                                  ' required', 403)
             compare_data_and_model(amenity_data, amenity_model)
             new_amenity = facade.create_amenity(amenity_data)
         except CustomError as e:

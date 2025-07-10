@@ -31,28 +31,6 @@ user_response_model = api.model('UserResponse', {
                            description='Email of the user', attribute='email')
 })
 
-# update_user_model = api.model('UpdateUser', {
-#     'first_name': fields.String(required=False, description='first name of'
-#                                 'the user'),
-#     'last_name': fields.String(required=False, description='Last name of the'
-#                                'user')
-# })
-# user_update_model = api.model('UserUpdate', {
-#     'first_name': fields.String(required=True,
-#                                 description='First name of the user',
-#                                 attribute='first_name'),
-#     'last_name': fields.String(required=True,
-#                                description='Last name of the user'),
-#     'email': fields.String(required=True,
-#                            description='Email of the user',
-#                            attribute='email')
-# })
-# update_user_model = api.model('UpdateUser', {
-#     'first_name': fields.String(required=False, description='first name of'
-#                                 'the user'),
-#     'last_name': fields.String(required=False,
-#                                description='Last name ofthe user')
-# })
 user_update_model = api.model('UserUpdate', {
     'first_name': fields.String(required=False,
                                 description='First name of the user',
@@ -149,7 +127,7 @@ class AdminPrivilegesUserModify(Resource):
             if user is None:
                 raise CustomError(
                     'Invalid user_id: no user found corresponding to that'
-                    'user_id', 404)
+                    ' user_id', 404)
             current_user = get_jwt_identity()
             is_admin = get_jwt().get('is_admin', False)
             # if is_admin is None:
@@ -159,7 +137,7 @@ class AdminPrivilegesUserModify(Resource):
             if not is_admin and current_user != user.id:
                 raise CustomError(
                     'Unauthorized action: you can not modify the user account'
-                    'of somebody else', 403)
+                    ' of somebody else', 403)
             given_email = user_data.get('email')
             given_password = user_data.get("password")
             if not is_admin and (
