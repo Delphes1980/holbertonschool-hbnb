@@ -18,6 +18,7 @@ user_model = api.model('User', {
                               description='Password of the user')
 })
 
+# Define the user response model
 user_response_model = api.model('UserResponse', {
     'id': fields.String(required=True,
                         description='ID of the user'),
@@ -31,6 +32,7 @@ user_response_model = api.model('UserResponse', {
                            description='Email of the user', attribute='email')
 })
 
+# Define the updating user data response model
 user_update_model = api.model('UserUpdate', {
     'first_name': fields.String(required=False,
                                 description='First name of the user',
@@ -46,16 +48,19 @@ user_update_model = api.model('UserUpdate', {
                               attribute='password')
 })
 
+# Define an error response model
 error_model = api.model('Error', {
     'error': fields.String(description='Error message')
 })
 
+# Define a success response model
 msg_model = api.model('Message', {
     'message': fields.String(description='Message')
 })
 
 
 class AdminUserCreate(Resource):
+    """ Handles creating user accounts requiring admin privileges"""
     @api.doc('Returns the created user', security='Bearer')
     @api.marshal_with(user_response_model,
                       code=_http.HTTPStatus.CREATED,
@@ -69,12 +74,18 @@ class AdminUserCreate(Resource):
     @jwt_required()
     def post(self):
         """Register a new user"""
+        # Get current user ID
         current_user = get_jwt()
+
+        # Check if the authenticated user is admin
         if not current_user.get('is_admin'):
             api.abort(403, error='Admin privileges required')
             return {'error': 'Admin privileges required'}, 403
+
+        # Automatically parses and validates request JSON
         user_data = api.payload
         try:
+            # Validate input data
             compare_data_and_model(user_data, user_model)
             new_user = facade.create_user(user_data)
         except CustomError as e:
@@ -83,6 +94,8 @@ class AdminUserCreate(Resource):
         except Exception as e:
             api.abort(400, error=str(e))
             return {'error': str(e)}, 400
+
+        # Unexpected facade behavior
         if new_user is None:
             api.abort(500,
                       error='Something happened and the user was not created')
@@ -106,6 +119,8 @@ class UserList(AdminUserCreate):
 
 
 class AdminPrivilegesUserModify(Resource):
+    """Handles updating user
+    Require admin privileges"""
     @api.doc('Returns the updated user', security='Bearer')
     @api.marshal_with(user_response_model,
                       code=_http.HTTPStatus.OK,
@@ -122,22 +137,29 @@ class AdminPrivilegesUserModify(Resource):
         """Update the user data of a registered user by ID"""
         user_data = api.payload
         try:
+            # Validate input data
             compare_data_and_model(user_data, user_update_model)
+            # Retrieve the user to be updated
             user = facade.get_user(user_id)
+
+            # Check if the user exists
             if user is None:
                 raise CustomError(
                     'Invalid user_id: no user found corresponding to that'
                     ' user_id', 404)
+
+            # Get current user ID
             current_user = get_jwt_identity()
+            # Get admin status
             is_admin = get_jwt().get('is_admin', False)
-            # if is_admin is None:
-            #     raise CustomError('is_admin claim was not found in the
-            # jwt', 401)
-            # check the user_id in the URL matches the authenticated user
+            # Check the user_id in the URL matches the authenticated user
             if not is_admin and current_user != user.id:
                 raise CustomError(
                     'Unauthorized action: you can not modify the user account'
                     ' of somebody else', 403)
+
+            # Restrictions for non-admin users attempting to change
+            # email and password
             given_email = user_data.get('email')
             given_password = user_data.get("password")
             if not is_admin and (
@@ -146,6 +168,8 @@ class AdminPrivilegesUserModify(Resource):
                  (given_password))):
                 raise CustomError(
                     'You cannot modify email or password action', 400)
+
+            # Update user
             updated_user = facade.update_user(user_id, user_data)
         except CustomError as e:
             api.abort(e.status_code, error=str(e))
@@ -166,11 +190,13 @@ class AdminPrivilegesUserDelete(Resource):
     @api.response(401, 'Missing authorization header', error_model)
     @api.response(403, 'Unauthorized action', error_model)
     @api.response(404, 'User not found', error_model)
-    @jwt_required()
+    @jwt_required()  # Requires authentication
     def delete(self, user_id):
         """Delete a user"""
         try:
+            # Get current user ID
             current_user_id = get_jwt_identity()
+            # Get admin status
             is_admin = get_jwt().get('is_admin', False)
             # Retrieve the user to validate its existence
             user = facade.get_user(user_id)
@@ -182,6 +208,8 @@ class AdminPrivilegesUserDelete(Resource):
                 raise CustomError(
                     'Unauthorized action: user can not delete other users',
                     403)
+
+            # Delete user
             facade.delete_user(user_id)
         except CustomError as e:
             api.abort(e.status_code, error=str(e))
@@ -206,47 +234,14 @@ class UserResource(AdminPrivilegesUserModify, AdminPrivilegesUserDelete):
     def get(self, user_id):
         """Get user details by ID"""
         try:
+            # Retrieve user
             user = facade.get_user(user_id)
         except Exception as e:
             api.abort(400, error=str(e))
             return {'error': str(e)}, 400
+
+        # Check if user exists
         if user is None:
             api.abort(404, error='User not found')
             return {'error': 'User not found'}, 404
         return user, 200
-
-    # @api.doc('Returns the updated user')
-    # @api.marshal_with(user_response_model,
-    #                   code=_http.HTTPStatus.OK,
-    #                   description='User updated successfully')
-    # @api.expect(update_user_model, validate=False)
-    # @api.response(200, 'User successfully updated')
-    # @api.response(400, 'Invalid input data')
-    # @api.response(404, 'User not found')
-    # @api.response(403, 'Unauthorized action')
-    # @jwt_required()
-    # def put(self, user_id):
-    #     """Update the user data of a registered user by ID"""
-    #     # Chek if user_id is the current user's ID
-    #     current_user_id = get_jwt_identity()
-    #     claims = get_jwt()
-    #     is_admin = claims.get('is_admin', False)
-    #     if current_user_id != user_id:
-    #         api.abort(403, error=str(e))
-    #         return {'error': str(e)}, 403
-    #     else:
-    #         user_data = api.payload
-    #         # User cannot modify email or password
-    #         if 'email' in user_data or 'password' in user_data:
-    #             api.abort(403, error=str(e))
-    #             return {'error': str(e)}, 403
-    #         try:
-    #             compare_data_and_model(user_data, update_user_model)
-    #             updated_user = facade.update_user(user_id, user_data)
-    #         except Exception as e:
-    #             api.abort(400, error=str(e))
-    #             return {'error': str(e)}, 400
-    #         if not updated_user:
-    #             api.abort(404, error='User not found')
-    #             return {'error': 'User not found'}, 404
-    #         return updated_user, 200

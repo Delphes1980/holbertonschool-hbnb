@@ -10,8 +10,8 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 
 class Review(BaseEntity):
+    """ Represents a  'Review' entity in the database"""
     __tablename__ = 'reviews'
-    # id = db.Column(db.Integer, primary_key=True)
     _text: Mapped[str] = mapped_column("text", Text, nullable=False)
     _rating: Mapped[int] = mapped_column("rating", Integer, nullable=False)
     place_id: Mapped[str] = mapped_column("place_id", String(36),
@@ -29,9 +29,6 @@ class Review(BaseEntity):
                  user: User):
         super().__init__()
         self.text = text
-        # self.rating = self.rating_validation(rating)
-        # self.place = self.set_place(place)
-        # self.user = self.set_user(user)
         self.rating = rating
         self.place = place
         self.user = user
@@ -64,6 +61,7 @@ class Review(BaseEntity):
         self._rating = self.rating_validation(value)
 
     def rating_validation(self, rating):
+        """ Validates the review rating"""
         if rating is None:
             raise ValueError(
                 "rating is required: provide an integer between 1 and 5 to"
@@ -119,8 +117,3 @@ class Review(BaseEntity):
                 "place is required: provide place being reviewed")
         type_validation(place, "Place", Place)
         return place
-
-    # def to_dict(self):
-    #     return {'id': self.id,
-    #             'user_id': self.user.id,
-    #             'place_id': self.place.id}

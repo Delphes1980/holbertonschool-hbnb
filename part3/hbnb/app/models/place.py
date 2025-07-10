@@ -14,8 +14,8 @@ if TYPE_CHECKING:
 
 
 class Place(BaseEntity):
+    """ Represents a 'Place' entity in the database"""
     __tablename__ = 'places'
-    # id = db.Column(db.Integer, primary_key=True, unique=True)
     _title: Mapped[str] = mapped_column("title", String(128),
                                         nullable=False)
     _description: Mapped[Optional[str]] = mapped_column("description", Text,
@@ -42,6 +42,7 @@ class Place(BaseEntity):
     def __init__(self, title: str, description=None, *,
                  price: float, latitude: float,
                  longitude: float, owner: User):
+        """ Initializes a new Place instance"""
         super().__init__()
         self.title = title
         self.description = description
@@ -156,17 +157,10 @@ class Place(BaseEntity):
         self._owner = value
         self.owner_id = value.id
 
-    # allow querying for the attribute
+    # Allow querying for the attribute
     @owner.expression
     def owner(cls):
         return cls._owner
-
-    # def is_owner(self, user_id):
-    #     """Verify is the user owns the place."""
-    #     if self.owner != user_id:
-    #         raise PermissionError("Unauthorized access: the current user "
-    #                           "is not the owner")
-    #     return True
 
     def add_review(self, review):
         """Add a review to the place."""
@@ -218,20 +212,3 @@ class Place(BaseEntity):
         self._amenities = []
         for amenity in value:
             self.add_amenity(amenity)
-            # self.__amenities.append(self.amenity_validation(amenity))
-
-    # def to_dict(self):
-    #     """ Convert the Place object to a dictionary representation,
-    #     including BaseEntity fields """
-    #     base_dict = super().to_dict()
-    #     base_dict.update({
-    #         "title": self.title,
-    #         "description": self.description,
-    #         "price": self.price,
-    #         "latitude": self.latitude,
-    #         "longitude": self.longitude,
-    #         "owner_id": self.owner_id,
-    #         "reviews": list(self.reviews),
-    #         "amenities": list(self.amenities)
-    #         })
-    #     return base_dict

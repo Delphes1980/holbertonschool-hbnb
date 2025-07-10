@@ -1,7 +1,4 @@
-# from app.persistence.repository import InMemoryRepository
 from app.persistence.repository import SQLAlchemyRepository
-# from app.persistence.UserRepository import UserRepository
-# from app.persistence.PlaceRepository import PlaceRepository
 from app.models.user import User
 from app.models.place import Place
 from app.models.amenity import Amenity
@@ -10,7 +7,6 @@ from app.services.UserService import UserService
 from app.services.PlaceService import PlaceService
 from app.services.AmenityService import AmenityService
 from app.services.ReviewService import ReviewService
-# from app.models.baseEntity import type_validation
 
 
 class HBnBFacade:

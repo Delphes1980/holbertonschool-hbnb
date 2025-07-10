@@ -12,6 +12,7 @@ amenity_model = api.model('Amenity', {
     'name': fields.String(required=True, description='Name of the amenity')
 })
 
+# Define the response model for amenity operations
 amenity_response_model = api.model('AmenityResponse', {
     'id': fields.String(
         required=True,
@@ -20,24 +21,15 @@ amenity_response_model = api.model('AmenityResponse', {
                           description='Name of the amenity')
 })
 
+# Define an error response model
 error_model = api.model('Error', {
     'error': fields.String(description='Error message')
 })
 
+# Define a success response model
 msg_model = api.model('Message', {
     'message': fields.String(description='Message')
 })
-
-# Define the response model for returning amenity data
-# amenity_response_model = api.inherit('AmenityResponse', amenity_model, {
-#     'id': fields.String(
-#         required=True,
-#         description='Unique identifier for the amenity'),
-# 'created_at': fields.DateTime(dt_format='iso8601', description=
-# 'Timestamp of creation (ISO 8601)'),
-# 'updated_at': fields.DateTime(dt_format='iso8601', description=
-# 'Timestamp of the last update (ISO 8601)')
-# })
 
 
 class AdminAmenityCreate(Resource):
@@ -57,12 +49,13 @@ class AdminAmenityCreate(Resource):
         is_admin = get_jwt().get('is_admin', False)
         amenity_data = api.payload
         try:
-            # If is_admin is None:
-            # raise CustomError('is_admin claim was not found in the jwt', 401)
+            # Check for admin privileges
             if not is_admin:
                 raise CustomError('Unauthorized action: admin privileges'
                                   ' required', 403)
+            # Validate input data
             compare_data_and_model(amenity_data, amenity_model)
+
             new_amenity = facade.create_amenity(amenity_data)
         except CustomError as e:
             api.abort(e.status_code, error=str(e))
@@ -86,8 +79,6 @@ class AmenityList(AdminAmenityCreate):
     def get(self):
         """Retrieve a list of all amenities"""
         return facade.get_all_amenities(), 200
-        # amenities = facade.get_all_amenities()
-        # return [amenity.to_dict() for amenity in amenities], 200
 
 
 class AdminAmenityModify(Resource):
@@ -104,14 +95,19 @@ class AdminAmenityModify(Resource):
     @jwt_required()
     def put(self, amenity_id):
         """Update an amenity's information"""
+        # Get admin status
         is_admin = get_jwt().get('is_admin')
         amenity_data = api.payload
+
         try:
+            # Check for admin privileges
             if is_admin is None:
                 raise CustomError('is_admin claim was not found in the jwt',
                                   401)
             elif not is_admin:
                 raise CustomError('Admin privileges required', 403)
+
+            # Validate input data
             compare_data_and_model(amenity_data, amenity_model)
             updated_amenity = facade.update_amenity(amenity_id,
                                                     amenity_data)
@@ -140,16 +136,19 @@ class AdminPrivilegesAmenityDelete(Resource):
     def delete(self, amenity_id):
         """Delete a amenity"""
         try:
+            # Get admin status
             is_admin = get_jwt().get('is_admin', False)
             if not is_admin:
                 raise CustomError("Unauthorized action: admin privileges"
                                   "required", 403)
+
             # Retrieve the amenity to validate its existence
             amenity = facade.get_amenity(amenity_id)
             # Check if the amenity exists
             if amenity is None:
                 raise CustomError('Invalid amenity_id: amenity not found',
                                   404)
+
             facade.delete_amenity(amenity_id)
         except CustomError as e:
             api.abort(e.status_code, error=str(e))
@@ -182,6 +181,8 @@ class AmenityResource(AdminAmenityModify, AdminPrivilegesAmenityDelete):
         except Exception as e:
             api.abort(400, error=str(e))
             return {'error': str(e)}, 400
+
+        # Check if amenity exists
         if amenity is None:
             api.abort(404, error='Amenity not found')
             return {'error': 'Amenity not found'}, 404
