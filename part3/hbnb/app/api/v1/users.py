@@ -100,8 +100,7 @@ class AdminUserCreate(Resource):
             api.abort(500,
                       error='Something happened and the user was not created')
             return {
-                'error': 'Something happened and the user was not created'},
-        400
+                'error': 'Something happened and the user was not created'}, 400
         return new_user, 201
 
 
