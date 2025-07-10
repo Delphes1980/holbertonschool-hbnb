@@ -113,7 +113,7 @@ pip install -r requirements.txt
 ```
 
 #### 4. Initialize the database
-On your terminal, tape the following command:
+On your terminal, type down the following command:
 ```
 sqlite3 instance/development.db < create_tables.sql
 ```

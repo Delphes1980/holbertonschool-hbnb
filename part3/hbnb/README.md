@@ -1,20 +1,34 @@
-# HBnB Evolution
-Business Logic implementation
+# HBnB Evolution - Installation
 
-Brief overview of the project setup:
+#### 1. Clone the repository
+git clone (https://github.com/Delphes1980/holbertonschool-hbnb/tree/main/)
+```
+cd part3/hbnb/
+```
 
-Description of the purpose of each directory and file.
+#### 2. Create and activate a virtual environment
+```
+python3 -m venv venv
+```
+then
+```
+source venv/bin/activate
+```
 
-
-Instructions on how to install dependencies and run the
-application.
-
-Install all dependencies with:
+#### 3. Install dependencies
 ```
 pip install -r requirements.txt
 ```
 
-Run the application executing:
+#### 4. Initialize the database
+On your terminal, type down the following command:
 ```
-python3 run.py
+sqlite3 instance/development.db < create_tables.sql
 ```
+
+#### 5. Application utilisation
+From the hbnb directory (within part3), run:
+```
+python run.py
+```
+The API will be available at http://127.0.0.1:5000/api/v1.
