@@ -200,20 +200,20 @@ VALUES(
 	'7414383a-c590-41aa-a4a5-02c11b8f2b17'
 );
 
-INSERT INTO reviews(id, text, rating, user_id, place_id)
-VALUES(
-	'8785d826-963b-4294-b67d-3a4b0983e2e5',
-	"I didn't like this place at all",
-	1,
-	'6fb5f1c1-f9d4-4987-aee3-16ab71704835',
-	'121c0d34-a070-4773-b1bf-b850da8b2607'
-);
+-- INSERT INTO reviews(id, text, rating, user_id, place_id)
+-- VALUES(
+-- 	'8785d826-963b-4294-b67d-3a4b0983e2e5',
+-- 	"I didn't like this place at all",
+-- 	1,
+-- 	'6fb5f1c1-f9d4-4987-aee3-16ab71704835',
+-- 	'121c0d34-a070-4773-b1bf-b850da8b2607'
+-- );
 
-INSERT INTO reviews(id, text, rating, user_id, place_id)
-VALUES(
-	'385fbe4c-34f8-4155-b850-cb1e4bd78a0e',
-	"This place was not bad, not great either, but not bad",
-	3,
-	'9962e46f-05fa-4ac2-9617-b53d06713a33',
-	'7414383a-c590-41aa-a4a5-02c11b8f2b17'
-);
+-- INSERT INTO reviews(id, text, rating, user_id, place_id)
+-- VALUES(
+-- 	'385fbe4c-34f8-4155-b850-cb1e4bd78a0e',
+-- 	"This place was not bad, not great either, but not bad",
+-- 	3,
+-- 	'7414383a-c590-41aa-a4a5-02c11b8f2b17'
+-- 	'9962e46f-05fa-4ac2-9617-b53d06713a33',
+-- );
