@@ -214,6 +214,6 @@ VALUES(
 	'385fbe4c-34f8-4155-b850-cb1e4bd78a0e',
 	"This place was not bad, not great either, but not bad",
 	3,
-	'9962e46f-05fa-4ac2-9617-b53d06713a33',
-	'7414383a-c590-41aa-a4a5-02c11b8f2b17'
+	'7414383a-c590-41aa-a4a5-02c11b8f2b17',
+	'9962e46f-05fa-4ac2-9617-b53d06713a33'	
 );
