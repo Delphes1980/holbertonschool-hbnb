@@ -54,11 +54,9 @@ place_model = api.model('Place', {
                              description='Latitude of the place'),
     'longitude': fields.Float(required=True,
                               description='Longitude of the place'),
-    # 'owner_id': fields.String(required=False,
-                            #   description='ID of the owner'),
-    'amenities_ids': fields.List(fields.String,
-                             required=False,
-                             description="List of amenities ID's")
+    # 'owner_id': fields.String(required=False, description='ID of the owner'),
+    'amenities_ids': fields.List(fields.String, required=False,
+                                 description="List of amenities ID's")
 })
 
 # Define the data model for place responses (full detail, including nested
@@ -106,6 +104,7 @@ msg_model = api.model('Message', {
     'message': fields.String(description='Message')
 })
 
+
 @api.route('/')
 class PlaceList(Resource):
     # Endpoint for creating a new place
@@ -117,7 +116,7 @@ class PlaceList(Resource):
     @api.response(201, 'Place successfully created',
                   place_response_model)
     @api.response(400, 'Invalid input data', error_model)
-    @jwt_required() # ensure the user is authenticated
+    @jwt_required()  # ensure the user is authenticated
     def post(self):
         """Register a new place"""
         # Check if owner is the current user's ID
@@ -130,7 +129,8 @@ class PlaceList(Resource):
             if given_owner_id is None:
                 place_data['owner_id'] = current_user
             elif current_user != facade.get_user(given_owner_id).id:
-                raise CustomError('Unauthorized action: user does not match the provided place owner', 403)
+                raise CustomError('Unauthorized action: user does not match'
+                                  'the provided place owner', 403)
             new_place = facade.create_place(place_data)
         except CustomError as e:
             api.abort(e.status_code, error=str(e))
@@ -187,14 +187,17 @@ class AdminPrivilegesPlaceModify(Resource):
             is_admin = get_jwt().get("is_admin", False)
             # Check if the owner is the current user
             if not is_admin and current_user_id != place.owner.id:
-                raise CustomError('Unauthorized action: user is not owner of place', 403)
+                raise CustomError('Unauthorized action: user is not owner of'
+                                  'place', 403)
             given_owner_id = place_data.get('owner_id')
             if given_owner_id is None:
                 place_data['owner_id'] = place.owner.id
             elif not is_admin and (given_owner_id != current_user_id):
-                raise CustomError('Unauthorized action: given owner_id doesn\' match authenticated user', 403)
+                raise CustomError("Unauthorized action: given owner_id doesn't"
+                                  "match authenticated user", 403)
             elif is_admin and given_owner_id != place.owner.id:
-                raise CustomError('Unauthorized action: not even an admin can change the owner of a place', 403)
+                raise CustomError('Unauthorized action: not even an admin can'
+                                  'change the owner of a place', 403)
             updated_place = facade.update_place(place_id,
                                                 place_data)
         except CustomError as e:
@@ -229,7 +232,8 @@ class AdminPrivilegesPlaceDelete(Resource):
                 raise CustomError('Invalid place_id: place not found', 404)
             # Check if the owner of the place is the current user
             elif not is_admin and current_user_id != place.owner.id:
-                raise CustomError('Unauthorized action: user is not the owner of the place', 403)
+                raise CustomError('Unauthorized action: user is not the owner'
+                                  'of the place', 403)
             facade.delete_place(place_id)
         except CustomError as e:
             api.abort(e.status_code, error=str(e))
@@ -238,6 +242,7 @@ class AdminPrivilegesPlaceDelete(Resource):
             api.abort(404, error=str(e))
             return {'error': str(e)}, 404
         return {"msg": f"Place {place_id} has been succesfully deleted"}, 200
+
 
 @api.route('/<place_id>')
 class PlaceResource(AdminPrivilegesPlaceModify, AdminPrivilegesPlaceDelete):
@@ -266,17 +271,15 @@ class PlaceResource(AdminPrivilegesPlaceModify, AdminPrivilegesPlaceDelete):
             return {'error': 'Place not found'}, 404
         return place, 200
 
-    
-
 
 @api.route('/<place_id>/reviews')
 class PlaceReviewsList(Resource):
     # Endpoint for retrieving all reviews associated with a specific
     # place
     @api.doc('Returns list of reviews given to the concerned place')
-    @api.marshal_list_with(review_response_model, 
+    @api.marshal_list_with(review_response_model,
                            code=_http.HTTPStatus.OK,
-                           description='List of reviews given to the '
+                           description='List of reviews given to the'
                            'place retrieved successfully')
     @api.response(200, 'List of reviews retrieved successfully',
                   review_response_model)

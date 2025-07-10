@@ -19,7 +19,7 @@ class Place(BaseEntity):
     _title: Mapped[str] = mapped_column("title", String(128),
                                         nullable=False)
     _description: Mapped[Optional[str]] = mapped_column("description", Text,
-                                              nullable=True)
+                                                        nullable=True)
     _price: Mapped[float] = mapped_column("price", Float,
                                           nullable=False)
     _latitude: Mapped[float] = mapped_column("latitude", Float,
@@ -27,12 +27,19 @@ class Place(BaseEntity):
     _longitude: Mapped[float] = mapped_column("longitude", Float,
                                               nullable=False)
     owner_id: Mapped[str] = mapped_column("owner_id",
-                                           ForeignKey('users.id'))
-    _owner: Mapped["User"] = relationship("User", back_populates="places", lazy=True)
-    _reviews: Mapped[List["Review"]] = relationship("Review", back_populates="_place", lazy=True, cascade="all, delete-orphan")
-    _amenities: Mapped[List["Amenity"]] = relationship("Amenity", secondary=place_amenity, back_populates="places")
-    
-    def __init__(self, title: str, description = None, *,
+                                          ForeignKey('users.id'))
+    _owner: Mapped["User"] = relationship("User", back_populates="places",
+                                          lazy=True)
+    _reviews: Mapped[List["Review"]] = relationship("Review",
+                                                    back_populates="_place",
+                                                    lazy=True,
+                                                    cascade="all,"
+                                                    "delete-orphan")
+    _amenities: Mapped[List["Amenity"]] = relationship("Amenity",
+                                                       secondary=place_amenity,
+                                                       back_populates="places")
+
+    def __init__(self, title: str, description=None, *,
                  price: float, latitude: float,
                  longitude: float, owner: User):
         super().__init__()
@@ -46,7 +53,7 @@ class Place(BaseEntity):
         self._amenities = []  # List to store related amenities
 
     @hybrid_property
-    def title(self): # type: ignore
+    def title(self):  # type: ignore
         return self._title
 
     @title.setter
@@ -56,31 +63,32 @@ class Place(BaseEntity):
     def validate_title(self, title):
         """Verify if the title is a string < 100 characters."""
         if title is None:
-            raise ValueError('Invalid title: expected a title but received None')
+            raise ValueError(
+                'Invalid title: expected a title but received None')
         type_validation(title, "Title", str)
         title = title.strip()
         strlen_validation(title, "Title", 4, 100)
         return title
 
     @hybrid_property
-    def description(self): # type: ignore
+    def description(self):  # type: ignore
         return self._description
 
-    @description.setter # type: ignore
+    @description.setter  # type: ignore
     def description(self, value):
-        self._description = self.validate_description(value) # type
+        self._description = self.validate_description(value)  # type
 
     def validate_description(self, description):
         """Verify if the description is a string."""
         if description is None:
-            return None # ""
+            return None  # ""
         type_validation(description, "Description", str)
         description = description.strip()
         strlen_validation(description, "Description", 3, 50)
         return description
 
     @hybrid_property
-    def price(self): # type: ignore
+    def price(self):  # type: ignore
         return self._price
 
     @price.setter
@@ -90,7 +98,8 @@ class Place(BaseEntity):
     def validate_price(self, price: float):
         """Verify is the price is an integer."""
         if price is None:
-            raise ValueError("Invalid price: expected float or int but received None")
+            raise ValueError(
+                "Invalid price: expected float or int but received None")
         type_validation(price, "Price", (float, int))
         if price <= 0:
             raise ValueError("Price must be a positive number (larger "
@@ -98,7 +107,7 @@ class Place(BaseEntity):
         return float(price)
 
     @hybrid_property
-    def latitude(self): # type: ignore
+    def latitude(self):  # type: ignore
         return self._latitude
 
     @latitude.setter
@@ -108,14 +117,15 @@ class Place(BaseEntity):
     def validate_latitude(self, latitude):
         """Verify is the latitude is a float between -90.0 & 90.0."""
         if latitude is None:
-            raise ValueError("Invalid latitude: expected float or int but received None")
+            raise ValueError(
+                "Invalid latitude: expected float or int but received None")
         type_validation(latitude, "Latitude", (float, int))
         if not (-90.0 <= latitude <= 90.0):
             raise ValueError("Latitude must be between -90.0 and 90.0.")
         return float(latitude)
 
     @hybrid_property
-    def longitude(self): # type: ignore
+    def longitude(self):  # type: ignore
         return self._longitude
 
     @longitude.setter
@@ -126,7 +136,8 @@ class Place(BaseEntity):
         """Verify is the longitude is a float between -180.0 &
         180.0."""
         if longitude is None:
-            raise ValueError("Invalid longitude: expected float or int but received None")
+            raise ValueError(
+                "Invalid longitude: expected float or int but received None")
         type_validation(longitude, "Longitude", (float, int))
         if not (-180.0 <= longitude <= 180.0):
             raise ValueError("Longitude must be between -180.0 and"
@@ -134,11 +145,11 @@ class Place(BaseEntity):
         return float(longitude)
 
     @hybrid_property
-    def owner(self): # type: ignore
+    def owner(self):  # type: ignore
         return self._owner
 
-    @owner.setter # type: ignore
-    def owner(self, value): # type: ignore
+    @owner.setter  # type: ignore
+    def owner(self, value):  # type: ignore
         if value is None:
             raise ValueError("Invalid owner: expected user but received None")
         type_validation(value, "owner", User)
@@ -149,7 +160,7 @@ class Place(BaseEntity):
     @owner.expression
     def owner(cls):
         return cls._owner
-    
+
     # def is_owner(self, user_id):
     #     """Verify is the user owns the place."""
     #     if self.owner != user_id:
@@ -166,10 +177,10 @@ class Place(BaseEntity):
         self.reviews.append(review)
 
     @hybrid_property
-    def reviews(self): #type: ignore
+    def reviews(self):  # type: ignore
         return self._reviews
-    
-    @reviews.setter #type: ignore
+
+    @reviews.setter  # type: ignore
     def reviews(self, value):
         if value is None:
             self._reviews = []
@@ -184,19 +195,21 @@ class Place(BaseEntity):
 
     def amenity_validation(self, amenity):
         if amenity is None:
-            raise ValueError('Invalid amenity: expected amenity but received None')
+            raise ValueError(
+                'Invalid amenity: expected amenity but received None')
         from app.models.amenity import Amenity
         type_validation(amenity, "Amenity", Amenity)
-        if any(place_amenity == amenity 
+        if any(place_amenity == amenity
                for place_amenity in self.amenities):
-            raise CustomError(f'Amenity "{amenity.name}" already listed for this place', 400)
+            raise CustomError(
+                f'Amenity "{amenity.name}" already listed for this place', 400)
         return amenity
 
     @hybrid_property
-    def amenities(self): # type: ignore
+    def amenities(self):  # type: ignore
         return self._amenities
-    
-    @amenities.setter # type: ignore
+
+    @amenities.setter  # type: ignore
     def amenities(self, value):
         if value is None:
             self._amenities = []

@@ -28,6 +28,7 @@ protected_access_model = api.model('ProtectedAccess', {
                                 accessed')
 })
 
+
 @api.route('/login')
 class Login(Resource):
     @api.doc('Returns the created access token')
@@ -46,26 +47,25 @@ class Login(Resource):
             api.abort(400, error=str(e))
             return {'error': str(e)}, 400
         # Step 2: Check if the user exists and the password is correct
-        if (not user or 
-            not user.verify_password(credentials['password'])):
+        if (not user or not user.verify_password(credentials['password'])):
             return {'error': 'Invalid credentials'}, 401
 
         # Step 3: Create a JWT token with the user's id and is_admin flag
         access_token = create_access_token(
             identity=str(user.id),
-            additional_claims={'id': str(user.id), 
+            additional_claims={'id': str(user.id),
                                'is_admin': user.is_admin}
             )
-        
+
         # Step 4: Return the JWT token to the client
         return {'access_token': access_token}, 200
-    
+
 # # Test endpoint for protected resources
 # @api.route('/protected')
 # class ProtectedResource(Resource):
 #     @api.doc('Confirms access to protected ressource',
 #              security='Bearer')
-#     @api.response(200, 'Ressource accessed successfully', 
+#     @api.response(200, 'Ressource accessed successfully',
 #                   protected_access_model)
 #     @jwt_required()
 #     def get(self):
@@ -76,4 +76,3 @@ class Login(Resource):
 #                 f'{" " if current_user["is_admin"] else "not"} '
 #                 'admin'}, 200
 #         # return {'message': f'Hello, user {current_user["id"]}'}, 200
-        
