@@ -115,10 +115,7 @@ pip install -r requirements.txt
 #### 4. Initialize the database
 On your terminal, tape the following command:
 ```
-flask shell
->>> from app import db
->>> db.create_all()
->>> exit()
+sqlite3 instance/development.db < create_tables.sql
 ```
 
 #### 5. Application utilisation
