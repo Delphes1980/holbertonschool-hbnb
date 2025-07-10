@@ -1,6 +1,7 @@
 # HBnB Evolution
 
 ## Installation
+#### 0. Install python 3.10.12 and sqlite 3.37.2
 #### 1. Clone the repository
 git clone https://github.com/Delphes1980/holbertonschool-hbnb.git desired_folder_name
 ```
@@ -24,7 +25,7 @@ pip install -r requirements.txt
 #### 4. Initialize the database
 On your terminal, type down the following command:
 ```
-sqlite3 instance/development.db < create_tables.sql
+mkdir instance; sqlite3 instance/development.db < create_tables.sql
 ```
 
 #### 5. Application utilisation
