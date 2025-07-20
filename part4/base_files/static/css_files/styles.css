@@ -1,0 +1,173 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #f4f4f4;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items:flex-end;
+}
+
+.header-nav {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+nav {
+    display: flex;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+    margin-left: 1rem;
+}
+
+.login-button {
+	display: inline-block;
+	padding: 0.2rem ;
+	border: 0.2rem solid #333;
+	font-size: 1rem;
+	color: #090909;
+	text-decoration: underline;
+    background-color: #ffbeae;
+    width: fit-content;
+    height: fit-content;
+    border-radius: 8px;
+}
+
+main {
+    padding: 2rem;
+    flex-grow: 1;
+}
+
+footer {
+    background-color: #333; 
+    height: 60px; 
+    width: 100%;
+    display:flex;
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center;
+    color: white;
+}
+
+/* ##### Styles for the modal pop up #####*/
+
+/* Styles for the modal */
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.7);
+    justify-content: center;
+    align-items: center;
+}
+
+/* Styles for the modal content parent box */
+
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 10px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Styles for the modal header content box */
+
+#modal-header-content {
+    padding: 15px 20px;
+    background: #ffbeae;
+    color: black;
+    border-radius: 10px 10px 0px 0px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#modal-header-content h2 {
+    margin: 0;
+    color: white;
+    text-align: center;
+    align-items: center;
+}
+
+/* Styles for the modal body content box */
+
+#modal-body-content {
+    padding: 5px;
+    flex-grow: 1;
+    overflow-y: auto;
+    border: solid 2px;
+    border-color: #ffbeae;
+}
+
+#modal-body-content p {
+    word-break: break-word;
+}
+
+/* Styles for the modal footer content box */
+
+#modal-footer-content {
+    padding: 15px 20px;
+    background-color: #ffbeae;
+    color: black;
+    border-radius: 0px 0px 10px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Styles for the modal close button */
+
+.close-button {
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: #ff988b;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.close-button:hover, .close-button:focus {
+    color: white;
+    text-decoration: none;
+}
+
+body.modal-open {
+    overflow: hidden;
+}

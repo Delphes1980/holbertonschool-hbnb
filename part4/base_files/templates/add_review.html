@@ -4,17 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Review</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../static/css_files/styles.css">
 </head>
 <body>
     <header>
-        <img class="logo" src="images/logo.png">
+        <div class="header-nav">
+        <img class="logo" src="../images/logo.png" alt="">
         <nav>
             <a href="index.html" id="home_link">Home</a>
             <a href="login.html" id="login-link">Login</a>
             <a href="place.html" id="place-link">Places</a>
-            <a href="add_review.html" id="review_link">Reviews</a>
         </nav>
+        </div>
+        <button class="login-button">Login</button>
     </header>
     <main>
         <!-- Add something to idfentify the place you're reviewing -->
@@ -24,12 +26,18 @@
             <textarea id="review" name="review" required></textarea>
             <label for="rating">Rating:</label>
             <select id="rating" name="rating" required>
+                <option value="">Choose a rating</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
                 <!-- Options for rating -->
             </select>
             <button type="submit">Submit Review</button>
         </form>
     </main>
-    <script src="scripts.js"></script>
+    <script src="../static/js_files/scripts.js"></script>
     <footer>
         <p>© HBnB Evolution 2025. Made by Delphine Coutouly-Laborda. All rights reserved.</p>
     </footer>

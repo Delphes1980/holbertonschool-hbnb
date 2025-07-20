@@ -1,0 +1,131 @@
+/* ##### Styles for place card on index page ##### */
+
+/* Styles for the parent box*/
+#places-list {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 10px;
+	padding: 1rem;
+}
+
+.place-card {
+    margin: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 21%;
+    height: auto;
+    background-color: #ffbeae;
+	min-height: 300px;
+}
+
+.place-card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+/* Styles for the child box */
+
+.place-card-container {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+	width: 100%;
+}
+
+.place-card-container img {
+	width: 100%;
+	height: 150px;
+	object-fit: cover;
+	border-radius: 5px;
+	margin-bottom: 10px;
+}
+
+.details-button {
+    padding: 10px 10px;
+    border: 0.2rem solid #ffbeae;
+    background-color: #ff988b;
+    margin-top: 10px;
+    width: 30%;
+	cursor: pointer;
+}
+
+/* Styles for place card on place page */
+
+/* Styles for the parent box */
+
+#place-details {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 20px;
+	padding: 2rem;
+}
+
+.place-details-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 10px;
+	background-color: #ffbeae;
+	width: calc(33% - 14px);
+	max-width: 400px;
+	box-sizing: border-box;
+	height: 350px;
+}
+
+/* Styles for the child box */
+
+.place-image {
+	padding: 10px;
+	box-sizing: border-box;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	overflow: hidden;
+	background-color: #ffbeae;
+	border-radius: 10px;
+	width: 100%;
+	overflow: hidden;
+	margin-bottom: 10px;
+}
+
+.place-image img {
+	display: block;
+	width: 100%;
+	height: auto;
+	border-radius: 5px;
+	object-fit: cover;
+}
+
+.place-info {
+    display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	text-align: left;
+    height:auto;
+	width: 100%;
+    background-color: #ffbeae;
+	flex: 1;
+	padding: 0px 10px 10px 10px;
+	box-sizing: border-box;
+	border-radius: 10px;
+}
+
+.review-card {
+    margin: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+	display: flex;
+	flex-direction: column;
+	padding: 10px;
+	flex-wrap: nowrap;
+	gap: 0;
+	background-color: #ffbeae;
+}
