@@ -3,7 +3,7 @@
 /* Styles for the parent box*/
 #places-list {
 	display: flex;
-	flex-wrap: wrap;
+	flex-wrap: wrap; /* regarder la propriété grid pour quand on réduit la page pour que ça ne change pas*/
 	justify-content: center;
 	gap: 10px;
 	padding: 1rem;
