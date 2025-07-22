@@ -102,7 +102,7 @@ function showPlaceDetails(placeId) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    loginRedirection();
+    // loginRedirection();
 
     const placeListContainer = document.getElementById('places-list');
     if (placeListContainer) {

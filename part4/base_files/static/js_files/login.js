@@ -1,42 +1,76 @@
+const DATA_URL = 'http://localhost:5000/api/v1';
+
 // Add the event listener for the form submission
 document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById('login-form');
+	console.log('DOMContentLoaded s\'est déclenché.');
+	const loginForm = document.getElementById('login-form');
 
-    if (loginForm) {
-        loginForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-              // Your code to handle form submission
-			const validateMail = document.forms['login-form']['email'].value;
-			if (validateMail == "") {
+	if (loginForm) {
+		console.log('Formulaire login-form trouvé');  //debug
+		loginForm.addEventListener('submit', async (event) => {
+			console.log('Événement "submit" du formulaire détecté.');  //debug
+			event.preventDefault();
+			console.log('preventDefault() exécuté. Le formulaire ne devrait pas rechargé la page');  //debug
+			  // Your code to handle form submission
+			const validateEmail = document.getElementById('email').value;
+			const validatePassword = document.getElementById('password').value;
+			console.log('Email:', email, 'Password:', password); // debug
+
+			if (validateEmail === "") {
 				alert('Email must be filled out');
-				return false;
+				return;
 			}
-			const validatePassword = document.forms['login-form']['password'].value;
-			if (validatePassword == "") {
+
+			if (validatePassword === "") {
 				alert('Password must be filled out');
-				return false;
+				return;
 			}
-        });
-    }
+			await loginUser(validateEmail, validatePassword);
+			console.log('Fonction loginUser appelée.'); //debug
+		});
+	} else {
+		console.error('Le formulaire avec l\'ID "login-form" n\'a PAS été trouvé');
+		}
 });
 
 // Make the AJAX request to the API
 async function loginUser(email, password) {
-    const response = await fetch('https://localhost:5000/api/v1/auth', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password })
-    });
-      // Handle the response
-	if (response.ok) {  // Handle the API response and store the token in a cookie
-    try {
-		const data = await response.json();
-    	document.cookie = `token=${data.access_token}; path=/`;
-    	window.location.href = 'templates/index.html';
-	} catch {
-    	alert('Login failed: ' + response.statusText);
+	try {
+		const response = await fetch(`${DATA_URL}/auth/login`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ email, password })
+		});
+		// Handle the response
+		if (response.ok) {  // Handle the API response and store the token in a cookie
+    		try {
+				const data = await response.json();
+				if (data && data.access_token) {
+					document.cookie = `token=${data.access_token}; path=/`;
+					window.location.href = 'index.html';
+				} else {
+					alert('Login failed: ' + response.statusText);
+				}
+			} catch (jsonError) {
+				console.error('Error parsing JSON:', jsonError);
+			}
+		} else {
+			let errorMessage = 'Login failed';
+			try {
+				const errorData = await response.json();
+				if (errorData && errorData.message) {
+					errorMessage += ' ' + errorData.message;
+				} else {
+					errorMessage += ' Status: ' + response.statusText;
+				}
+			} catch (networkError) {
+				console.error('Network error during login:', networkError);
+			}
+			alert(errorMessage);
+		}
+	} catch (e) {
+		console.error('Unexpected error during login:', e);
 	}
-};
 }
