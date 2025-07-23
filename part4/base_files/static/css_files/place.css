@@ -2,22 +2,22 @@
 
 /* Styles for the parent box*/
 #places-list {
-	display: flex;
-	flex-wrap: wrap; /* regarder la propriété grid pour quand on réduit la page pour que ça ne change pas*/
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(calc(280px + 2*20px), 1fr));
 	justify-content: center;
-	gap: 10px;
 	padding: 1rem;
 }
 
 .place-card {
     margin: 20px;
+	padding: 10px;
     border: 1px solid #ddd;
     border-radius: 10px;
+	box-sizing: border-box;
     display: flex;
+	flex-direction: column;
     align-items: center;
-    justify-content: center;
-    width: 21%;
-    height: auto;
+    justify-content: space-between;
     background-color: #ffbeae;
 	min-height: 300px;
 }
@@ -29,7 +29,6 @@
 /* Styles for the child box */
 
 .place-card-container {
-    padding: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -49,9 +48,11 @@
     padding: 10px 10px;
     border: 0.2rem solid #ffbeae;
     background-color: #ff988b;
-    margin-top: 10px;
-    width: 30%;
+    margin-top: auto;
+    width: 80%;
 	cursor: pointer;
+	border-radius: 5px;
+	color: white;
 }
 
 /* Styles for place card on place page */
@@ -59,25 +60,24 @@
 /* Styles for the parent box */
 
 #place-details {
-	display: flex;
-	flex-wrap: wrap;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(calc(300px + 2*20px), 1fr));
 	justify-content: center;
-	gap: 20px;
 	padding: 2rem;
 }
 
 .place-details-card {
+	margin: 20px;
+	padding: 10px;
     border: 1px solid #ddd;
     border-radius: 10px;
+	box-sizing: border-box;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	padding: 10px;
 	background-color: #ffbeae;
-	width: calc(33% - 14px);
 	max-width: 400px;
-	box-sizing: border-box;
-	height: 350px;
+	min-height: 350px;
 }
 
 /* Styles for the child box */
@@ -92,14 +92,13 @@
 	background-color: #ffbeae;
 	border-radius: 10px;
 	width: 100%;
-	overflow: hidden;
 	margin-bottom: 10px;
 }
 
 .place-image img {
 	display: block;
 	width: 100%;
-	height: auto;
+	height: 200px;
 	border-radius: 5px;
 	object-fit: cover;
 }
@@ -120,12 +119,15 @@
 
 .review-card {
     margin: 20px;
+	padding: 10px;
     border: 1px solid #ddd;
     border-radius: 10px;
+	box-sizing: border-box;
 	display: flex;
 	flex-direction: column;
-	padding: 10px;
 	flex-wrap: nowrap;
 	gap: 0;
 	background-color: #ffbeae;
+	max-width: 600px;
+	width: 100%;
 }

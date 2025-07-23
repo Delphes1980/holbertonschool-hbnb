@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			console.log('Événement "submit" du formulaire détecté.');  //debug
 			event.preventDefault();
 			console.log('preventDefault() exécuté. Le formulaire ne devrait pas rechargé la page');  //debug
-			  // Your code to handle form submission
+
 			const validateEmail = document.getElementById('email').value;
 			const validatePassword = document.getElementById('password').value;
 			console.log('Email:', email, 'Password:', password); // debug
@@ -43,12 +43,13 @@ async function loginUser(email, password) {
 			},
 			body: JSON.stringify({ email, password })
 		});
-		// Handle the response
-		if (response.ok) {  // Handle the API response and store the token in a cookie
+
+		if (response.ok) {
     		try {
 				const data = await response.json();
 				if (data && data.access_token) {
-					document.cookie = `token=${data.access_token}; path=/`;
+					// Return the token into a cookie
+					document.cookie = `token=${data.access_token}; path=/; secure;`;
 					window.location.href = 'index.html';
 				} else {
 					alert('Login failed: ' + response.statusText);
@@ -74,3 +75,14 @@ async function loginUser(email, password) {
 		console.error('Unexpected error during login:', e);
 	}
 }
+
+function getCookie(name) {
+	const cookies = document.cookie.split("; ");
+	const value = cookies
+		.find(c => c.startsWith(name))
+		?.split("=")[1]
+		if (value === undefined) {
+			return null
+		}
+		return value
+	}
