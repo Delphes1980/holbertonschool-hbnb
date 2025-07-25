@@ -1,39 +1,4 @@
-const DATA_URL = 'http://localhost:5000/api/v1';
-
-// Add the event listener for the form submission
-document.addEventListener('DOMContentLoaded', () => {
-	console.log('DOMContentLoaded s\'est déclenché.');
-	const loginForm = document.getElementById('login-form');
-
-	if (loginForm) {
-		console.log('Formulaire login-form trouvé');  //debug
-		loginForm.addEventListener('submit', async (event) => {
-			console.log('Événement "submit" du formulaire détecté.');  //debug
-			event.preventDefault();
-			console.log('preventDefault() exécuté. Le formulaire ne devrait pas rechargé la page');  //debug
-
-			const validateEmail = document.getElementById('email').value;
-			const validatePassword = document.getElementById('password').value;
-			console.log('Email:', email, 'Password:', password); // debug
-
-			if (validateEmail === "") {
-				alert('Email must be filled out');
-				return;
-			}
-
-			if (validatePassword === "") {
-				alert('Password must be filled out');
-				return;
-			}
-			await loginUser(validateEmail, validatePassword);
-			console.log('Fonction loginUser appelée.'); //debug
-		});
-	} else {
-		console.error('Le formulaire avec l\'ID "login-form" n\'a PAS été trouvé');
-		}
-});
-
-// Make the AJAX request to the API
+// Function that log in a user
 async function loginUser(email, password) {
 	try {
 		const response = await fetch(`${DATA_URL}/auth/login`, {
@@ -76,13 +41,37 @@ async function loginUser(email, password) {
 	}
 }
 
-function getCookie(name) {
-	const cookies = document.cookie.split("; ");
-	const value = cookies
-		.find(c => c.startsWith(name))
-		?.split("=")[1]
-		if (value === undefined) {
-			return null
+
+document.addEventListener('DOMContentLoaded', () => {
+	loginButtonVisibility();
+
+	console.log('DOMContentLoaded s\'est déclenché.');
+	const loginForm = document.getElementById('login-form');
+
+	if (loginForm) {
+		console.log('Formulaire login-form trouvé');  //debug
+		loginForm.addEventListener('submit', async (event) => {
+			console.log('Événement "submit" du formulaire détecté.');  //debug
+			event.preventDefault();
+			console.log('preventDefault() exécuté. Le formulaire ne devrait pas rechargé la page');  //debug
+
+			const validateEmail = document.getElementById('email').value;
+			const validatePassword = document.getElementById('password').value;
+			console.log('Email:', email, 'Password:', password); // debug
+
+			if (validateEmail === "") {
+				alert('Email must be filled out');
+				return;
+			}
+
+			if (validatePassword === "") {
+				alert('Password must be filled out');
+				return;
+			}
+			await loginUser(validateEmail, validatePassword);
+			console.log('Fonction loginUser appelée.'); //debug
+		});
+	} else {
+		console.error('Le formulaire avec l\'ID "login-form" n\'a PAS été trouvé');
 		}
-		return value
-	}
+});

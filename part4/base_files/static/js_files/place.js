@@ -1,18 +1,36 @@
-// const DATA_URL = 'http://localhost:5000/api/v1';
+// Function that fetch the details of a specific place
+async function fetchPlaceDetails(placeId) {
+  try {
+    const token = getCookie('token');
+    const headers = { 'Content-Type': 'application/json'};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
 
-function getCookie(name) {
-	const cookies = document.cookie.split("; ");
-	const value = cookies
-		.find(c => c.startsWith(name))
-		?.split("=")[1]
-		if (value === undefined) {
-			return null
-		}
-		return value
-	}
+    const response = await fetch(`${DATA_URL}/places/${placeId}`, {
+    method: 'GET',
+    mode: 'cors',
+    credentials: 'include',
+    headers: headers,
+  });
+    if (!response.ok) {
+      const errorBody = await response.json();
+      console.error(`HTTP error during getting the details for the place ${placeId}: ${response.status} ${response.statusText}`, errorBody);
+      throw new Error(`Fail during details recuperation for the place: ${response.status} ${response.statusText}`);
+    }
 
-// Function to add a place card with details
+    const data = await response.json();
+    console.log(`Details for the place ${placeId} with success`, data);
+    return data;
 
+  } catch (error) {
+    console.error(`Fail during details recuperation of the place ${placeId}`, error);
+    throw error;
+  }
+}
+
+
+// Function that create and add a details card for a specific place
 function addPlaceDetailsCard(place) {
   const detailsPlace = document.getElementById('place-details');
   if (detailsPlace) {
@@ -40,7 +58,7 @@ function addPlaceDetailsCard(place) {
     placeInfoHost.innerHTML = `<b>Host:</b> ${place.owner.first_name} ${place.owner.last_name}`;
 
     const placeInfoPrice = document.createElement('p');
-    placeInfoPrice.innerHTML = `<b>Price:</b> ${place.price}`;
+    placeInfoPrice.innerHTML = `<b>Price:</b> ${place.price}€`;
 
     const placeInfoDescription = document.createElement('p');
     placeInfoDescription.innerHTML = `<b>Description:</b> ${place.description || 'No description available'}`;
@@ -86,37 +104,10 @@ function addPlaceDetailsCard(place) {
     }
 }
 
-async function fetchPlaceDetails(placeId) {
-  try {
-    const token = getCookie('token');
-    const headers = { 'Content-Type': 'application/json'};
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const response = await fetch(`${DATA_URL}/places/${placeId}`, {
-    method: 'GET',
-    mode: 'cors',
-    credentials: 'include',
-    headers: headers,
-  });
-    if (!response.ok) {
-      const errorBody = await response.json();
-      console.error(`HTTP error during getting the details for the place ${placeId}: ${response.status} ${response.statusText}`, errorBody);
-      throw new Error(`Fail during details recuperation for the place: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    console.log(`Details for the place ${placeId} with success`, data);
-    return data;
-
-  } catch (error) {
-    console.error(`Fail during details recuperation of the place ${placeId}`, error);
-    throw error;
-  }
-}
 
 document.addEventListener('DOMContentLoaded', () => {
+  loginButtonVisibility();
+
 	const detailsPlaceSection = document.getElementById('place-details');
 	if (detailsPlaceSection) {
     const urlParams = new URLSearchParams(window.location.search);
