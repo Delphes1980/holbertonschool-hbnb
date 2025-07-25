@@ -128,7 +128,7 @@ class ReviewList(Resource):
 
 
 class AdminPrivilegesReviewModify(Resource):
-    """ Handles updating an existing review 
+    """ Handles updating an existing review
     Requires the author of the review or the admin privileges"""
     # Endpoint for updating an existing review by ID
     @api.doc('Returns the updated review', security='Bearer')

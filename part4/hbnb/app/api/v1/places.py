@@ -27,6 +27,13 @@ user_response_model = api.model('PlaceOwner', {
                            description='Email of the owner')
 })
 
+user_in_review_model_for_place = api.model('UserInReviewForPlace', {
+	'id': fields.String(required=True, description='User ID'),
+	'first_name': fields.String(required=True, description='User first name'),
+	'last_name': fields.String(required=True, description='User last name'),
+	'email': fields.String(required=True, description='User email'),
+})
+
 # Define a model for nested review objects within a place response
 review_response_model = api.model('PlaceReview', {
     'id': fields.String(required=True, description='Review ID'),
@@ -35,10 +42,8 @@ review_response_model = api.model('PlaceReview', {
     'rating': fields.Integer(required=True,
                              description='Rating of the place (1-5)'),
     # 'attribute' maps the review's user object to its ID for the response
-    'user_id': fields.String(
-        attribute=lambda review: f"{review.user.id}",
-        required=True,
-        description='ID of the user who left the review')
+    'user': fields.Nested(user_in_review_model_for_place, description='User' \
+    'who posted the review'),
 })
 
 # Define the data model for place input (e.g., for POST/PUT requests)

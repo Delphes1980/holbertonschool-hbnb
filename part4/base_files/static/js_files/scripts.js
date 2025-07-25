@@ -1,9 +1,10 @@
 let dialogTag = null;
+// const DATA_URL = 'http://localhost:5000/api/v1';
 
 // Function to redirect the login button to the login page
 
 function loginRedirection() {
-  const clickLogin = document.querySelector('.login-button')
+  const clickLogin = document.querySelector('.login-button');
   if (clickLogin) {
     clickLogin.addEventListener('click', () => {
       window.location.href = "login.html";
@@ -25,9 +26,9 @@ function addPlaceCard(place) {
     const addContainer = document.createElement('div');
     addContainer.classList.add('place-card-container');
 
-    const placeImage = document.createElement('img');
-    placeImage.src = place.imageUrl;
-    placeImage.alt = place.name;
+    // const placeImage = document.createElement('img');
+    // placeImage.src = place.imageUrl;
+    // placeImage.alt = place.name;
 
     const placeName = document.createElement('h4');
     const boldName = document.createElement('b');
@@ -41,11 +42,12 @@ function addPlaceCard(place) {
     placeDetailsButton.classList.add('details-button');
     placeDetailsButton.textContent = 'View Details';
     placeDetailsButton.dataset.placeId = place.id;
+
     placeDetailsButton.addEventListener('click', () => {
-      showPlaceDetails(place.id);
+      window.location.href = `place.html?id=${encodeURIComponent(place.id)}`;
     });
 
-    addContainer.appendChild(placeImage);
+    // addContainer.appendChild(placeImage);
     addContainer.appendChild(placeName);
     addContainer.appendChild(placePrice);
     addContainer.appendChild(placeDetailsButton);
@@ -57,35 +59,58 @@ function addPlaceCard(place) {
   }
 }
 
-/* Function to show a card containing al the place details
+/* Function to show a card containing all the place details
 when clicking on the 'view details' button of the place card*/
 
-function showPlaceDetails(placeId) {
+async function showPlaceDetails(placeId) {
     const modal = document.getElementById('placeDetailsModal');
-    // const modalHeaderContent = document.getElementById('modal-header-content');
     const modalBodyContent = document.getElementById('modal-body-content');
-    // const modalFooterContent = document.getElementById('modal-footer-content');
     const closeButton = document.querySelector('.close-button');
     const modalPlaceName = document.getElementById('modal-place-name');
 
-    const place = placeData.find(p => p.id === placeId);
+    // const place = placeData.find(p => p.id === placeId);
 
-    if (!place) {
-        console.error('Place not found');
-        return;
+    // if (!place) {
+    //     console.error('Place not found');
+    //     return;
+    // }
+
+    let place;
+    try {
+      const response = await fetch(`${DATA_URL}/places/${placeId}`, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status} during getting details for ID ${placeId}`);
+      }
+      place = await response.json();
+      console.log(`Getting details for ${placeId}`, place);
+
+    } catch (error) {
+      console.error(`Loading impossible for the details of ${placeId} for the modal`, error);
+      modalPlaceName.textContent = 'Loading error';
+      modalBodyContent.innerHTML = `<p styme="color: red">Sorry, Loading details for this place is impossible. (${error.message})</p>`;
+      modal.style.display = 'flex';
+      document.body.classList.add('modal-open');
+      closeButton.onclick = function() {
+        modal.style.display = 'none';
+        document.body.classList.remove('modal-open');
+      };
+      return;
     }
 
-    modalPlaceName.textContent = place.name;
+    if (place) {
+      modalPlaceName.textContent = place.name;
 
-    modalBodyContent.innerHTML = `
-    <p><b>Host:</b> ${place.owner}<p>
-    <p><b>Price:</b> ${place.price}€</p>
-    <p><b>Description:</b> ${place.description}</p>
-    <p><b>Amenities:</b> ${place.amenities}</p>
-    `;
-
-    modal.style.display = 'flex';
-    document.body.classList.add('modal-open');
+      modalBodyContent.innerHTML = `
+        <p><b>Host:</b> ${place.owner}<p>
+        <p><b>Price:</b> ${place.price}€</p>
+        <p><b>Description:</b> ${place.description || 'No description available'}</p>
+        <p><b>Amenities:</b> ${place.amenities && Array.isArray(place.amenities) ? place.amenities.join(', ') : 'Aucune'}</p>
+      `;
 
     closeButton.onclick = function() {
         modal.style.display = 'none';
@@ -99,23 +124,38 @@ function showPlaceDetails(placeId) {
     //     }
     // };
     // console.log('Modal opened');
+    } else {
+      console.error('PLace details not found after API call for modal:', placeId);
+      modalPlaceName.textContent = 'Error';
+      modalBodyContent.innerHTML = '<p style="color: red;">Sorry, Loading details for this place is impossible.</p>'
+      modal.style.display = 'flex';
+      document.body.classList.add('modal-open');
+      closeButton.onclick = function() {
+        modal.style.display = 'none';
+        document.body.classList.remove('modal-open');
+      };
+    }
+  }
+
+function displayAllPlaces(places) {
+  const placeToAdd = document.getElementById('places-list');
+  if (!placeToAdd) {
+    console.error('ID "places-list" not found in the DOM');
+    return;
+  }
+  placeToAdd.innerHTML = '';
+
+  if (places && Array.isArray(places) && places.length > 0) {
+    places.forEach(place => {
+      addPlaceCard(place);
+    });
+    console.log('List of places displayed with success');
+  } else {
+    console.warn('No places to display, or invalid data');
+    placeToAdd.innerHTML = '<p> No available place for the moment</p>';
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     loginRedirection();
-
-    const placeListContainer = document.getElementById('places-list');
-    if (placeListContainer) {
-      placeData.forEach(place => {
-        addPlaceCard(place);
-    });
-    }
-
-    const detailButtons = document.querySelectorAll('.details-button');
-    detailButtons.forEach(button => {
-        button.addEventListener('click', (event) => {
-            const placeId = parseInt(event.target.dataset.placeId);
-            showPlaceDetails(placeId);
-        });
-});
 });

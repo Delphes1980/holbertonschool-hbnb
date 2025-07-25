@@ -24,12 +24,12 @@ authorizations = {
 
 def create_app(config_class="config.DevelopmentConfig"):
     app = Flask(__name__)
+    CORS(app, supports_credentials=True, origins=["http://127.0.0.1:3000"])
     app.config.from_object(config_class)
     # app.config['ERROR_INCLUDE_MESSAGE'] = False
     bcrypt.init_app(app)
     jwt.init_app(app)
     db.init_app(app)
-    CORS(app)
 
     from app.api.v1.amenities import api as amenities_ns
     from app.api.v1.places import api as places_ns

@@ -2,6 +2,9 @@ from app.models.baseEntity import type_validation
 from app.services.ressources import is_valid_uuid4
 from app.api.v1.apiRessources import validate_init_args, CustomError
 from app.models.place import Place
+from sqlalchemy.orm import joinedload
+from app.models.review import Review
+from app import db
 
 
 class PlaceService:
@@ -66,7 +69,14 @@ class PlaceService:
         if not is_valid_uuid4(place_id):
             raise ValueError('Invalid ID: given place_id is not a '
                              'valid UUID4')
-        return facade.place_repo.get(place_id)
+
+        place = db.session.query(Place).options(
+            joinedload(Place.owner),
+            joinedload(Place.reviews).joinedload(Review.user),
+            joinedload(Place.amenities)
+        ).filter_by(id=place_id).first()
+        return place
+        # return facade.place_repo.get(place_id)
 
     @classmethod
     def update_place(cls, facade, place_id, place_data):

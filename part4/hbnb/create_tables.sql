@@ -152,6 +152,54 @@ VALUES (
 	False
 	);
 
+INSERT INTO users(id, created_at, updated_at, email, first_name, last_name, password, is_admin)
+VALUES (
+	'13a9b620-310c-4e3a-846c-9d548fcf240a',
+	CURRENT_TIMESTAMP,
+	CURRENT_TIMESTAMP,
+	'charles@ingalls.com',
+	'Charles',
+	'Ingalls',
+	'$2a$12$Jf1ZR1o4uO5KI/LdjQdeD.sT6YPXoUgPZyuCjLaYejmiD1lnkUyrW',
+	False
+	);
+
+INSERT INTO users(id, created_at, updated_at, email, first_name, last_name, password, is_admin)
+VALUES (
+	'72d605d3-af7b-4055-9fe6-fc01c0e86345',
+	CURRENT_TIMESTAMP,
+	CURRENT_TIMESTAMP,
+	'big@daddy.com',
+	'Big',
+	'Daddy',
+	'$2a$12$N3/kq/zKvv2jauyTRCZQt./F7szvuOAEU2TOI794EkwVFzV39WGeO',
+	False
+	);
+
+INSERT INTO users(id, created_at, updated_at, email, first_name, last_name, password, is_admin)
+VALUES (
+	'c2676497-058b-4438-9aad-e2591186e3d8',
+	CURRENT_TIMESTAMP,
+	CURRENT_TIMESTAMP,
+	'michael@myers.com',
+	'Michael',
+	'Myers',
+	'$2a$12$6vUthmk9Wezjm1N5uAt4zeT8a3xTcuux/cr.aE/Jr.B.u8XutLw2C',
+	False
+	);
+
+INSERT INTO users(id, created_at, updated_at, email, first_name, last_name, password, is_admin)
+VALUES (
+	'dcc28b1a-50ce-4d48-b7dc-1d29094e7d40',
+	CURRENT_TIMESTAMP,
+	CURRENT_TIMESTAMP,
+	'carrie@bradshaw.com',
+	'Carrie',
+	'Bradshaw',
+	'$2a$12$uPtJWNvSH0QGDQpPJoFndunJrVs9WgAuhqIN0gMB/mnSAatBbPy6u',
+	False
+);
+
 INSERT INTO amenities(id, created_at, updated_at, name)
 VALUES (
 	'9505dcd5-2d59-403f-a6da-b818e1db9d55',
@@ -200,6 +248,83 @@ VALUES(
 	'7414383a-c590-41aa-a4a5-02c11b8f2b17'
 );
 
+INSERT INTO places(id, title, description, price, latitude, longitude, owner_id)
+VALUES (
+	'1992dcc6-c608-4874-ac01-76d8c58bbd64',
+	'Maison de Campagne',
+	"Petite maison cosy pour profiter d'un petit moment sympa",
+	250,
+	49.6460955,
+	2.9596039,
+	'6fb5f1c1-f9d4-4987-aee3-16ab71704835'
+);
+
+INSERT INTO places(id, title, description, price, latitude, longitude, owner_id)
+VALUES (
+	'2e039425-2acd-4b87-94de-3336ee838e7e',
+	'Appartement Perdu',
+	"Pour retrouver ce qu'on a perdu",
+	300,
+	18.46667,
+	-72.46667,
+	'3b670ec5-1ff8-4431-8de7-2b646b05bd3b'
+);
+
+INSERT INTO places(id, title, description, price, latitude, longitude, owner_id)
+VALUES (
+	'13840f3f-2cbc-4aeb-97a4-2930da5a3465',
+	'Loft en bord de Mer',
+	"Pour découvrir ce qui s'y cache",
+	150,
+	47.7083642,
+	1.5062706,
+	'e4f87197-440f-47ae-8a27-1e1f23184be0'
+);
+
+INSERT INTO places(id, title, description, price, latitude, longitude, owner_id)
+VALUES (
+	'44e18cdb-56c6-468e-92ec-edf5d9e69381',
+	'Cute little house',
+	'Cute little house in the prairy. A beautiful place where you can find yourself.. or nobody.',
+	25,
+	35.1592256,
+	-98.4422802,
+	'13a9b620-310c-4e3a-846c-9d548fcf240a'
+);
+
+INSERT INTO places(id, title, description, price, latitude, longitude, owner_id)
+VALUES (
+	'6afb6d48-82b3-413b-9449-f618469dde8c',
+	'Modern house',
+	'Big modern house with all the comfort you need.',
+	150,
+	33.76994226292834,
+	-118.19424544801036,
+	'72d605d3-af7b-4055-9fe6-fc01c0e86345'
+);
+
+INSERT INTO places(id, title, description, price, latitude, longitude, owner_id)
+VALUES (
+	'21128672-c321-49d0-87d8-b34c76059e02',
+	'Cozy Cottage',
+	'A charming cottage by the lake',
+	75,
+	42.3069227,
+	-95.0510911,
+	'c2676497-058b-4438-9aad-e2591186e3d8'
+);
+
+INSERT INTO places(id, title, description, price, latitude, longitude, owner_id)
+VALUES (
+	'32d5bab8-599f-47ba-a291-03e5cd3795f9',
+	'City Apartment',
+	'Spacious apartment near the beach',
+	100,
+	-22.90172720310348,
+	-43.17813365522944,
+	'dcc28b1a-50ce-4d48-b7dc-1d29094e7d40'
+);
+
 INSERT INTO reviews(id, text, rating, user_id, place_id)
 VALUES(
 	'8785d826-963b-4294-b67d-3a4b0983e2e5',
@@ -216,4 +341,40 @@ VALUES(
 	3,
 	'7414383a-c590-41aa-a4a5-02c11b8f2b17',
 	'9962e46f-05fa-4ac2-9617-b53d06713a33'	
+);
+
+INSERT INTO reviews(id, text, rating, user_id, place_id)
+VALUES(
+	'1f3e3a27-bd8f-42a0-b13e-cc20c3b0034b',
+	'I found myself, that was great. Then a deer, that was cool too. And then a bear, i don''t want to go back there again',
+	2,
+	'dcc28b1a-50ce-4d48-b7dc-1d29094e7d40',
+	'44e18cdb-56c6-468e-92ec-edf5d9e69381'
+);
+
+INSERT INTO reviews(id, text, rating, user_id, place_id)
+VALUES(
+	'7afdf57e-5a65-4486-9073-bd71a540208b',
+	'Everything you need is in this house, even the things you didn''t know you needed. Best swimming pool ever!',
+	5,
+	'dcc28b1a-50ce-4d48-b7dc-1d29094e7d40',
+	'6afb6d48-82b3-413b-9449-f618469dde8c'
+);
+
+INSERT INTO reviews(id, text, rating, user_id, place_id)
+VALUES(
+	'8d332488-78cd-44c0-8f72-565fa33382fa',
+	'The lake was pretty great but sometimes a guy with a hockey mask appears. That''s a little bit scary, but the place was great',
+	4,
+	'13a9b620-310c-4e3a-846c-9d548fcf240a',
+	'21128672-c321-49d0-87d8-b34c76059e02'
+);
+
+INSERT INTO reviews(id, text, rating, user_id, place_id)
+VALUES(
+	'8d3a7e8c-548a-4416-83c8-c907ebbb15b2',
+	'The advantage of the city, with its balcony with view to everyone, it''s awesome',
+	4,
+	'c2676497-058b-4438-9aad-e2591186e3d8',
+	'32d5bab8-599f-47ba-a291-03e5cd3795f9'
 );

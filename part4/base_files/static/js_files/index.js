@@ -1,7 +1,21 @@
+const DATA_URL = 'http://localhost:5000/api/v1';
+
+function getCookie(name) {
+	const cookies = document.cookie.split("; ");
+	const value = cookies
+		.find(c => c.startsWith(name))
+		?.split("=")[1];
+
+		if (value === undefined) {
+			return null;
+		}
+		return value;
+	}
+
 function checkAuthentication() {
-    const token = getCookie('auth_cookie');
+    const token = getCookie('token');
     const loginLink = document.getElementById('login-link');
-	const loginButton = document.querySelector('login-button');
+	const loginButton = document.querySelector('.login-button');
 
     if (!token) {
         if (loginLink) loginLink.style.display = 'block';
@@ -9,24 +23,30 @@ function checkAuthentication() {
     } else {
         if (loginLink) loginLink.style.display = 'none';
 		if (loginButton) loginButton.style.display = 'none';
+
           // Fetch places data if the user is authenticated
         fetchPlaces(token)
 			.then(placesData => {
-				addPlaceCard(placesData);
+				displayAllPlaces(placesData);
 			})
 			.catch(error => {
-				console.error('Fail during display of places ofter authentication', error);
+				console.error('Fail during display of places after authentication', error);
+				const placeListContainer = document.getElementById('places-list');
+				if (placeListContainer) {
+					placeListContainer.innerHTML = `<p style="color: red;">Fail during the places loading: ${error.message}</p>`;
+				}
 			});
 		}
 	}
 
 async function fetchPlaces(token) {
       // Make a GET request to fetch places data
-      // Include the token in the Authorization header
-      // Handle the response and pass the data to displayPlaces function
+
 	try {
 		const authHeader = new Headers();
-		authHeader.append('Authorization', `Bearer ${token}`);
+		if (token) {
+			authHeader.append('Authorization', `Bearer ${token}`);
+		}
 
 		const response = await fetch(`${DATA_URL}/places/`, {
 			method: 'GET',
@@ -65,5 +85,6 @@ async function fetchPlaces(token) {
 	// 	};
 
 document.addEventListener('DOMContentLoaded', () => {
+	// loginRedirection();
 	checkAuthentication();
 });
