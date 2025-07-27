@@ -15,7 +15,7 @@ async function loginUser(email, password) {
 				if (data && data.access_token) {
 					// Return the token into a cookie
 					document.cookie = `token=${data.access_token}; path=/; secure;`;
-					window.location.href = 'index.html';
+					window.location.href = 'index.html'; // Redirection to the index page
 				} else {
 					alert('Login failed: ' + response.statusText);
 				}
@@ -29,7 +29,7 @@ async function loginUser(email, password) {
 				if (errorData && errorData.message) {
 					errorMessage += ' ' + errorData.message;
 				} else {
-					errorMessage += ' Status: ' + response.statusText;
+					errorMessage += 'Status: ' + response.statusText;
 				}
 			} catch (networkError) {
 				console.error('Network error during login:', networkError);
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 			const validateEmail = document.getElementById('email').value;
 			const validatePassword = document.getElementById('password').value;
-			console.log('Email:', email, 'Password:', password); // debug
+			console.log('Email:', validateEmail, 'Password:', validatePassword); // debug
 
 			if (validateEmail === "") {
 				alert('Email must be filled out');

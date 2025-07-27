@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Place Details</title>
-    <link rel="stylesheet" href="../static/css_files/place.css">
     <link rel="stylesheet" href="../static/css_files/styles.css">
+    <link rel="stylesheet" href="../static/css_files/place.css">
+    <link rel="stylesheet" href="../static/css_files/review.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 <body>
     <header>
@@ -27,16 +29,30 @@
             <!-- Reviews will be populated dynamically -->
         </section>
         <section id="add-review">
-            <h2>Add a Review</h2>
-            <form id="review-form">
-                <label for="review-text">Review:</label>
-                <textarea id="review-text" name="review-text" required></textarea>
-                
-                <button type="submit">Submit</button>
-            </form>
+            <div class="wrapper">
+                <h3>Add a Review</h3>
+                <form id="review-form" action="#">
+                    <label for="rating-input">Rating: </label>
+                    <div class="rating">
+                        <input type="number" name="rating" hidden id="rating-input">
+                        <i class="bx bx-star star" style="--i: 0;" data-value="1"></i>
+                        <i class="bx bx-star star" style="--i: 1;" data-value="2"></i>
+                        <i class="bx bx-star star" style="--i: 2;" data-value="3"></i>
+                        <i class="bx bx-star star" style="--i: 3;" data-value="4"></i>
+                        <i class="bx bx-star star" style="--i: 4;" data-value="5"></i>
+                    </div>
+                    <label for="review-text">Your review:</label>
+                    <textarea id="review-text" name="opinion" cols="30" rows="5" placeholder="Your opinion" required></textarea>
+                    <div class="btn-group">
+                        <button type="submit" class="btn-submit">Submit</button>
+                        <button type="button" class="btn-cancel">Cancel</button>
+                    </div>
+                </form>
+            </div>
         </section>
     </main>
     <script src="../static/js_files/scripts.js"></script>
+    <script src="../static/js_files/review.js"></script>
     <script src="../static/js_files/place.js"></script>
     <footer>
         <p>© HBnB Evolution 2025. Made by Delphine Coutouly-Laborda. All rights reserved.</p>

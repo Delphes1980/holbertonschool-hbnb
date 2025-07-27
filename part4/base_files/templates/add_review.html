@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Review</title>
     <link rel="stylesheet" href="../static/css_files/styles.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="../static/css_files/review.css">
 </head>
 <body>
     <header>
@@ -19,25 +21,32 @@
         <button class="login-button">Login</button>
     </header>
     <main>
+        <h2 id="review-place-name">Add a Review</h2>
+
         <!-- Add something to idfentify the place you're reviewing -->
+        <div class="wrapper">
         <form id="review-form">
-            <h2>Add a Review</h2>
-            <label for="review">Your Review:</label>
-            <textarea id="review" name="review" required></textarea>
-            <label for="rating">Rating:</label>
-            <select id="rating" name="rating" required>
-                <option value="">Choose a rating</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <!-- Options for rating -->
-            </select>
-            <button type="submit">Submit Review</button>
+            <label for="rating-input">Rating:</label>
+                <div class="rating">
+                    <input type="number" name="rating" hidden id="rating-input" required>
+                    <i class="bx bx-star star" style="--i: 0;" data-value="1"></i>
+                    <i class="bx bx-star star" style="--i: 1;" data-value="2"></i>
+                    <i class="bx bx-star star" style="--i: 2;" data-value="3"></i>
+                    <i class="bx bx-star star" style="--i: 3;" data-value="4"></i>
+                    <i class="bx bx-star star" style="--i: 4;" data-value="5"></i>
+                </div>
+            <label for="review-text">Your review:</label>
+            <textarea id="review-text" name="review" cols="30" rows="5" placeholder="Write your review here" required></textarea>
+        <div class="btn-group">
+            <button type="submit" class="btn-submit">Submit Review</button>
+            <button type="button" class="btn-cancel">Cancel</button>
+        </div>
         </form>
+        </div>
     </main>
     <script src="../static/js_files/scripts.js"></script>
+    <!-- <script src="../static/js_files/place.js"></script> -->
+    <script src="../static/js_files/review.js"></script>
     <footer>
         <p>© HBnB Evolution 2025. Made by Delphine Coutouly-Laborda. All rights reserved.</p>
     </footer>

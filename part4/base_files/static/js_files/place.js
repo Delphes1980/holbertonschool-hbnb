@@ -30,6 +30,21 @@ async function fetchPlaceDetails(placeId) {
 }
 
 
+// Function that generate stars in an already left review
+function generateStarsInReviews(rating) {
+  let stars = '';
+  const maxStars = 5;
+  for (let i = 1; i <= maxStars; i++) {
+  if (i <= rating) {
+    stars += '<i class="bx bxs-star star"></i>';
+    } else {
+    stars += '<i class="bx bx-star star"></i>';
+    }
+  }
+  return `<div class="review-rating">${stars}</div>`;
+}
+
+
 // Function that create and add a details card for a specific place
 function addPlaceDetailsCard(place) {
   const detailsPlace = document.getElementById('place-details');
@@ -80,33 +95,77 @@ function addPlaceDetailsCard(place) {
     const reviewSection = document.getElementById('reviews');
 
     if (reviewSection) {
-      reviewSection.innerHTML = '<h3>Reviews</h3><ul id="review-list"></ul>';
-      const reviewList = document.getElementById('review-list');
+      reviewSection.innerHTML = '<h3>Reviews</h3>';
 
-      if (reviewList) {
-        if (place.reviews && Array.isArray(place.reviews) && place.reviews.length > 0) {
-          place.reviews.forEach(review => {
-            const listItem = document.createElement('li');
-            listItem.innerHTML = `<b>${review.user.first_name} ${review.user.last_name}</b><br> ${review.text}<br><b>Rating:</b> ${review.rating}/5`;
-            reviewList.appendChild(listItem);
-          });
-        } else {
-          reviewList.innerHTML = '<li>No review for the moment</li>';
-        }
+      if (place.reviews && Array.isArray(place.reviews) && place.reviews.length > 0) {
+        place.reviews.forEach(review => {
+          const reviewCard = document.createElement('div');
+          reviewCard.classList.add('review-card');
+
+          reviewCard.innerHTML = `
+          <p class="user-info"><b>${review.user.first_name} ${review.user.last_name}</b></p>
+          ${generateStarsInReviews(review.rating)} <p class="review-content">${review.text}</p>`;
+
+          reviewSection.appendChild(reviewCard);
+        });
+
       } else {
-        console.error('The element with ID "review-list" was not found inside the "reviews" section');
+        const noReviewMessage = document.createElement('p');
+        noReviewMessage.textContent = 'No review for this place yet';
+        reviewSection.appendChild(noReviewMessage);
       }
     } else {
-      console.error('The element with ID "reviews" was not found on the page');
+      console.error('The element with ID "reviews" was not found');
     }
   } else {
-  console.error('Place info not found on place page');
-    }
+    console.error('Place info not found on place page');
+  }
 }
 
 
 document.addEventListener('DOMContentLoaded', () => {
   loginButtonVisibility();
+  ratingSubmit();
+  userReviewForm();
+
+  const reviewForm = document.getElementById('review-form');
+    if (reviewForm) {
+        reviewForm.addEventListener('submit', async(event) => {
+            event.preventDefault();
+
+            const placeId = new URLSearchParams(window.location.search).get('id');
+            const reviewText = document.getElementById('review-text').value;
+            const ratingInput = reviewForm.querySelector('input[name="rating"]');
+            const rating = ratingInput ? parseInt(ratingInput.value) : 0;
+
+            const token = getCookie('token');
+
+            if (!token) {
+                alert('You should be authenticated to submit a review');
+                return;
+            }
+
+            await submitReview(token, placeId, reviewText, rating);
+            // Rappel de la fonction qui gère le rafraichissement des commentaires 
+        });
+            const cancelButton = reviewForm.querySelector('.btn-cancel');
+            if (cancelButton) {
+                cancelButton.addEventListener('click', () => {
+                    reviewForm.reset();
+
+                    const stars = document.querySelectorAll('#review-form .rating .star');
+                    const ratingInput = document.getElementById('rating-input');
+                    if (ratingInput) {
+                        ratingInput.value = '';
+                        stars.forEach(s => {
+                            s.classList.remove('bxs-star');
+                            s.classList.add('bx-star');
+                            s.classList.remove('active');
+                        });
+                    }
+            });
+        }
+    }
 
 	const detailsPlaceSection = document.getElementById('place-details');
 	if (detailsPlaceSection) {
@@ -120,13 +179,9 @@ document.addEventListener('DOMContentLoaded', () => {
         })
 
         .catch(error => {
-          console.error("Fail during loading places\' details", error);
-          detailsPlaceSection.innerHTML = '<p style="color: red;">Sorry, impossible to load places\' details</p>';
+          console.error("Fail during loading places' details", error);
         });
-
-    } else {
-      detailsPlaceSection.innerHTML ='<p>No place specified. Please choose a place</p>';
-    }
+      }
   } else {
     console.error('The element with ID "place-details" was not found');
   }

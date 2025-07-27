@@ -4,6 +4,10 @@ function checkAuthentication() {
     const loginLink = document.getElementById('login-link');
 	const loginButton = document.querySelector('.login-button');
 
+    // if (token) {
+    //     loginButton.classList.add('hide-me');
+    // }
+
     if (!token) {
         if (loginLink) loginLink.style.display = 'block';
 		if (loginButton) loginButton.style.display = 'block';
@@ -187,8 +191,8 @@ function placesFilter() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    loginRedirection();
     loginButtonVisibility();
+    loginRedirection();
 	checkAuthentication();
 
     const priceFilter = document.getElementById('price-filter');

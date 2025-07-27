@@ -57,6 +57,63 @@ function getCookie(name) {
   return value;
 }
 
+// Function that display a review form for authenticated user
+function userReviewForm() {
+    const reviewFormSection = document.getElementById('add-review');
+    const token = getCookie('token');
+
+    if (reviewFormSection) {
+        if (token) {
+            reviewFormSection.style.display = 'flex';
+            console.log('Review form displayed for authenticated user');
+        } else {
+        reviewFormSection.style.display = 'none';
+        console.log('Review form hidden for non authenticated user');
+        }
+    } else {
+        console.error('The "add-review" section was not found on the page');
+    }
+}
+
+// Function that submit rating stars
+function ratingSubmit() {
+    const allStar = document.querySelectorAll('.rating .star');
+    const ratingValue = document.getElementById('rating-input');
+
+    allStar.forEach((item, idx) => {
+        item.addEventListener('click', () => {
+          let click = 0;
+
+        ratingValue.value = item.dataset.value;
+        console.log('Selected rating value: ', ratingValue.value)
+
+        // Reinitialization of all stars
+        allStar.forEach(star => {
+            star.classList.replace('bxs-star', 'bx-star');
+            star.classList.remove('active');
+        });
+
+        // For visual effects
+        for(let i = 0; i < allStar.length; i++) {
+          const starCurrentValue = parseInt(allStar[i].dataset.value);
+          const selectedRating = parseInt(ratingValue.value);
+
+            if (starCurrentValue <= selectedRating) {
+                allStar[i].classList.replace('bx-star', 'bxs-star');
+                allStar[i].classList.add('active');
+                allStar[i].style.setProperty('--i', i);
+
+            } else {
+                allStar[i].classList.replace('bxs-star', 'bx-star');
+                allStar[i].classList.remove('active');
+                allStar[i].style.setProperty('--i', click);
+                click++;
+            }
+        }
+    });
+});
+}
+
 
   /* Function to show a card containing all the place details
   when clicking on the 'view details' button of the place card*/
