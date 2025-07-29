@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="../static/css_files/styles.css">
+    <link rel="stylesheet" href="../static/css_files/login.css">
+</head>
+<body>
+    <header>
+        <div class="header-nav">
+        <img class="logo" src="../images/logo.png" alt="">
+        <nav>
+            <a href="index.html" id="home_link">Home</a>
+            <a href="place.html" id="place-link">Places</a>
+            <a href="add_review.html" id="review_link">Reviews</a>
+        </nav>
+        </div>
+    </header>
+    <main>
+        <div class="login-container">
+            <h2>Login</h2>
+        <form id="login-form">
+            <ul id="form-messages"></ul> <!--pour le style des messages erreurs-->
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            
+            <button type="submit">Login</button>
+        </form>
+        </div>
+    </main>
+    <script src="../static/js_files/scripts.js"></script>
+    <script src="../static/js_files/login.js"></script>
+    <footer>
+        <p>© HBnB Evolution 2025. Made by Delphine Coutouly-Laborda. All rights reserved.</p>
+    </footer>
+</body>
+</html>

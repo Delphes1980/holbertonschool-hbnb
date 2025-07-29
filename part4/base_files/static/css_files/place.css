@@ -1,0 +1,223 @@
+/* ##### Styles for place card on index page ##### */
+
+/* Styles for the parent box*/
+#places-list {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(calc(280px + 2*20px), 1fr));
+	justify-content: center;
+	padding: 1rem;
+}
+
+.place-card {
+	margin: 20px;
+	padding: 10px;
+	border: 1px solid #ddd;
+	border-radius: 10px;
+	box-sizing: border-box;
+	background-color: var(--card-background);
+	color: var(--dark-text);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+	flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+	min-height: 300px;
+}
+
+.place-card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+/* Styles for the child box */
+
+.place-card-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+	width: 100%;
+}
+
+.place-card-container img {
+	width: 100%;
+	height: 150px;
+	object-fit: cover;
+	border-radius: 5px;
+	margin-bottom: 10px;
+}
+
+.details-button {
+    padding: 10px 10px;
+    border: 0.2rem solid var(--button-background);
+    background-color: var(--button-background);
+    margin-top: auto;
+    width: 80%;
+	cursor: pointer;
+	border-radius: 5px;
+	color: var(--button-text-color);
+}
+
+/* Styles for place card on place page */
+
+/* Styles for the parent box */
+
+#place-details {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(calc(300px + 2*20px), 1fr));
+	justify-content: center;
+	padding: 2rem;
+}
+
+.place-details-card {
+	margin: 20px;
+	padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+	box-sizing: border-box;
+	background-color: var(--card-background);
+	color: var(--dark-text);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	max-width: 400px;
+	min-height: 350px;
+}
+
+.place-details-card:hover {
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Styles for the child box */
+
+.place-image {
+	padding: 10px;
+	box-sizing: border-box;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	overflow: hidden;
+	background-color: var(--card-background);
+	border-radius: 10px;
+	width: 100%;
+	margin-bottom: 10px;
+}
+
+.place-image img {
+	display: block;
+	width: 100%;
+	height: 200px;
+	border-radius: 5px;
+	object-fit: cover;
+}
+
+.place-info {
+    display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	text-align: left;
+    height:auto;
+	width: 100%;
+    background-color: var(--card-background);
+	color: var(--dark-text);
+	flex: 1;
+	padding: 0px 10px 10px 10px;
+	box-sizing: border-box;
+	border-radius: 10px;
+}
+
+#reviews {
+	display: flex;
+	flex-direction: column;
+	/* align-items: flex-start; */
+	padding: 20px;
+	/* max-width: 800px; */
+	/* margin: 2rem auto; */
+	/* width: 100%; */
+	/* background: var(--card-background); */
+	/* border-radius: 10px; */
+	/* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
+	margin: 2rem;
+}
+
+#reviews h3 {
+	width: 100%;
+	text-align: left;
+	margin-bottom: 1rem;
+	color: var(--dark-text);
+}
+
+.review-card {
+    margin: 10px 0;
+	padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+	box-sizing: border-box;
+	background-color: var(--card-background);
+	color: var(--dark-text);
+	display: flex;
+	flex-direction: column;	
+	max-width: 600px;
+	width: 100%;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.review-card:hover {
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.review-card .user-info {
+	font-weight: bold;
+	margin-bottom: 8px;
+	color: var(--medium-text);
+}
+
+.review-card .review-rating {
+	display: flex;
+	color: var(--dark-text);
+	gap: 0.2rem;
+	margin-bottom: 0.5rem;
+	margin-bottom: 0.5rem;
+	/* font-size: 1.2rem; */
+}
+
+.review-card .review-rating .star {
+	margin-right: 2px;
+	font-size: 1.2rem;
+	color: #514e4e;
+}
+
+.review-card .review-rating .bxs-star {
+	color: black;
+}
+
+.review-card .review-content {
+	flex-grow: 1;
+	margin-bottom: 10px;
+	line-height: 1.5;
+	color: var(--dark-text);
+}
+
+#add-review {
+	display: flex;
+	justify-content: center;
+	padding: 2rem;
+	width: 100%;
+}
+
+#add-review .wrapper {
+	margin: 0;
+	padding: 10px;
+	border: 1px solid #ddd;
+	border-radius: 10px;
+	box-sizing: border-box;
+	background: var(--card-background);
+	color: var(--dark-text);
+	box-shadow: var(--shadow);
+	max-width: 576px;
+	width: 100%;
+	
+}
+
+#add-review .wrapper:hover {
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
