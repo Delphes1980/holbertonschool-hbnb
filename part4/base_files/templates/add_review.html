@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Review</title>
     <link rel="stylesheet" href="../static/css_files/styles.css">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="../static/css_files/place.css">
     <link rel="stylesheet" href="../static/css_files/review.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 <body>
     <header>
@@ -22,31 +24,44 @@
     </header>
     <main>
         <h2 id="review-place-name">Add a Review</h2>
-
-        <!-- Add something to idfentify the place you're reviewing -->
-        <div class="wrapper">
-        <form id="review-form">
-            <label for="rating-input">Rating:</label>
-                <div class="rating">
-                    <input type="number" name="rating" hidden id="rating-input" required>
-                    <i class="bx bx-star star" style="--i: 0;" data-value="1"></i>
-                    <i class="bx bx-star star" style="--i: 1;" data-value="2"></i>
-                    <i class="bx bx-star star" style="--i: 2;" data-value="3"></i>
-                    <i class="bx bx-star star" style="--i: 3;" data-value="4"></i>
-                    <i class="bx bx-star star" style="--i: 4;" data-value="5"></i>
-                </div>
-            <label for="review-text">Your review:</label>
-            <textarea id="review-text" name="review" cols="30" rows="5" placeholder="Write your review here" required></textarea>
-        <div class="btn-group">
-            <button type="submit" class="btn-submit">Submit Review</button>
-            <button type="button" class="btn-cancel">Cancel</button>
+        <div class="search-container">
+            <input type="text" id="place-search-input" placeholder="Search.." name="search">
+            <button type="submit"><i class="fa fa-search"></i></button>
         </div>
-        </form>
+        <div id="places-list-review"></div>
+        <!-- Add something to idfentify the place you're reviewing -->
+        <div id="placeDetailsModal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h3 id="modal-place-name"></h3>
+                <div id="modal-body-content">
+                    <div class="wrapper">
+                        <form id="review-form">
+                            <input type="hidden" name="review_place_id" id="review-place-id-input">
+                            <label for="rating-input">Rating:</label>
+                            <div class="rating">
+                                <input type="number" name="rating" hidden id="rating-input" required>
+                                <i class="bx bx-star star" style="--i: 0;" data-value="1"></i>
+                                <i class="bx bx-star star" style="--i: 1;" data-value="2"></i>
+                                <i class="bx bx-star star" style="--i: 2;" data-value="3"></i>
+                                <i class="bx bx-star star" style="--i: 3;" data-value="4"></i>
+                                <i class="bx bx-star star" style="--i: 4;" data-value="5"></i>
+                            </div>
+                            <label for="review-text">Your review:</label>
+                            <textarea id="review-text" name="review" cols="30" rows="5" placeholder="Write your review here" required></textarea>
+                            <div class="btn-group">
+                                <button type="submit" class="btn-submit">Submit Review</button>
+                                <button type="button" class="btn-cancel">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
     <script src="../static/js_files/scripts.js"></script>
     <!-- <script src="../static/js_files/place.js"></script> -->
-    <script src="../static/js_files/review.js"></script>
+    <script src="../static/js_files/add_review.js"></script>
     <footer>
         <p>© HBnB Evolution 2025. Made by Delphine Coutouly-Laborda. All rights reserved.</p>
     </footer>

@@ -2,6 +2,24 @@ let dialogTag = null;
 let allPlaces = [];
 const DATA_URL = 'http://localhost:5000/api/v1';
 
+let modal = null;
+let closeButton = null;
+let modalPlaceName = null;
+let reviewForm = null;
+let reviewPlaceIdInput = null;
+let reviewTextInput = null;
+let ratingInput = null;
+let cancelButton = null;
+
+// Close the modal
+    const closeModal = () => {
+      if (modal) {
+        modal.style.display = 'none';
+      }
+      document.body.classList.remove('modal-open');
+    };
+
+
 // Function to redirect the login button to the login page
 function loginRedirection() {
   const clickLogin = document.querySelector('.login-button');
@@ -57,6 +75,7 @@ function getCookie(name) {
   return value;
 }
 
+
 // Function that display a review form for authenticated user
 function userReviewForm() {
     const reviewFormSection = document.getElementById('add-review');
@@ -75,17 +94,23 @@ function userReviewForm() {
     }
 }
 
+
 // Function that submit rating stars
 function ratingSubmit() {
     const allStar = document.querySelectorAll('.rating .star');
-    const ratingValue = document.getElementById('rating-input');
+    const ratingInput = document.getElementById('rating-input');
+
+    if (!allStar.length || !ratingInput) {
+      console.warn('Rating stars or input not found');
+      return;
+    }
 
     allStar.forEach((item, idx) => {
         item.addEventListener('click', () => {
           let click = 0;
 
-        ratingValue.value = item.dataset.value;
-        console.log('Selected rating value: ', ratingValue.value)
+        ratingInput.value = item.dataset.value;
+        console.log('Selected rating value: ', ratingInput.value)
 
         // Reinitialization of all stars
         allStar.forEach(star => {
@@ -96,7 +121,7 @@ function ratingSubmit() {
         // For visual effects
         for(let i = 0; i < allStar.length; i++) {
           const starCurrentValue = parseInt(allStar[i].dataset.value);
-          const selectedRating = parseInt(ratingValue.value);
+          const selectedRating = parseInt(ratingInput.value);
 
             if (starCurrentValue <= selectedRating) {
                 allStar[i].classList.replace('bx-star', 'bxs-star');
@@ -115,71 +140,44 @@ function ratingSubmit() {
 }
 
 
-  /* Function to show a card containing all the place details
-  when clicking on the 'view details' button of the place card*/
+  /* Function to show a card containing a review form
+  when clicking on the 'submit review' button of the place card*/
 
-// async function showPlaceDetails(placeId) {
-//     const modal = document.getElementById('placeDetailsModal');
-//     const modalBodyContent = document.getElementById('modal-body-content');
-//     const closeButton = document.querySelector('.close-button');
-//     const modalPlaceName = document.getElementById('modal-place-name');
+async function showPlaceDetails(placeId, placeTitle) {
+    if (!modal || !closeButton || !modalPlaceName ||!reviewForm || !reviewPlaceIdInput || !reviewTextInput || !ratingInput || !cancelButton) {
+      console.error('One or many elements of the modal were not found');
+      return;
+    }
 
-//     let place;
-//     try {
-//       const response = await fetch(`${DATA_URL}/places/${placeId}`, {
-//         method: 'GET',
-//         mode: 'cors',
-//         credentials: 'include'
-//       });
+    modal = document.getElementById('placeDetailsModal');
+    closeButton = document.querySelector('.close-button');
+    modalPlaceName = document.getElementById('modal-place-name');
+    reviewForm = document.getElementById('review-form');
+    reviewPlaceIdInput = document.getElementById('review-place-id-input');
+    reviewTextInput = document.getElementById('review-text');
+    ratingInput = document.getElementById('rating-input');
+    cancelButton = document.querySelector('.btn-cancel');
 
-//       if (!response.ok) {
-//         throw new Error(`HTTP error: ${response.status} during getting details for ID ${placeId}`);
-//       }
-//       place = await response.json();
-//       console.log(`Getting details for ${placeId}`, place);
+    if (!modal || !closeButton || !modalPlaceName ||!reviewForm || !reviewPlaceIdInput || !reviewTextInput || !ratingInput || !cancelButton) {
+      console.error('Critical error: still missing modal elements');
+      return;
+    }
 
-//     } catch (error) {
-//       console.error(`Loading impossible for the details of ${placeId} for the modal`, error);
-//       modalPlaceName.textContent = 'Loading error';
-//       modalBodyContent.innerHTML = `<p styme="color: red">Sorry, Loading details for this place is impossible. (${error.message})</p>`;
-//       modal.style.display = 'flex';
-//       document.body.classList.add('modal-open');
-//       closeButton.onclick = function() {
-//         modal.style.display = 'none';
-//         document.body.classList.remove('modal-open');
-//       };
-//       return;
-//     }
+    modalPlaceName.textContent = `Submit a review for: ${placeTitle}`;
 
-//     if (place) {
-//       modalPlaceName.textContent = place.name;
+    reviewPlaceIdInput.value = placeId;
+    console.log('showPlaceDetails: hidden place ID set to: ', reviewPlaceIdInput.value); //debug
 
-//       modalBodyContent.innerHTML = `
-//         <p><b>Host:</b> ${place.owner}<p>
-//         <p><b>Price:</b> ${place.price}€</p>
-//         <p><b>Description:</b> ${place.description || 'No description available'}</p>
-//         <p><b>Amenities:</b> ${place.amenities && Array.isArray(place.amenities) ? place.amenities.join(', ') : 'Aucune'}</p>
-//       `;
+    // Reinitialize stars & form at every modal opening
+    reviewForm.reset();
+    const stars = reviewForm.querySelectorAll('.rating .star');
+    stars.forEach(s => {
+      s.classList.remove('bxs-star', 'active');
+      s.classList.add('bx-star');
+    });
+    ratingInput.value = '';
 
-//     closeButton.onclick = function() {
-//         modal.style.display = 'none';
-//         document.body.classList.remove('modal-open');
-//     };
-
-//     } else {
-//       console.error('PLace details not found after API call for modal:', placeId);
-//       modalPlaceName.textContent = 'Error';
-//       modalBodyContent.innerHTML = '<p style="color: red;">Sorry, Loading details for this place is impossible.</p>'
-//       modal.style.display = 'flex';
-//       document.body.classList.add('modal-open');
-//       closeButton.onclick = function() {
-//         modal.style.display = 'none';
-//         document.body.classList.remove('modal-open');
-//       };
-//     }
-//   }
-
-
-// document.addEventListener('DOMContentLoaded', () => {
-//     loginRedirection();
-// });
+    // Display the modal
+    modal.style.display = 'flex';
+    document.body.classList.add('modal-open');
+  }

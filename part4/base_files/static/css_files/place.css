@@ -1,7 +1,7 @@
 /* ##### Styles for place card on index page ##### */
 
 /* Styles for the parent box*/
-#places-list {
+#places-list, #places-list-review {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(calc(280px + 2*20px), 1fr));
 	justify-content: center;
