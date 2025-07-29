@@ -1,6 +1,6 @@
 /* ##### Styles for place card on index page ##### */
 
-/* Styles for the parent box*/
+/* Styles for the place list container*/
 #places-list, #places-list-review {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(calc(280px + 2*20px), 1fr));
@@ -22,6 +22,8 @@
     align-items: center;
     justify-content: space-between;
 	min-height: 300px;
+	transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
 }
 
 .place-card:hover {
@@ -29,7 +31,6 @@
 }
 
 /* Styles for the child box */
-
 .place-card-container {
     display: flex;
     flex-direction: column;
@@ -59,8 +60,7 @@
 
 /* Styles for place card on place page */
 
-/* Styles for the parent box */
-
+/* Styles for the container box */
 #place-details {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(calc(300px + 2*20px), 1fr));
@@ -87,8 +87,7 @@
 	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
-/* Styles for the child box */
-
+/* Styles for the place image */
 .place-image {
 	padding: 10px;
 	box-sizing: border-box;
@@ -125,17 +124,11 @@
 	border-radius: 10px;
 }
 
+/* Styles for the review card on place page */
 #reviews {
 	display: flex;
 	flex-direction: column;
-	/* align-items: flex-start; */
 	padding: 20px;
-	/* max-width: 800px; */
-	/* margin: 2rem auto; */
-	/* width: 100%; */
-	/* background: var(--card-background); */
-	/* border-radius: 10px; */
-	/* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
 	margin: 2rem;
 }
 
@@ -165,6 +158,7 @@
 	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
+/* Styles for the review card containing user review information */
 .review-card .user-info {
 	font-weight: bold;
 	margin-bottom: 8px;
@@ -177,7 +171,6 @@
 	gap: 0.2rem;
 	margin-bottom: 0.5rem;
 	margin-bottom: 0.5rem;
-	/* font-size: 1.2rem; */
 }
 
 .review-card .review-rating .star {
@@ -197,6 +190,7 @@
 	color: var(--dark-text);
 }
 
+/* Styles for the review form on place page*/
 #add-review {
 	display: flex;
 	justify-content: center;

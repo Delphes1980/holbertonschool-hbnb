@@ -82,7 +82,7 @@ function addPlaceCard(place) {
 
     const placeName = document.createElement('h4');
     const boldName = document.createElement('b');
-    boldName.textContent = place.name;
+    boldName.textContent = place.title;
     placeName.appendChild(boldName);
 
     const placePrice = document.createElement('p');
@@ -193,6 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loginButtonVisibility();
     loginRedirection();
 	checkAuthentication();
+    homeRedirection();
 
     const priceFilter = document.getElementById('price-filter');
     if (priceFilter) {

@@ -140,6 +140,7 @@ function displayPlacesOnReviewPage(placesToDisplay) {
     });
 }
 
+
 // Function to redirect user if not authenticated
 function reviewButtonClick(placeId, placeTitle) {
     const token = getCookie('token');
@@ -156,6 +157,7 @@ function reviewButtonClick(placeId, placeTitle) {
 }
 
 
+// Function that fetch all the places and display them
 async function fetchAndDisplayPlaces() {
     try {
         const token = getCookie('token');
@@ -188,6 +190,7 @@ async function fetchAndDisplayPlaces() {
 document.addEventListener('DOMContentLoaded', async () => {
     loginButtonVisibility();
     loginRedirection();
+    homeRedirection();
 
     modal = document.getElementById('placeDetailsModal');
     closeButton = document.querySelector('.close-button');

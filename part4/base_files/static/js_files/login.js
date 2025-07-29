@@ -44,20 +44,17 @@ async function loginUser(email, password) {
 
 document.addEventListener('DOMContentLoaded', () => {
 	loginButtonVisibility();
+	homeRedirection();
 
 	console.log('DOMContentLoaded s\'est déclenché.');
 	const loginForm = document.getElementById('login-form');
 
 	if (loginForm) {
-		console.log('Formulaire login-form trouvé');  //debug
 		loginForm.addEventListener('submit', async (event) => {
-			console.log('Événement "submit" du formulaire détecté.');  //debug
 			event.preventDefault();
-			console.log('preventDefault() exécuté. Le formulaire ne devrait pas rechargé la page');  //debug
 
 			const validateEmail = document.getElementById('email').value;
 			const validatePassword = document.getElementById('password').value;
-			console.log('Email:', validateEmail, 'Password:', validatePassword); // debug
 
 			if (validateEmail === "") {
 				alert('Email must be filled out');
@@ -69,9 +66,8 @@ document.addEventListener('DOMContentLoaded', () => {
 				return;
 			}
 			await loginUser(validateEmail, validatePassword);
-			console.log('Fonction loginUser appelée.'); //debug
 		});
 	} else {
-		console.error('Le formulaire avec l\'ID "login-form" n\'a PAS été trouvé');
+		console.error('Form with ID "login-form" was not found');
 		}
 });

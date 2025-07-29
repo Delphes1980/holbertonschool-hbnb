@@ -57,6 +57,19 @@ function loginButtonVisibility() {
   }
 
 
+function homeRedirection() {
+  const cliskHome = document.querySelector('.logo');
+  if (cliskHome) {
+    cliskHome.addEventListener('click', () => {
+      window.location.href = "index.html";
+      console.log('Redirection to the index page');
+    });
+  } else {
+    console.error('Logo button not found');
+  }
+}
+
+
 // Function to get a cookie by its name
 function getCookie(name) {
 	const cookies = document.cookie.split("; ");

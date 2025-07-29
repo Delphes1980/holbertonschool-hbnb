@@ -73,6 +73,10 @@ nav a {
     cursor: pointer;
 }
 
+.logo {
+    cursor: pointer;
+}
+
 main {
     padding: 2rem;
     flex-grow: 1;
@@ -110,7 +114,7 @@ footer {
 /* Styles for the modal content parent box */
 
 .modal-content {
-    background-color: #fefefe;
+    background-color: var(--card-background);
     margin: auto;
     padding: 20px;
     border: 1px solid #888;
@@ -134,12 +138,12 @@ footer {
     align-items: center;
 }
 
-#modal-header-content h2 {
+/* #modal-header-content h2 {
     margin: 0;
     color: white;
     text-align: center;
     align-items: center;
-}
+} */
 
 /* Styles for the modal body content box */
 
@@ -169,7 +173,7 @@ footer {
 
 /* Styles for the modal close button */
 
-.close-button {
+/* .close-button {
     color: white;
     font-size: 1rem;
     font-weight: bold;
@@ -182,7 +186,7 @@ footer {
 .close-button:hover, .close-button:focus {
     color: white;
     text-decoration: none;
-}
+} */
 
 body.modal-open {
     overflow: hidden;

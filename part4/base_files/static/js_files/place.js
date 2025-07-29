@@ -129,6 +129,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   loginRedirection();
   userReviewForm();
   ratingSubmit();
+  homeRedirection();
 
   const reviewForm = document.getElementById('review-form');
   if (reviewForm) {
