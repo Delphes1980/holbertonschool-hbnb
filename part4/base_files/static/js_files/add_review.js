@@ -185,7 +185,80 @@ async function fetchAndDisplayPlaces() {
 }
 
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     loginButtonVisibility();
     loginRedirection();
+
+    modal = document.getElementById('placeDetailsModal');
+    closeButton = document.querySelector('.close-button');
+    modalPlaceName = document.getElementById('modal-place-name');
+    reviewForm = document.getElementById('review-form');
+    reviewPlaceIdInput = document.getElementById('review-place-id-input');
+    reviewTextInput = document.getElementById('review-text');
+    ratingInput = document.getElementById('rating-input');
+    cancelButton = document.querySelector('.btn-cancel');
+
+    if (!modal || !closeButton || !modalPlaceName || !reviewForm || !reviewPlaceIdInput || !reviewTextInput || !ratingInput || !cancelButton) {
+        console.error('Critical error: modal elements missing');
+        const addReviewSection = document.getElementById('add-review');
+        if (addReviewSection) addReviewSection.style.display = 'none';
+        return;
+    }
+
+    closeButton.onclick = closeModal;
+    cancelButton.onclick = closeModal;
+
+    ratingSubmit();
+
+    reviewForm.onsubmit = async (event) => {
+        event.preventDefault();
+
+        const token = getCookie('token');
+        if (!token) {
+            alert('You must be identified to submit a review');
+            return;
+        }
+
+        const placeIdToSubmit = reviewPlaceIdInput.value;
+        const reviewTextContent = reviewTextInput.value.trim();
+        const ratingValue = parseInt(ratingInput.value);
+
+        if (!placeIdToSubmit || placeIdToSubmit === '') {
+            console.error('Submission failed: place ID is null or missing');
+            return;
+        }
+
+        if (!reviewTextContent) {
+            alert('You must write a review');
+            return;
+        }
+
+        if (isNaN(ratingValue) || ratingValue < 1 || ratingValue > 5) {
+            alert('You must give a valid rating');
+            return;
+        }
+
+        // Debug
+        console.log('add_review.js: Submission from the modal');
+        console.log(' Place ID:', placeIdToSubmit);
+        console.log(' Review text:', reviewTextContent);
+        console.log(' Token status:', token ? 'Present' : 'Missing');
+        // End of debug
+
+        try {
+            await submitReview(token, placeIdToSubmit, reviewTextContent, ratingValue);
+            closeModal();
+            await fetchAndDisplayPlaces();
+        } catch (error) {
+            console.error('Submission failed from the modal', error);
+            alert('Error during review submission');
+        }
+    };
+
+    await fetchAndDisplayPlaces();
+
+    const searchInput = document.getElementById('place-search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', searchPlace);
+    }
 });

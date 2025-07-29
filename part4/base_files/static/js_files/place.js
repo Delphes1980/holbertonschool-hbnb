@@ -226,6 +226,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('No placeId found in URL');
       }
     } else {
-      console.error('The element wit ID "place-details" was not found');
+      console.error('The element with ID "place-details" was not found');
     }
   });
