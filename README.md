@@ -44,6 +44,22 @@ Key Objectives:
 
 This part of the project will significantly enhance the application's security, scalability, and data integrity, making it ready for real-world scenarios.
 
+### Simple Web Client
+This last part of the HBnB project aims to focus on the front-end development by creating an interactive user interface connecting with the back-end services.
+
+Key objectives:
+- Creation of Login, List of Places, Place Details and Add Review pages with a design using HTML and CSS files.
+
+- Utilization of cookies to store the token from the login function for session management.
+
+- Fetching places data from API and display them based on a price selection. If the user is not authenticated, they are redirected to the login page.
+
+- Fetching places data from API with a specific ID and display the details of the place. If the user is authenticated, they can access to the review form.
+  
+- Authenticated users can add a review to a specific place, if they are not authenticated, they are redirected to the login page.
+
+This part of the project ends to a functional application with an interactive functionalities for the users.
+
 ### Authors
 - [Delphine Coutouly-Laborda](https://github.com/Delphes1980)
 - [Xavier Laforgue](https://github.com/XavierLaforgue)
