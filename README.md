@@ -44,7 +44,7 @@ Key Objectives:
 
 This part of the project will significantly enhance the application's security, scalability, and data integrity, making it ready for real-world scenarios.
 
-### Simple Web Client
+## Simple Web Client
 This last part of the HBnB project aims to focus on the front-end development by creating an interactive user interface connecting with the back-end services.
 
 Key objectives:
