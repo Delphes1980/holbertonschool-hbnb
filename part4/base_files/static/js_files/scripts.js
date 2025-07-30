@@ -11,6 +11,23 @@ let reviewTextInput = null;
 let ratingInput = null;
 let cancelButton = null;
 
+const placeImageMapping = {
+  '121c0d34-a070-4773-b1bf-b850da8b2607': '../images/bedroom.jpg',
+  '1992dcc6-c608-4874-ac01-76d8c58bbd64': '../images/maison_campagne.jpg',
+  'f428ffc2-b4e3-4117-b393-7ed9df361785': '../images/apartment_perdu.jpg',
+  'cb1bcb40-200e-4f60-941a-5fb4e3a15b68': '../images/loft_mer.jpg',
+  '44e18cdb-56c6-468e-92ec-edf5d9e69381': '../images/cute_little_house.jpg',
+  '6afb6d48-82b3-413b-9449-f618469dde8c': '../images/modern_house.jpg',
+  '21128672-c321-49d0-87d8-b34c76059e02': '../images/cozy_cottage.jpg',
+  '32d5bab8-599f-47ba-a291-03e5cd3795f9': '../images/city_apartment.jpg'
+};
+
+// Function to get the image URL of a place
+function getPlaceImage(placeId) {
+  return placeImageMapping[placeId] || '../images/no_image.png';
+}
+
+
 // Close the modal
     const closeModal = () => {
       if (modal) {
@@ -34,26 +51,46 @@ function loginRedirection() {
 }
 
 
+// Function that log out a user
+function logoutUser() {
+	document.cookie = 'token=; path=/; Max-Age=0; secure;';
+  alert('You are deconnected, please login');
+	console.log('Token cookie successfully deleted');
+	window.location.href = 'login.html'; // Redirection to the login page
+}
+
+
 function loginButtonVisibility() {
   const token = getCookie('token');
   const loginLink = document.getElementById('login-link');
 	const loginButton = document.querySelector('.login-button');
+  const logoutButton = document.getElementById('logout-button');
 
-    if (loginLink) {
-        if (!token) {
-          loginLink.style.display = 'block';
-        } else {
+    if (token) {
+        if (loginLink) {
           loginLink.style.display = 'none';
         }
-      }
-		if (loginButton) {
-      if (!token) {
-        loginButton.style.display = 'block';
+        if (loginButton) {
+          loginButton.style.display = 'none';
+        }
+        if (logoutButton) {
+          logoutButton.style.display = 'inline-block';
+
+          logoutButton.removeEventListener('click', logoutUser);
+          logoutButton.addEventListener('click', logoutUser);
+        }
       } else {
-        loginButton.style.display = 'none';
+        if (loginLink) {
+          loginLink.style.display = 'block';
+        }
+        if (loginButton) {
+          loginButton.style.display = 'inline-block';
+        }
+        if (logoutButton) {
+          logoutButton.style.display = 'none';
+        }
       }
-    }
-    console.log('Login button visibility update');
+      console.log('Login button visibility update');
   }
 
 

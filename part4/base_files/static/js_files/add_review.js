@@ -77,6 +77,16 @@ function searchPlace() {
 function createPlaceCard(place) {
     const placeCard = document.createElement('div');
     placeCard.classList.add('place-card');
+    placeCard.dataset.placeId = place.id;
+    placeCard.dataset.placeTitle = place.title;
+
+    const imageWrapper = document.createElement('div');
+    imageWrapper.classList.add('card-image-wrapper');
+    const placeImage = document.createElement('img');
+    placeImage.src = getPlaceImage(place.id);
+    placeImage.alt = place.title;
+    imageWrapper.appendChild(placeImage);
+    placeCard.appendChild(imageWrapper);
 
     const addContainer = document.createElement('div');
     addContainer.classList.add('place-card-container');

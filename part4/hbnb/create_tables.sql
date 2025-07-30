@@ -133,9 +133,9 @@ VALUES (
 	'6fb5f1c1-f9d4-4987-aee3-16ab71704835',
 	CURRENT_TIMESTAMP,
 	CURRENT_TIMESTAMP,
-	'test@example.com',
-	'Test',
-	'User',
+	'john@doe.com',
+	'John',
+	'Doe',
 	'$2b$12$KoRE19LjSeh8pAGLYdd9Q.DMMCYs7TH3EYFizvdoyuaX62JFg2TmW',
 	False
 	);
@@ -145,9 +145,9 @@ VALUES (
 	'7414383a-c590-41aa-a4a5-02c11b8f2b17',
 	CURRENT_TIMESTAMP,
 	CURRENT_TIMESTAMP,
-	'test2@example.com',
-	'Second Test',
-	'User',
+	'jane@doe.com',
+	'Jane',
+	'Doe',
 	'$2b$12$KoRE19LjSeh8pAGLYdd9Q.DMMCYs7TH3EYFizvdoyuaX62JFg2TmW',
 	False
 	);
@@ -224,11 +224,43 @@ VALUES(
 	'Air Conditioning'
 );
 
+INSERT INTO amenities(id, created_at, updated_at, name)
+VALUES(
+	'e400974a-cfb0-4650-beee-96431d3048c7',
+	CURRENT_TIMESTAMP,
+	CURRENT_TIMESTAMP,
+	'Pool'
+);
+
+INSERT INTO amenities(id, created_at, updated_at, name)
+VALUES(
+	'7c30b67a-166f-45e5-87c9-397b4579ad4d',
+	CURRENT_TIMESTAMP,
+	CURRENT_TIMESTAMP,
+	'BBQ'
+);
+
+INSERT INTO amenities(id, created_at, updated_at, name)
+VALUES(
+	'bae601d4-2ace-4e0b-af9c-8fbf9697bd1e',
+	CURRENT_TIMESTAMP,
+	CURRENT_TIMESTAMP,
+	'Electricity'
+);
+
+INSERT INTO amenities(id, created_at, updated_at, name)
+VALUES(
+	'e6b2beed-e39c-4af0-be40-e266eb8fe6f9',
+	CURRENT_TIMESTAMP,
+	CURRENT_TIMESTAMP,
+	'Balcony'
+);
+
 INSERT INTO places(id, title, description, price, 
 				   latitude, longitude, owner_id)
 VALUES(
 	'9962e46f-05fa-4ac2-9617-b53d06713a33',
-	'Appartment of Test User',
+	'Beautiful apartment',
 	'It is an OK place',
 	20,
 	0,
@@ -240,9 +272,9 @@ INSERT INTO places(id, title, description, price,
 				   latitude, longitude, owner_id)
 VALUES(
 	'121c0d34-a070-4773-b1bf-b850da8b2607',
-	'Appartment of Second Test User',
-	'It is a bad place',
-	10,
+	'Bedroom',
+	'It is a place to sleep',
+	5,
 	0,
 	0,
 	'7414383a-c590-41aa-a4a5-02c11b8f2b17'
@@ -251,8 +283,8 @@ VALUES(
 INSERT INTO places(id, title, description, price, latitude, longitude, owner_id)
 VALUES (
 	'1992dcc6-c608-4874-ac01-76d8c58bbd64',
-	'Maison de Campagne',
-	"Petite maison cosy pour profiter d'un petit moment sympa",
+	'"Maison de Campagne"',
+	"Cosy little house to enjoy a nice moment",
 	250,
 	49.6460955,
 	2.9596039,
@@ -262,8 +294,8 @@ VALUES (
 INSERT INTO places(id, title, description, price, latitude, longitude, owner_id)
 VALUES (
 	'f428ffc2-b4e3-4117-b393-7ed9df361785',
-	'Appartement Perdu',
-	"Pour retrouver ce qu'on a perdu",
+	'Apartment Perdu',
+	"To find what we've lost",
 	300,
 	18.46667,
 	-72.46667,
@@ -273,8 +305,8 @@ VALUES (
 INSERT INTO places(id, title, description, price, latitude, longitude, owner_id)
 VALUES (
 	'cb1bcb40-200e-4f60-941a-5fb4e3a15b68',
-	'Loft en bord de Mer',
-	"Pour découvrir ce qui s'y cache",
+	'Loft by Mer',
+	"To discover what's hidden there",
 	150,
 	47.7083642,
 	1.5062706,
@@ -377,4 +409,118 @@ VALUES(
 	4,
 	'c2676497-058b-4438-9aad-e2591186e3d8',
 	'32d5bab8-599f-47ba-a291-03e5cd3795f9'
+);
+
+INSERT INTO place_amenity(place_id, amenity_id)
+VALUES(
+	'6afb6d48-82b3-413b-9449-f618469dde8c',
+	'9505dcd5-2d59-403f-a6da-b818e1db9d55'
+);
+
+INSERT INTO place_amenity(place_id, amenity_id)
+VALUES(
+	'6afb6d48-82b3-413b-9449-f618469dde8c',
+	'2cfb7c28-d405-4856-af63-28d033968df0'
+);
+
+INSERT INTO place_amenity(place_id, amenity_id)
+VALUES(
+	'6afb6d48-82b3-413b-9449-f618469dde8c',
+	'a6d13673-416b-4cea-99cc-d846583cfcd1'
+);
+
+INSERT INTO place_amenity(place_id, amenity_id)
+VALUES(
+	'6afb6d48-82b3-413b-9449-f618469dde8c',
+	'bae601d4-2ace-4e0b-af9c-8fbf9697bd1e'
+);
+
+INSERT INTO place_amenity(place_id, amenity_id)
+VALUES(
+	'6afb6d48-82b3-413b-9449-f618469dde8c',
+	'e400974a-cfb0-4650-beee-96431d3048c7'
+);
+
+INSERT INTO place_amenity(place_id, amenity_id)
+VALUES(
+	'6afb6d48-82b3-413b-9449-f618469dde8c',
+	'7c30b67a-166f-45e5-87c9-397b4579ad4d'
+);
+
+INSERT INTO place_amenity(place_id, amenity_id)
+VALUES(
+	'6afb6d48-82b3-413b-9449-f618469dde8c',
+	'e6b2beed-e39c-4af0-be40-e266eb8fe6f9'
+);
+
+INSERT INTO place_amenity(place_id, amenity_id)
+VALUES(
+	'cb1bcb40-200e-4f60-941a-5fb4e3a15b68',
+	'9505dcd5-2d59-403f-a6da-b818e1db9d55'
+);
+
+INSERT INTO place_amenity(place_id, amenity_id)
+VALUES(
+	'f428ffc2-b4e3-4117-b393-7ed9df361785',
+	'a6d13673-416b-4cea-99cc-d846583cfcd1'
+);
+
+INSERT INTO place_amenity(place_id, amenity_id)
+VALUES(
+	'21128672-c321-49d0-87d8-b34c76059e02',
+	'e400974a-cfb0-4650-beee-96431d3048c7'
+);
+
+INSERT INTO place_amenity(place_id, amenity_id)
+VALUES(
+	'21128672-c321-49d0-87d8-b34c76059e02',
+	'7c30b67a-166f-45e5-87c9-397b4579ad4d'
+);
+
+INSERT INTO place_amenity(place_id, amenity_id)
+VALUES(
+	'32d5bab8-599f-47ba-a291-03e5cd3795f9',
+	'e6b2beed-e39c-4af0-be40-e266eb8fe6f9'
+);
+
+INSERT INTO place_amenity(place_id, amenity_id)
+VALUES(
+	'32d5bab8-599f-47ba-a291-03e5cd3795f9',
+	'9505dcd5-2d59-403f-a6da-b818e1db9d55'
+);
+
+INSERT INTO place_amenity(place_id, amenity_id)
+VALUES(
+	'32d5bab8-599f-47ba-a291-03e5cd3795f9',
+	'a6d13673-416b-4cea-99cc-d846583cfcd1'
+);
+
+INSERT INTO place_amenity(place_id, amenity_id)
+VALUES(
+	'9962e46f-05fa-4ac2-9617-b53d06713a33',
+	'7c30b67a-166f-45e5-87c9-397b4579ad4d'
+);
+
+INSERT INTO place_amenity(place_id, amenity_id)
+VALUES(
+	'9962e46f-05fa-4ac2-9617-b53d06713a33',
+	'9505dcd5-2d59-403f-a6da-b818e1db9d55'
+);
+
+INSERT INTO place_amenity(place_id, amenity_id)
+VALUES(
+	'121c0d34-a070-4773-b1bf-b850da8b2607',
+	'7c30b67a-166f-45e5-87c9-397b4579ad4d'
+);
+
+INSERT INTO place_amenity(place_id, amenity_id)
+VALUES(
+	'1992dcc6-c608-4874-ac01-76d8c58bbd64',
+	'2cfb7c28-d405-4856-af63-28d033968df0'
+);
+
+INSERT INTO place_amenity(place_id, amenity_id)
+VALUES(
+	'1992dcc6-c608-4874-ac01-76d8c58bbd64',
+	'7c30b67a-166f-45e5-87c9-397b4579ad4d'
 );

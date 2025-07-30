@@ -73,12 +73,18 @@ function addPlaceCard(place) {
     addPlace.classList.add('place-card');
     addPlace.dataset.price = place.price;
 
+    const imageWrapper = document.createElement('div');
+    imageWrapper.classList.add('card-image-wrapper');
+
+    const placeImage = document.createElement('img');
+    placeImage.src = getPlaceImage(place.id);
+    placeImage.alt = place.title;
+
+    imageWrapper.appendChild(placeImage);
+    addPlace.appendChild(imageWrapper);
+
     const addContainer = document.createElement('div');
     addContainer.classList.add('place-card-container');
-
-    // const placeImage = document.createElement('img');
-    // placeImage.src = place.imageUrl;
-    // placeImage.alt = place.name;
 
     const placeName = document.createElement('h4');
     const boldName = document.createElement('b');
@@ -97,7 +103,6 @@ function addPlaceCard(place) {
         window.location.href = `place.html?id=${encodeURIComponent(place.id)}`;
     });
 
-    // addContainer.appendChild(placeImage);
     addContainer.appendChild(placeName);
     addContainer.appendChild(placePrice);
     addContainer.appendChild(placeDetailsButton);
@@ -148,7 +153,7 @@ function addPriceFilter() {
 
     const minOption = document.createElement('option');
     minOption.value = '10';
-    minOption.textContent = '<= 10€';
+    minOption.textContent = 'Up to 10€';
     filterToAdd.appendChild(minOption);
 
     const maxPrice = allPlaces.reduce((max, place) => Math.max(max, place.price), 0);
@@ -157,7 +162,7 @@ function addPriceFilter() {
     for (let i = step; i <= maxPrice + step; i += step) {
         const option = document.createElement('option');
         option.value = i.toString();
-        option.textContent = `<= ${i}€`;
+        option.textContent = `Up to ${i}€`;
         filterToAdd.appendChild(option);
     }
 	}
@@ -184,7 +189,7 @@ function placesFilter() {
             filteredPlaces = [...allPlaces];
         }
     }
-    filteredPlaces.sort((a,b) => a.price - b.price);
+    filteredPlaces.sort((a,b) => b.price - a.price); // Descending sorted prices
 
     displayAllPlaces(filteredPlaces);
 }
