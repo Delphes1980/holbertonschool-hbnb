@@ -261,24 +261,24 @@ VALUES (
 
 INSERT INTO places(id, title, description, price, latitude, longitude, owner_id)
 VALUES (
-	'2e039425-2acd-4b87-94de-3336ee838e7e',
+	'f428ffc2-b4e3-4117-b393-7ed9df361785',
 	'Appartement Perdu',
 	"Pour retrouver ce qu'on a perdu",
 	300,
 	18.46667,
 	-72.46667,
-	'3b670ec5-1ff8-4431-8de7-2b646b05bd3b'
+	'72d605d3-af7b-4055-9fe6-fc01c0e86345'
 );
 
 INSERT INTO places(id, title, description, price, latitude, longitude, owner_id)
 VALUES (
-	'13840f3f-2cbc-4aeb-97a4-2930da5a3465',
+	'cb1bcb40-200e-4f60-941a-5fb4e3a15b68',
 	'Loft en bord de Mer',
 	"Pour découvrir ce qui s'y cache",
 	150,
 	47.7083642,
 	1.5062706,
-	'e4f87197-440f-47ae-8a27-1e1f23184be0'
+	'13a9b620-310c-4e3a-846c-9d548fcf240a'
 );
 
 INSERT INTO places(id, title, description, price, latitude, longitude, owner_id)

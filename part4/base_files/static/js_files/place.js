@@ -55,6 +55,7 @@ function addPlaceDetailsCard(place) {
     detailsPlaceCardContainer.classList.add('place-details-card');
 
     const detailsPlaceCardName = document.createElement('h3');
+    detailsPlaceCardName.classList.add('place-title');
     const boldPlaceCardName = document.createElement('b');
     boldPlaceCardName.textContent = place.title;
     detailsPlaceCardName.appendChild(boldPlaceCardName);
@@ -123,66 +124,109 @@ function addPlaceDetailsCard(place) {
 }
 
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   loginButtonVisibility();
-  ratingSubmit();
+  loginRedirection();
   userReviewForm();
+  ratingSubmit();
+  homeRedirection();
 
   const reviewForm = document.getElementById('review-form');
-    if (reviewForm) {
-        reviewForm.addEventListener('submit', async(event) => {
-            event.preventDefault();
+  if (reviewForm) {
+    reviewForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
 
-            const placeId = new URLSearchParams(window.location.search).get('id');
-            const reviewText = document.getElementById('review-text').value;
-            const ratingInput = reviewForm.querySelector('input[name="rating"]');
-            const rating = ratingInput ? parseInt(ratingInput.value) : 0;
+      const placeIdToSubmit = new URLSearchParams(window.location.search).get('id');
+      const reviewTextContent = document.getElementById('review-text').value;
+      const ratingInput = reviewForm.querySelector('input[name="rating"]');
+      const ratingValue = ratingInput ? parseInt(ratingInput.value) : 0;
 
-            const token = getCookie('token');
+      const token = getCookie('token');
 
-            if (!token) {
-                alert('You should be authenticated to submit a review');
-                return;
-            }
+      if (!token) {
+        alert('You must be authenticated');
+        return;
+      }
 
-            await submitReview(token, placeId, reviewText, rating);
-            // Rappel de la fonction qui gère le rafraichissement des commentaires 
-        });
-            const cancelButton = reviewForm.querySelector('.btn-cancel');
-            if (cancelButton) {
-                cancelButton.addEventListener('click', () => {
-                    reviewForm.reset();
+      if (!placeIdToSubmit) {
+        alert('Place ID is missing for review submission');
+        console.error('Submission failed: Place ID is null or empty');
+        return;
+      }
 
-                    const stars = document.querySelectorAll('#review-form .rating .star');
-                    const ratingInput = document.getElementById('rating-input');
-                    if (ratingInput) {
-                        ratingInput.value = '';
-                        stars.forEach(s => {
-                            s.classList.remove('bxs-star');
-                            s.classList.add('bx-star');
-                            s.classList.remove('active');
-                        });
-                    }
+      if (!reviewTextContent) {
+        alert('You must write a review');
+        return;
+      }
+
+      if (isNaN(ratingValue) || ratingValue < 1 || ratingValue > 5) {
+        alert('You must give a valid rating');
+        return;
+      }
+
+      try {
+      await submitReview(token, placeIdToSubmit, reviewTextContent, ratingValue);
+
+        fetchPlaceDetails(placeIdToSubmit)
+          .then(updatedPlace => {
+            addPlaceDetailsCard(updatedPlace);
+            reviewForm.reset();
+
+            const stars = reviewForm.querySelectorAll('.rating .star');
+            stars.forEach(s => {
+              s.classList.remove('bxs-star', 'active');
+              s.classList.add('bx-star');
             });
-        }
-    }
+            if (ratingInput) ratingInput.value ='';
+          })
 
-	const detailsPlaceSection = document.getElementById('place-details');
-	if (detailsPlaceSection) {
-    const urlParams = new URLSearchParams(window.location.search);
-    const placeId = urlParams.get('id');
+          .catch (error => {
+            console.error("Fail during loading places' details", error);
+            alert('Review submit but error during loading place details');
+          });
 
-    if (placeId) {
-      fetchPlaceDetails(placeId)
-        .then(place => {
-          addPlaceDetailsCard(place);
-        })
+      } catch (error) {
+        console.error('Error during reiew submission', error);
+        alert(`Error submitting review: ${error.message}`);
+      }
+    });
 
-        .catch(error => {
-          console.error("Fail during loading places' details", error);
+      const cancelButton = reviewForm.querySelector('.btn-cancel');
+      if (cancelButton) {
+        cancelButton.addEventListener('click', () => {
+          reviewForm.reset();
+
+          const stars = document.querySelectorAll('#review-form .rating .star');
+          const currentRatingInput = document.getElementById('rating-input');
+          if (currentRatingInput) {
+            currentRatingInput.value ='';
+            stars.forEach(s => {
+              s.classList.remove('bxs-star');
+              s.classList.add('bx-star');
+              s.classList.remove('active');
+            });
+          }
         });
       }
-  } else {
-    console.error('The element with ID "place-details" was not found');
-  }
-});
+    }
+
+    const detailsPlaceSection = document.getElementById('place-details');
+    if (detailsPlaceSection) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const placeId = urlParams.get('id');
+
+      if (placeId) {
+        fetchPlaceDetails(placeId)
+          .then(place => {
+            addPlaceDetailsCard(place);
+          })
+          .catch(error => {
+            console.error("Fail during loading places' details", error);
+          });
+      } else {
+        console.error('No placeId found in URL');
+      }
+    } else {
+      console.error('The element with ID "place-details" was not found');
+    }
+  });

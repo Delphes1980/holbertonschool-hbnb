@@ -1,4 +1,4 @@
-# HBNB Project - Partie 3 : Authentication and Data Persistence
+# HBNB Project - Part 3 : Authentication and Data Persistence
 
 ## Table of Contents
 - [Introduction](#introduction)

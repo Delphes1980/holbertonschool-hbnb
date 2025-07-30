@@ -1,12 +1,11 @@
+// let allPlaces;
+
 // Function that check user authentication
 function checkAuthentication() {
     const token = getCookie('token');
+
     const loginLink = document.getElementById('login-link');
 	const loginButton = document.querySelector('.login-button');
-
-    // if (token) {
-    //     loginButton.classList.add('hide-me');
-    // }
 
     if (!token) {
         if (loginLink) loginLink.style.display = 'block';
@@ -15,6 +14,7 @@ function checkAuthentication() {
         if (loginLink) loginLink.style.display = 'none';
 		if (loginButton) loginButton.style.display = 'none';
 
+    if (token) {
       // Fetch places data if the user is authenticated
         fetchPlaces(token)
 			.then(placesData => {
@@ -26,12 +26,12 @@ function checkAuthentication() {
 			.catch(error => {
 				console.error('Fail during display of places after authentication', error);
 				const placeListContainer = document.getElementById('places-list');
-				if (placeListContainer) {
-					placeListContainer.innerHTML = `<p style="color: red;">Fail during the places loading: ${error.message}</p>`;
-				}
 			});
-		}
+		} else {
+            console.log('User not authenticated');
+        }
 	}
+}
 
 
 // Function that fetch all places from the DB
@@ -82,7 +82,7 @@ function addPlaceCard(place) {
 
     const placeName = document.createElement('h4');
     const boldName = document.createElement('b');
-    boldName.textContent = place.name;
+    boldName.textContent = place.title;
     placeName.appendChild(boldName);
 
     const placePrice = document.createElement('p');
@@ -94,7 +94,7 @@ function addPlaceCard(place) {
     placeDetailsButton.dataset.placeId = place.id;
 
     placeDetailsButton.addEventListener('click', () => {
-      window.location.href = `place.html?id=${encodeURIComponent(place.id)}`;
+        window.location.href = `place.html?id=${encodeURIComponent(place.id)}`;
     });
 
     // addContainer.appendChild(placeImage);
@@ -106,7 +106,7 @@ function addPlaceCard(place) {
     placeToAdd.appendChild(addPlace);
     } else {
         console.error('Place not found');
-  }
+    }
 }
 
 
@@ -172,28 +172,28 @@ function placesFilter() {
     }
     const valueSelection = priceFilterElement.value;
 
-    let filteredPlace = [];
+    let filteredPlaces = [];
 
     if (valueSelection === 'all') {
-        filteredPlace = [...allPlaces];
+        filteredPlaces = [...allPlaces];
     } else {
         const maxPriceFilter = parseFloat(valueSelection);
         if (!isNaN(maxPriceFilter)) {
-            filteredPlace = allPlaces.filter(place => place.price <= maxPriceFilter);
+            filteredPlaces = allPlaces.filter(place => place.price <= maxPriceFilter);
         } else {
-            filteredPlace = [...allPlaces];
+            filteredPlaces = [...allPlaces];
         }
-
-        filteredPlace.sort((a,b) => a.price - b.price);
-
-        displayAllPlaces(filteredPlace);
     }
+    filteredPlaces.sort((a,b) => a.price - b.price);
+
+    displayAllPlaces(filteredPlaces);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     loginButtonVisibility();
     loginRedirection();
 	checkAuthentication();
+    homeRedirection();
 
     const priceFilter = document.getElementById('price-filter');
     if (priceFilter) {
