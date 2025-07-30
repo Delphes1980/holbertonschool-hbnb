@@ -8,7 +8,7 @@ git clone https://github.com/Delphes1980/holbertonschool-hbnb.git desired_folder
 ```
 then
 ```
-cd desired_folder_name/part3/hbnb/
+cd desired_folder_name/part4/hbnb/
 ```
 
 #### 2. Create and activate a virtual environment
@@ -32,7 +32,7 @@ mkdir instance; sqlite3 instance/development.db < create_tables.sql
 ```
 
 #### 5. Application utilisation
-From the hbnb directory (within part3), run:
+From the hbnb directory (within part4), run:
 ```
 python run.py
 ```
