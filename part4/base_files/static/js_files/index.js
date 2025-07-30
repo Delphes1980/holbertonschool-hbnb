@@ -188,9 +188,8 @@ function placesFilter() {
         } else {
             filteredPlaces = [...allPlaces];
         }
+        filteredPlaces.sort((a,b) => b.price - a.price); // Descending sorted prices
     }
-    filteredPlaces.sort((a,b) => b.price - a.price); // Descending sorted prices
-
     displayAllPlaces(filteredPlaces);
 }
 

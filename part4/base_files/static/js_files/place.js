@@ -81,7 +81,12 @@ function addPlaceDetailsCard(place) {
     placeInfoDescription.innerHTML = `<b>Description:</b> ${place.description || 'No description available'}`;
 
     const placeInfoAmenities = document.createElement('p');
-    placeInfoAmenities.innerHTML = `<b>Amenities:</b> ${place.amenities && Array.isArray(place.amenities) ? place.amenities.join(', ') : 'No amenities available'}`;
+    let amenitiesText = 'No amenities available';
+    if (place.amenities && Array.isArray(place.amenities) && place.amenities.length > 0) {
+      // Extract every amenities and concatenated them
+      amenitiesText = place.amenities.map(amenity => amenity.name).join(', ');
+    }
+    placeInfoAmenities.innerHTML = `<b>Amenities:</b> ${amenitiesText}`;
 
     placeInfoContainer.appendChild(placeInfoHost);
     placeInfoContainer.appendChild(placeInfoPrice);

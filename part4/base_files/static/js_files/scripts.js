@@ -11,6 +11,7 @@ let reviewTextInput = null;
 let ratingInput = null;
 let cancelButton = null;
 
+// Mapping for the image associated to a specific place ID
 const placeImageMapping = {
   '121c0d34-a070-4773-b1bf-b850da8b2607': '../images/bedroom.jpg',
   '1992dcc6-c608-4874-ac01-76d8c58bbd64': '../images/maison_campagne.jpg',
@@ -60,6 +61,7 @@ function logoutUser() {
 }
 
 
+// Function that switch between the login button and the logout button
 function loginButtonVisibility() {
   const token = getCookie('token');
   const loginLink = document.getElementById('login-link');
@@ -94,6 +96,7 @@ function loginButtonVisibility() {
   }
 
 
+// Function that redirect to the home page by clicking on the logo
 function homeRedirection() {
   const cliskHome = document.querySelector('.logo');
   if (cliskHome) {
@@ -216,7 +219,6 @@ async function showPlaceDetails(placeId, placeTitle) {
     modalPlaceName.textContent = `Submit a review for: ${placeTitle}`;
 
     reviewPlaceIdInput.value = placeId;
-    console.log('showPlaceDetails: hidden place ID set to: ', reviewPlaceIdInput.value); //debug
 
     // Reinitialize stars & form at every modal opening
     reviewForm.reset();
