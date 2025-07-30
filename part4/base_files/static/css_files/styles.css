@@ -59,7 +59,8 @@ nav a {
     margin-left: 1rem;
 }
 
-.login-button {
+/* Styles for the login/ logout buttons on all pages */
+.login-button, #logout-button {
 	display: inline-block;
 	padding: 0.2rem ;
 	border: 0.2rem solid #333;
@@ -96,7 +97,6 @@ footer {
 /* ##### Styles for the modal pop up #####*/
 
 /* Styles for the modal */
-
 .modal {
     display: none;
     position: fixed;
@@ -112,7 +112,6 @@ footer {
 }
 
 /* Styles for the modal content parent box */
-
 .modal-content {
     background-color: var(--card-background);
     margin: auto;
@@ -127,7 +126,6 @@ footer {
 }
 
 /* Styles for the modal header content box */
-
 #modal-header-content {
     padding: 15px 20px;
     background: #ffbeae;
@@ -138,15 +136,7 @@ footer {
     align-items: center;
 }
 
-/* #modal-header-content h2 {
-    margin: 0;
-    color: white;
-    text-align: center;
-    align-items: center;
-} */
-
 /* Styles for the modal body content box */
-
 #modal-body-content {
     padding: 5px;
     flex-grow: 1;
@@ -160,7 +150,6 @@ footer {
 }
 
 /* Styles for the modal footer content box */
-
 #modal-footer-content {
     padding: 15px 20px;
     background-color: #ffbeae;
@@ -171,22 +160,9 @@ footer {
     align-items: center;
 }
 
-/* Styles for the modal close button */
-
-/* .close-button {
-    color: white;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    background-color: #ff988b;
-    padding: 5px 10px;
-    border-radius: 5px;
+.close-button {
+    display: none;
 }
-
-.close-button:hover, .close-button:focus {
-    color: white;
-    text-decoration: none;
-} */
 
 body.modal-open {
     overflow: hidden;

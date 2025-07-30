@@ -14,7 +14,7 @@ async function loginUser(email, password) {
 				const data = await response.json();
 				if (data && data.access_token) {
 					// Return the token into a cookie
-					document.cookie = `token=${data.access_token}; path=/; secure;`;
+					document.cookie = `token=${data.access_token}; path=/; Max-Age=300; secure;`; // Expires after 5 minutes
 					window.location.href = 'index.html'; // Redirection to the index page
 				} else {
 					alert('Login failed: ' + response.statusText);
@@ -46,7 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	loginButtonVisibility();
 	homeRedirection();
 
-	console.log('DOMContentLoaded s\'est déclenché.');
 	const loginForm = document.getElementById('login-form');
 
 	if (loginForm) {

@@ -54,18 +54,19 @@ function addPlaceDetailsCard(place) {
     const detailsPlaceCardContainer = document.createElement('div');
     detailsPlaceCardContainer.classList.add('place-details-card');
 
+    const imageWrapper = document.createElement('div');
+    imageWrapper.classList.add('card-image-wrapper');
+    const imagePlace = document.createElement('img');
+    imagePlace.src = getPlaceImage(place.id);
+    imagePlace.alt = place.title;
+    imageWrapper.appendChild(imagePlace);
+    detailsPlaceCardContainer.appendChild(imageWrapper);
+
     const detailsPlaceCardName = document.createElement('h3');
     detailsPlaceCardName.classList.add('place-title');
     const boldPlaceCardName = document.createElement('b');
     boldPlaceCardName.textContent = place.title;
     detailsPlaceCardName.appendChild(boldPlaceCardName);
-
-    // const detailsPlaceImageContainer = document.createElement('div');
-    // detailsPlaceImageContainer.classList.add('place-image');
-    // const detailsPlaceImage = document.createElement('img');
-    // detailsPlaceImage.src = place.imageUrl;
-    // detailsPlaceImage.alt = place.name;
-    // detailsPlaceImageContainer.appendChild(detailsPlaceImage);
 
     const placeInfoContainer = document.createElement('div');
     placeInfoContainer.classList.add('place-info');
@@ -80,7 +81,12 @@ function addPlaceDetailsCard(place) {
     placeInfoDescription.innerHTML = `<b>Description:</b> ${place.description || 'No description available'}`;
 
     const placeInfoAmenities = document.createElement('p');
-    placeInfoAmenities.innerHTML = `<b>Amenities:</b> ${place.amenities && Array.isArray(place.amenities) ? place.amenities.join(', ') : 'No amenities available'}`;
+    let amenitiesText = 'No amenities available';
+    if (place.amenities && Array.isArray(place.amenities) && place.amenities.length > 0) {
+      // Extract every amenities and concatenated them
+      amenitiesText = place.amenities.map(amenity => amenity.name).join(', ');
+    }
+    placeInfoAmenities.innerHTML = `<b>Amenities:</b> ${amenitiesText}`;
 
     placeInfoContainer.appendChild(placeInfoHost);
     placeInfoContainer.appendChild(placeInfoPrice);

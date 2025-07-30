@@ -10,12 +10,12 @@
 
 /* Styles for the place cards */
 .place-card {
-	margin: 20px;
-	padding: 10px;
+	background-color: var(--card-background);
 	border: 1px solid #ddd;
 	border-radius: 10px;
+	margin: 20px;
+	padding: 10px;
 	box-sizing: border-box;
-	background-color: var(--card-background);
 	color: var(--dark-text);
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     display: flex;
@@ -25,6 +25,7 @@
 	max-width: 400px;
 	min-height: 300px;
 	transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+	overflow: hidden;
 }
 
 .place-card:hover {
@@ -45,13 +46,19 @@
 }
 
 /* Styles for the image inside the place card */
-.place-card-container img {
+.card-image-wrapper {
 	width: 100%;
 	height: 150px;
-	object-fit: cover;
-	border-radius: 5px;
-	margin-bottom: 10px;
+	overflow: hidden;
+	border-radius: 8px 8px 0 0;
+}
+
+.card-image-wrapper img {
 	display: block;
+	width: 100%;
+	height: 200px;
+	border-radius: 5px;
+	object-fit: cover;
 }
 
 /* Styles for the 'view details' button */
@@ -98,28 +105,6 @@
 
 .place-details-card:hover {
 	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-}
-
-/* Styles for the place image */
-.place-image {
-	padding: 10px;
-	box-sizing: border-box;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	overflow: hidden;
-	background-color: var(--card-background);
-	border-radius: 10px;
-	width: 100%;
-	margin-bottom: 10px;
-}
-
-.place-image img {
-	display: block;
-	width: 100%;
-	height: 200px;
-	border-radius: 5px;
-	object-fit: cover;
 }
 
 .place-info {
