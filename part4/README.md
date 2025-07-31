@@ -153,18 +153,22 @@ python run.py
 ```
 
 ### Usage
-After running the application, open your web browser and go to:
+After running the application, open a new terminal and write the following command:
 ```
-http://127.0.0.1:3000/base_files/templates/index.html
+python3 -m http.server 8000
 ```
+and open it to your browser, click on ```base_files/``` and then on ```templates/``` and enjoy the different functionalities .
+
 To login, you can use these various users to leave reviews:
+- john@doe.com
+- jane@doe.com
 - charles@ingalls.com
 - big@daddy.com
 - michael@myers.com
 - carrie@bradshaw.com
 
 All of these users have the same password: ```password```
-**_⚠ WARNING:_** Never put important information like email or password on your README file! These details appear here in order to test the application and its various functionalities.**_⚠_**
+**_⚠ WARNING:_** Never put important information like email or password on your README file! These details appear here in order to test the application and its various functionalities.**_⚠ WARNING_**
 
 
 ### Technologies used

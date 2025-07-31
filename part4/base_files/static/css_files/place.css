@@ -11,13 +11,13 @@
 /* Styles for the place cards */
 .place-card {
 	background-color: var(--card-background);
-	border: 1px solid #ddd;
+	border: var(--border);
 	border-radius: 10px;
 	margin: 20px;
 	padding: 10px;
 	box-sizing: border-box;
 	color: var(--dark-text);
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	box-shadow: var(--card-shadow);
     display: flex;
 	flex-direction: column;
     align-items: center;
@@ -29,7 +29,7 @@
 }
 
 .place-card:hover {
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    box-shadow: var(--card-shadow-hover);
 	transform: translateY(-5px); /* Flight effect */
 }
 
@@ -74,7 +74,7 @@
 }
 
 .details-button:hover {
-	background-color: #f0543f;
+	background-color: var(--login-hover-color);
 }
 
 /* Styles for place details card on place page */
@@ -91,7 +91,7 @@
 .place-details-card {
 	margin: 20px;
 	padding: 10px;
-    border: 1px solid #ddd;
+    border: var(--border);
     border-radius: 10px;
 	box-sizing: border-box;
 	background-color: var(--card-background);
@@ -104,7 +104,7 @@
 }
 
 .place-details-card:hover {
-	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+	box-shadow: var(--card-shadow-hover);
 }
 
 .place-info {
@@ -134,13 +134,13 @@
 	width: 100%;
 	text-align: left;
 	margin-bottom: 1rem;
-	color: var(--dark-text);
+	color: var(--black);
 }
 
 .review-card {
     margin: 10px 0;
 	padding: 15px;
-    border: 1px solid #ddd;
+    border: var(--border);
     border-radius: 10px;
 	box-sizing: border-box;
 	background-color: var(--card-background);
@@ -149,11 +149,11 @@
 	flex-direction: column;	
 	max-width: 600px;
 	width: 100%;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	box-shadow: var(--card-shadow);
 }
 
 .review-card:hover {
-	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+	box-shadow: var(--card-shadow-hover);
 }
 
 /* Styles for the review card containing user review information */
@@ -173,11 +173,11 @@
 .review-card .review-rating .star {
 	margin-right: 2px;
 	font-size: 1.2rem;
-	color: #514e4e;
+	color: var(--review-rating-place);
 }
 
 .review-card .review-rating .bxs-star {
-	color: black;
+	color: var(--review-rating-place);
 }
 
 .review-card .review-content {
@@ -198,7 +198,7 @@
 #add-review .wrapper {
 	margin: 0;
 	padding: 10px;
-	border: 1px solid #ddd;
+	border: var(--border);
 	border-radius: 10px;
 	box-sizing: border-box;
 	background: var(--card-background);
@@ -209,6 +209,6 @@
 }
 
 #add-review .wrapper:hover {
-	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+	box-shadow: var(--card-shadow-hover);
 	transform: translateY(-5px);
 }

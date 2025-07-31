@@ -1,17 +1,99 @@
 :root {
-	--yellow: #ffbd13;
-	--blue: #4383ff;
-	--blue-d-l: #3278ff;
 	--light: #f5f5f5;
 	--grey: #e9e3e3;
 	--white: #fff;
+    --black: black;
 	--shadow: 8px 8px 30px rgba(0, 0, 0, .05);
     --card-background: #ffbeae;
     --dark-text: #333;
     --medium-text: #555;
+    --light-text: #5f6368;
     --button-background: #ff9886;
     --button-text-color: #fff;
+    --body-background: #f4f4f4;
+    --border: 1px solid #ddd;
+    --star-color: red;
+    --search-container-color: #ddd;
+    --card-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.2);
+    --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    --modal-background-color: rgba(0, 0, 0, 0.7);
+    --modal-content-border: 1px solid #888;
+    --login-border: 1px solid #dadce0;
+    --login-button-color: #ff988b;
+    --login-hover-color: #f0543f;
+    --form-writing-color: #202124;
+    --review-rating-place: #514e4e;
+    --place-description-color: #666;
+    --media-border: 1px solid #ccc;
+    --login-shadow-field: 0 0 0 1px var(--login-button-color), rgba(255, 152, 139, 0.4)
 }
+
+.darkmode {
+    --light: #f5f5f5;
+	/* --grey: #e9e3e3; */
+	--white: #f0f0f0;
+    --black: #ffffff;
+	--shadow: 8px 8px 30px rgba(0, 0, 0, .04);
+    --card-background: #ffbeae;
+    /* --dark-text: #e0e0e0; */
+    /* --medium-text: #b0b0b0; */
+    /* --light-text: #888888; */
+    --button-background: #ff9886;
+    /* --button-text-color: #fff; */
+    --body-background: #1a1a2e;
+    --border: 1px solid #3a3a4a;
+    --star-color: red;
+    --search-container-color: #2a2a3e;
+    --card-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.5);
+    --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    --modal-background-color: rgba(0, 0, 0, 0.5);
+    --modal-content-border: 1px solid #555555;
+    --login-border: 1px solid #444444;
+    --login-button-color: #ff988b;
+    --login-hover-color: #f0543f;
+    --form-writing-color: var(--dark-text);
+    --review-rating-place: var(--medium-text);
+    --place-description-color: var(--medium-text);
+    --media-border: 1px solid #444444;
+    --login-shadow-field: 0 0 0 1px #4a4a5a, rgba(0, 0, 0, 0.4);
+}
+
+/* Styles for the icons container */
+#theme-switch {
+    height: 50px;
+    width: 50px;
+    padding: 0;
+    border-radius: 50%;
+    background-color: var(--dark-text);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+}
+
+/* Styles for the color of the icons */
+#theme-switch svg {
+    fill: var(--star-color);
+}
+
+/* Styles that hides the sun icon on light mode */
+#theme-switch svg:last-child {
+    display: none;
+}
+
+/* Styles that hides the moon icon on dark mode */
+.darkmode #theme-switch svg:first-child {
+    display: none;
+}
+
+/* Styles that make the sun icon visible */
+.darkmode #theme-switch svg:last-child {
+    display: block;
+}
+
 
 * {
     box-sizing: border-box;
@@ -27,19 +109,19 @@ html, body {
 }
 
 body {
-    background-color: #f4f4f4;
-    color: #333;
+    background-color: var(--body-background);
+    color: var(--dark-text);
     display: flex;
     flex-direction: column;
 }
 
 header {
-    background-color: #333;
-    color: #fff;
+    background-color: var(--dark-text);
+    color: var(--white);
     padding: 1rem;
     display: flex;
     justify-content: space-between;
-    align-items:flex-end;
+    align-items: flex-end;
 }
 
 .header-nav {
@@ -54,7 +136,7 @@ nav {
 }
 
 nav a {
-    color: #fff;
+    color: var(--white);
     text-decoration: none;
     margin-left: 1rem;
 }
@@ -63,9 +145,9 @@ nav a {
 .login-button, #logout-button {
 	display: inline-block;
 	padding: 0.2rem ;
-	border: 0.2rem solid #333;
+	border: 0.2rem solid var(--dark-text);
 	font-size: 1rem;
-	color: white;
+	color: var(--white);
 	text-decoration: underline;
     background-color: var(--button-background);
     width: fit-content;
@@ -84,14 +166,14 @@ main {
 }
 
 footer {
-    background-color: #333; 
+    background-color: var(--dark-text); 
     height: 60px; 
     width: 100%;
     display:flex;
     flex-direction: column; 
     justify-content: center; 
     align-items: center;
-    color: white;
+    color: var(--white);
 }
 
 /* ##### Styles for the modal pop up #####*/
@@ -106,7 +188,7 @@ footer {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0,0,0,0.7);
+    background-color: var(--modal-background-color);
     justify-content: center;
     align-items: center;
 }
@@ -116,7 +198,7 @@ footer {
     background-color: var(--card-background);
     margin: auto;
     padding: 20px;
-    border: 1px solid #888;
+    border: var(--modal-content-border);
     width: 80%;
     max-width: 600px;
     border-radius: 10px;
@@ -128,8 +210,8 @@ footer {
 /* Styles for the modal header content box */
 #modal-header-content {
     padding: 15px 20px;
-    background: #ffbeae;
-    color: black;
+    background: var(--card-background);
+    color: var(--black);
     border-radius: 10px 10px 0px 0px;
     display: flex;
     justify-content: space-between;
@@ -142,7 +224,7 @@ footer {
     flex-grow: 1;
     overflow-y: auto;
     border: solid 2px;
-    border-color: #ffbeae;
+    border-color: var(--card-background);
 }
 
 #modal-body-content p {
@@ -152,8 +234,8 @@ footer {
 /* Styles for the modal footer content box */
 #modal-footer-content {
     padding: 15px 20px;
-    background-color: #ffbeae;
-    color: black;
+    background-color: var(--card-background);
+    color: var(--black);
     border-radius: 0px 0px 10px 10px;
     display: flex;
     justify-content: center;
