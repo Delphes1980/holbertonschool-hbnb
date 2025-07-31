@@ -131,6 +131,7 @@ function addPlaceDetailsCard(place) {
 
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // darkModeSwitch();
   loginButtonVisibility();
   loginRedirection();
   userReviewForm();

@@ -3,16 +3,17 @@
 	max-width: 450px;
 	margin: 30px auto;
 	padding: 30px;
-	border: 1px solid #dadce0;
+	border: var(--login-border);
 	border-radius: 8px;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	background-color: #fff;
+	box-shadow: var(--card-shadow);
+	background-color: var(--white);
 }
 
 #login-form h2, .login-container {
 	text-align: center;
 	margin-bottom: 30px;
-	color: #333;
+	color: var(--dark-text);
+	background-color: var(--card-background);
 }
 
 /*##### Styles for the fields ##### */
@@ -20,38 +21,38 @@ input[type="email"], input[type="password"] {
 	width: 100%;
 	padding: 10px 10px;
 	margin-bottom: 20px;
-	border: 1px solid #dadce0;
+	border: var(--login-border);
 	border-radius: 4px;
 	box-sizing: border-box;
 	font-size: 16px;
 	line-height: 24px;
-	color: #202124;
-	background-color: #fff;
+	color: var(--form-writing-color);
+	background-color: var(--white);
 	outline: none;
 	transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 input[type="email"]:hover, input[type="password"]:hover {
-	border-color: #f0543f;
+	border-color: var(--login-hover-color);
 }
 
 input[type="email"]:focus, input[type="password"]:focus {
-	border-color: #ff988b;
-	box-shadow: 0 0 0 1px #ff988b, rgba(255, 152, 139, 0.4);
+	border-color: var(--login-button-color);
+	box-shadow: var(--login-shadow-field);
 }
 
 label {
 	display: grid;
 	margin-bottom: 8px;
 	font-size: 14px;
-	color: #5f6368;
+	color: var(--light-text);
 }
 
 /* ##### Styles for the submit button ##### */
 
 button[type="submit"] {
-	background-color: #ff988b;
-	color: white;
+	background-color: var(--login-button-color);
+	color: var(--white);
 	padding: 12px 24px;
 	border: none;
 	border-radius: 4px;
@@ -64,18 +65,18 @@ button[type="submit"] {
 }
 
 button[type="submit"]:hover{
-	background-color: #f0543f;
+	background-color: var(--login-hover-color);
 }
 
 /* ##### Styles for error messages */
-#form-messages {
+/* #form-messages {
 	background-color: rgb(255, 232, 232);
-	border: 1px solid red;
-	color: red;
+	border: 1px solid var(--star-color);
+	color: var(--star-color);
 	display: none;
 	font-size: 12px;
 	font-weight: bold;
 	margin-bottom: 10px;
 	padding: 10px 25px;
 	max-width: 250px;
-} /* gérer le pop up dans la function JS*/
+} */

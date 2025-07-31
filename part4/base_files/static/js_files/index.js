@@ -193,7 +193,9 @@ function placesFilter() {
     displayAllPlaces(filteredPlaces);
 }
 
+
 document.addEventListener('DOMContentLoaded', () => {
+    // darkModeSwitch();
     loginButtonVisibility();
     loginRedirection();
 	checkAuthentication();

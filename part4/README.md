@@ -17,18 +17,25 @@ The goal is to design an interactive user interface connecting with the back-end
 
 ### Objectives
 The main objectives of this part of the project include:
-- Developing a user-friendly interface
-- Implementation of client-side functionality interacting with the back-end
-- Ensuring secure and efficient data handling using JavaScript
-- Creating a dynamic web application
+- Developing a user-friendly interface.
+
+- Implementation of client-side functionality interacting with the back-end.
+
+- Ensuring secure and efficient data handling using JavaScript.
+
+- Creating a dynamic web application.
 
 ### Features
 In addition to the functionalities from Part3, this phase introduces:
-- Creation of Login, List of Places, Place Details and Add Review pages with a design using HTML and CSS files
-- Utilization of cookies to store the token from login function for session management
-- Fetching places data from API and display them based on a price selection. If the user is not authenticated, they are redirected to the login page
-- Fetching places data from API with a specific ID and display the details of the place. If the user is authenticated, they can access to the review form
-- Authenticated users can add a review to a specific place, if they are not authenticated, they are redirected to the login page
+- Creation of Login, List of Places, Place Details and Add Review pages with a design using HTML and CSS files.
+
+- Utilization of cookies to store the token from login function for session management.
+
+- Fetching places data from API and display them based on a price selection. If the user is not authenticated, they are redirected to the login page.
+
+- Fetching places data from API with a specific ID and display the details of the place. If the user is authenticated, they can access to the review form.
+
+- Authenticated users can add a review to a specific place, if they are not authenticated, they are redirected to the login page.
 
 ### Structure
 The project structure evolves to accomodate the new functionalities:
@@ -146,18 +153,22 @@ python run.py
 ```
 
 ### Usage
-After running the application, open your web browser and go to:
+After running the application, open a new terminal and write the following command:
 ```
-http://127.0.0.1:3000/base_files/templates/index.html
+python3 -m http.server 8000
 ```
+and open it to your browser, click on ```base_files/``` and then on ```templates/``` and enjoy the different functionalities .
+
 To login, you can use these various users to leave reviews:
+- john@doe.com
+- jane@doe.com
 - charles@ingalls.com
 - big@daddy.com
 - michael@myers.com
 - carrie@bradshaw.com
 
 All of these users have the same password: ```password```
-**_⚠ WARNING:_** Never put important information like email or password on your README file! These details appear here in order to test the application and its various functionalities.
+**_⚠ WARNING:_** Never put important information like email or password on your README file! These details appear here in order to test the application and its various functionalities.**_⚠ WARNING_**
 
 
 ### Technologies used

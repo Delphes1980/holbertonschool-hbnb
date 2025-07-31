@@ -24,7 +24,7 @@ authorizations = {
 
 def create_app(config_class="config.DevelopmentConfig"):
     app = Flask(__name__)
-    CORS(app, supports_credentials=True, origins=["http://127.0.0.1:3000"])
+    CORS(app)
     app.config.from_object(config_class)
     # app.config['ERROR_INCLUDE_MESSAGE'] = False
     bcrypt.init_app(app)

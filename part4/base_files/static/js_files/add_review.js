@@ -198,6 +198,7 @@ async function fetchAndDisplayPlaces() {
 
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // darkModeSwitch();
     loginButtonVisibility();
     loginRedirection();
     homeRedirection();

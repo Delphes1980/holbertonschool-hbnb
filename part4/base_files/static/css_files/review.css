@@ -12,7 +12,7 @@
 .search-container input[type=text] {
 	flex-grow: 1;
 	padding: 10px;
-	border: 1px solid #ddd;
+	border: var(--border);
 	border-radius: 4px;
 	box-sizing: border-box;
 	height: 40px;
@@ -20,7 +20,7 @@
 
 .search-container button {
 	padding: 10px 15px;
-	background: #ddd;
+	background: var(--search-container-color);
 	color: var(--dark-text);
 	font-size: 17px;
 	border: none;
@@ -45,7 +45,7 @@
 		padding: 14px;
 	}
 	input[type=text] {
-		border: 1px solid #ccc;
+		border: var(--media-border);
 	}
 }
 
@@ -62,7 +62,7 @@
 	color: var(--dark-text);
 	padding: 10px;
 	border-radius: 5px;
-	border: 1px solid #ddd;
+	border: var(--border);
 	outline: none;
 	resize: vertical;
 	margin-bottom: 1rem;
@@ -85,7 +85,7 @@
 }
 
 #review-form .rating .bxs-star {
-	color: red;
+	color: var(--star-color);
 }
 
 /* Styles for the stars animation rating */
@@ -133,13 +133,13 @@
 }
 
 #review-form .btn-group .btn-submit:hover {
-	background: red;
+	background: var(--star-color);
 }
 
 /* Styles for the cancel button on review form*/
 #review-form .btn-group .btn-cancel {
 	background: var(--light);
-	color: red;
+	color: var(--star-color);
 	border-radius: .2rem;
 	margin: 3px;
 	padding: .75rem 1rem;
@@ -157,13 +157,13 @@
 #page-title, #review-place-name {
 	text-align: center;
 	margin-bottom: 30px;
-	color: #333;
+	color: var(--dark-text);
 }
 
 /* Styles for place card on review page */
 #places-list-review .place-card:hover {
 	transform: translateY(-5px); /* Flight effect */
-	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+	box-shadow: var(--card-shadow-hover);
 }
 
 /* Styles for inside the place card on review page */
@@ -177,19 +177,19 @@
 #places-list-review .place-card .place-title {
 	font-size: 1.2em;
 	margin-bottom: 10px;
-	color: #333;
+	color: var(--dark-text);
 }
 
 #places-list-review .place-card .description {
 	font-size: 0.9em;
-	color: #666;
+	color: var(--place-description-color);
 	margin-bottom: 10px;
 	flex-grow: 1;
 }
 
 #places-list-review .place-card .price {
 	font-weight: bold;
-	color: red;
+	color: var(--star-color);
 	margin-top: auto;
 	margin-bottom: 15px;
 }
@@ -209,5 +209,5 @@
 }
 
 #places-list-review .place-card .submit-review-button:hover {
-	background-color: #f0543f;
+	background-color: var(--login-hover-color)
 }

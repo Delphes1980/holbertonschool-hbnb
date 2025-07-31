@@ -23,6 +23,7 @@ const placeImageMapping = {
   '32d5bab8-599f-47ba-a291-03e5cd3795f9': '../images/city_apartment.jpg'
 };
 
+
 // Function to get the image URL of a place
 function getPlaceImage(placeId) {
   return placeImageMapping[placeId] || '../images/no_image.png';
@@ -36,6 +37,31 @@ function getPlaceImage(placeId) {
       }
       document.body.classList.remove('modal-open');
     };
+
+
+// Function to switch into dark mode
+function darkModeSwitch() {
+  const darkmode = localStorage.getItem('darkmode');
+  if (darkmode === 'active') {
+    document.body.classList.add('darkmode');
+  } else {
+    document.body.classList.remove('darkmode');
+    console.log('Classe "darkmode" retirée au chargement de la page');
+  }
+
+  const themeSwitch = document.getElementById('theme-switch');
+  if (themeSwitch) {
+    themeSwitch.addEventListener('click', () => {
+      document.body.classList.toggle('darkmode');
+
+      if (document.body.classList.contains('darkmode')) {
+        localStorage.setItem('darkmode', 'active');
+      } else {
+        localStorage.removeItem('darkmode');
+      }
+    });
+}
+}
 
 
 // Function to redirect the login button to the login page

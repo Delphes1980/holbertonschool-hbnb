@@ -43,6 +43,7 @@ async function loginUser(email, password) {
 
 
 document.addEventListener('DOMContentLoaded', () => {
+	// darkModeSwitch();
 	loginButtonVisibility();
 	homeRedirection();
 
